@@ -10,7 +10,7 @@ $(function(){
 			var isAnonymous = user.isAnonymous;
 			var uid = user.uid;
 			var providerData = user.providerData;
-			$('.footer--p').html(email + ' <a href="#" class="salir">Cerrar sesión</a>')
+			$('.session-status').html(email + ' <a href="#" class="salir">Cerrar sesión</a>')
 			if (!emailVerified) {
 				//document.getElementById('quickstart-verify-email').disabled = false;
 			}
@@ -19,7 +19,7 @@ $(function(){
 			if(location.pathname!='/'){
 				location.href = '/';
 			} else {			
-				$('.footer--p').text("Sin inicio de sesión")
+				$('.session-status').text("Sin inicio de sesión")
 			}
 		}
 	});
