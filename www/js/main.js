@@ -38,7 +38,7 @@ $(function(){
 		var email = $.trim($('#email').val())
 		, pass = $.trim($('#password').val())
 		firebase.auth().signInWithEmailAndPassword(email, pass).then(function(){
-			location.href = email == 'telemagico@gmail.com' ? 'admin.html' : 'user.html';
+			location.href = email == 'telemagico@gmail.com' ? 'admin.html' : 'estadisticas.html';
 		}).catch(function(err) {
 			alert(err.message)
 		})		
