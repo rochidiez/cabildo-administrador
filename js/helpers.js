@@ -8,15 +8,16 @@ var helpers = {
         }
         return url + '&' + name + '=' + value 
     }
-    , getParameterByName : function(name) {
-	  name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-	  var regexS = "[\\?&]"+name+"=([^&#]*)";
-	  var regex = new RegExp( regexS );
-	  var results = regex.exec( window.location.href );
-	  if( results == null )
-	    return "";
-	  else
-	    return decodeURIComponent(results[1].replace(/\+/g, " "));
+    , getParameterByName : function(name, url) {
+	    if (!url) {
+	      url = window.location.href;
+	    }
+	    name = name.replace(/[\[\]]/g, "\\$&");
+	    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+	        results = regex.exec(url);
+	    if (!results) return null;
+	    if (!results[2]) return '';
+	    return decodeURIComponent(results[2].replace(/\+/g, " "));
     }  		
 	, render_tabs : function(a,b,c){
 		firebase.database().ref(a).once('value').then(function(snap) {
