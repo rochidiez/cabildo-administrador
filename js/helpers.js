@@ -19,7 +19,7 @@ var helpers = {
 	    if (!results[2]) return '';
 	    return decodeURIComponent(results[2].replace(/\+/g, " "));
     }  		
-	, render_tabs : function(a,b,c){
+	, render_tabs : function(a,b,c,d){
 		firebase.database().ref(a).once('value').then(function(snapshot) {
 			var tabs = c
 			snapshot.forEach(function(childSnapshot) {
@@ -35,19 +35,23 @@ var helpers = {
 			})
 
 	    	for(var slug in c){
-	    		$('div[data-w-tab="' + slug + '"] .' + a).html($.templates(b).render(tabs[slug]))
+	    		helpers.render_tpl('div[data-w-tab="' + slug + '"] .' + a,b,tabs[slug])
 	    	}
-	    	
+
 	    	setTimeout(function(){
-	    		$('#loading').fadeOut(200)	
+	    		if(typeof d == 'function') d.call(this)
 	    	},200)	    	
 		})
 	}
-	, render_row : function(a,b,c){
+	, render_row : function(a,b,c,d){
+		if(!a) return helpers.render_tpl(b,c,{},d)
 		firebase.database().ref(a).once('value').then(function(snap) {
-	   		$(b).html($.templates(c).render(snap.val())).promise().done(function(){
-	   			$('#loading').fadeOut(200)
-	   		})
+			helpers.render_tpl(b,c,snap.val(),d)
 		})
+	}
+	, render_tpl : function(a,b,c,d) {
+   		$(a).html($.templates(b).render(c)).promise().done(function(){
+   			if(typeof d == 'function') d.call(this)
+   		})
 	}
 }

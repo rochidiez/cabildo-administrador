@@ -11,5 +11,14 @@ $(function(){
 	// modal action
 
 	// bring all and sort.
-	helpers.render_tabs('locales','#locales',{"todos":[],"premium":[],"basico":[],"avenida":[]})
+	helpers.render_tabs('locales','#locales',
+		{
+			"todos":[]
+			,"premium":[]
+			,"basico":[]
+			,"avenida":[]
+		}, function(){
+			$('#loading').fadeOut(200)	
+		}
+	)
 })
