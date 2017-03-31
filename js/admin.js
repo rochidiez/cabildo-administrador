@@ -18,7 +18,7 @@ $(function(){
 			,"basico":[]
 			,"avenida":[]
 		}, function(){
-			$('#loading').fadeOut(200)	
+			//$('#loading').fadeOut(200)	
 		}
 	)
 })

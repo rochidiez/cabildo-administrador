@@ -1,5 +1,5 @@
 #loading{
-	background-color: #374140;
+	background-color: #ffffff;
 	height: 100%;
 	width: 100%;
 	position: fixed;
@@ -24,7 +24,7 @@
 .object{
 	width: 20px;
 	height: 20px;
-	background-color: #FFF;
+	background-color: #d8d2d2;
 	float: left;
 	margin-right: 20px;
 	margin-top: 65px;
