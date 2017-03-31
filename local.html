@@ -69,14 +69,14 @@
       <h3 class="heading">Cargá un nuevo local</h3>
       <div class="section-photos">
         <div class="profile-picture">
-          <a class="link-block w-inline-block" href="#"><img class="foto-perfil" src="images/profile-medidas.png">
+          <a class="link-block w-inline-block" href="#"><img class="foto-perfil" src="{{if ~prop('imagen logo',entry)}}{{:entry['imagen logo']}}{{else}}images/profile-medidas.png{{/if}}">
           </a>
           <div class="button-container"><a class="picture-button w-button" href="#">Subi una foto de perfil</a>
             <p class="picture-span">Subí una imagen en jpg o png de 500px x 500px aprox.</p>
           </div>
         </div>
         <div class="portada">
-          <a class="link-block w-inline-block" href="#"><img class="foto-perfil" src="images/portada-medidas.png">
+          <a class="link-block w-inline-block" href="#"><img class="foto-perfil" src="{{if ~prop('imagen fondo',entry)}}{{:entry['imagen fondo']}}{{else}}images/portada-medidas.png{{/if}}">
           </a>
           <div class="button-container"><a class="picture-button w-button" href="#">Subi una foto de portada</a>
             <p class="picture-span">Subí una imagen en jpg o png de 800px x 458px aprox.</p>
@@ -88,47 +88,29 @@
           <div class="title-section">Información básica</div>
           <div class="w-form">
             <label for="nombre">Nombre del negocio</label>
-            <input class="input w-input" data-name="nombre" id="nombre" maxlength="256" name="nombre" placeholder="Avenida Cabildo" required="required" type="text" value="{{:nombre_simple}}">
+            <input class="input w-input" data-name="nombre" id="nombre" maxlength="256" name="nombre" placeholder="Avenida Cabildo" required="required" type="text" value="{{:~prop('nombre_simple',entry)}}">
             <label for="direcci-n">Dirección</label>
-            <input class="input w-input" data-name="dirección" id="direcci-n" maxlength="256" name="direcci-n" placeholder="Av. Cabildo 1394" required="required" type="text" value="{{:direccion}}">
+            <input class="input w-input" data-name="dirección" id="direcci-n" maxlength="256" name="direcci-n" placeholder="Av. Cabildo 1394" required="required" type="text" value="{{:~prop('direccion',entry)}}">
             <label for="descripci-n">Descripción sobre tu negocio</label>
             <textarea class="input w-input" data-name="descripción" id="descripci-n-2" maxlength="5000" name="descripci-n" placeholder="Toda la AVENIDA en una sola aplicación."></textarea>
             <label for="categoria">Categoría</label>
             <select class="select w-select" data-name="categoria" id="categoria" name="categoria" required="required">
               <option value="">Seleccionar</option>
-              <option value="Animales y mascotas">Animales y mascotas</option>
-              <option value="Arte y entretenimiento">Arte y entretenimiento</option>
-              <option value="Automotores">Automotores</option>
-              <option value="Belleza">Belleza</option>
-              <option value="Deporte y recreación">Deporte y recreación</option>
-              <option value="Electro">Electro</option>
-              <option value="Gasolineras y estaciones de servicio">Gasolineras y estaciones de servicio</option>
-              <option value="Gastronomía">Gastronomía</option>
-              <option value="Hogar">Hogar</option>
-              <option value="Hotel">Hotel</option>
-              <option value="Indumentaria">Indumentaria</option>
-              <option value="Infantiles">Infantiles</option>
-              <option value="Inmobiliaria y administración">Inmobiliaria y administración</option>
-              <option value="Juegos y juguetes">Juegos y juguetes</option>
-              <option value="Librería">Librería</option>
-              <option value="Medicina y salud">Medicina y salud</option>
-              <option value="Salón de fiestas">Salón de fiestas</option>
-              <option value="Tiendas oficiales">Tiendas oficiales</option>
-              <option value="Todos">Todos</option>
-              <option value="Transporte">Transporte</option>
+              {{for ~toArray(extra.categorias.val())}}
+              <option value="{{:key}}"{{if ~root.entry.categoria==key}} selected{{/if}}>{{:key}}</option>
+              {{/for}}
             </select>
             <label for="web">Sitio Web</label>
-            <input class="input w-input" data-name="web" id="web" maxlength="256" name="web" placeholder="avenicacabildo.com.ar" required="required" type="text">
+            <input class="input w-input" data-name="web" id="web" maxlength="256" name="web" placeholder="avenicacabildo.com.ar" required="required" type="text" value="{{:~prop('web',entry)}}">
           </div>
         </div>
         <div class="conteiner-info">
           <div class="title-section">Tu suscripción</div>
           <div class="w-form">
               <label for="nombre-2">Nombre</label>
-              <input class="input w-input" data-name="nombre" id="nombre-2" maxlength="256" name="nombre" placeholder="María Fernanda" type="text">
+              <input class="input w-input" data-name="nombre" id="nombre-2" maxlength="256" name="nombre" placeholder="María Fernanda" type="text"  value="{{:~prop('nombre_suscriptor',entry)}}">
               <label for="email-18">Email</label>
-              <input class="input w-input" data-name="email" id="email-18" maxlength="256" name="email" placeholder="maria@avenidacabildo.com.ar" required="required" type="email">
-
+              <input class="input w-input" data-name="email" id="email-18" maxlength="256" name="email" placeholder="maria@avenidacabildo.com.ar" required="required" type="email" value="{{:~prop('mail_suscriptor',entry)}}">
           </div>
           <div class="plan">Plan Básico</div>
           <div class="plan-span">Para cambiar el plan escribinos a hola@avenidacabildo.com.ar</div>
@@ -145,7 +127,6 @@
               <input class="input w-input" data-name="sabado" id="sabado" maxlength="256" name="sabado" placeholder="Ej: de 9 a 12" type="text">
               <label for="domingo">Domingos</label>
               <input class="input w-input" data-name="domingo" id="domingo" maxlength="256" name="domingo" placeholder="ej: cerrado" type="text">
-
           </div>
         </div>
         <div class="conteiner-info">
@@ -220,13 +201,13 @@
           <div class="title-section">¿Cómo te contactan tus clientes?</div>
           <div class="w-form">
               <label for="telefono">Teléfono</label>
-              <input class="input w-input" data-name="telefono" id="telefono" maxlength="256" name="telefono" placeholder="4544-4674" type="text">
+              <input class="input w-input" data-name="telefono" id="telefono" maxlength="256" name="telefono" placeholder="4544-4674" type="text" value="{{:~prop('telefono',entry)}}">
               <label for="email-clientes">Email</label>
-              <input class="input w-input" data-name="email-clientes" id="email-clientes" maxlength="256" name="email-clientes" placeholder="hola@avenidacabildo.com.ar" type="email">
+              <input class="input w-input" data-name="email-clientes" id="email-clientes" maxlength="256" name="email-clientes" placeholder="hola@avenidacabildo.com.ar" type="email" value="{{:~prop('mail',entry)}}">
               <label for="facebook">Facebook</label>
-              <input class="input w-input" data-name="facebook" id="facebook" maxlength="256" name="facebook" placeholder="www.facebook.com/AvenidaCabildoApp" type="text">
+              <input class="input w-input" data-name="facebook" id="facebook" maxlength="256" name="facebook" placeholder="www.facebook.com/AvenidaCabildoApp" type="text" value="{{:~prop('facebook',entry)}}">
               <label for="instagram">Instagram</label>
-              <input class="input w-input" data-name="instagram" id="instagram" maxlength="256" name="instagram" placeholder="instagram.com/avenidacabildo" type="text">
+              <input class="input w-input" data-name="instagram" id="instagram" maxlength="256" name="instagram" placeholder="instagram.com/avenidacabildo" type="text" value="{{:~prop('instagram',entry)}}">
           </div>
         </div>
         <div class="conteiner-info">
