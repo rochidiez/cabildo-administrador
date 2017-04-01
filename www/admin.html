@@ -11,6 +11,7 @@
   <meta content="summary" name="twitter:card">
   <meta content="WAAWS" name="generator">
   <meta content="width=device-width, initial-scale=1" name="viewport">
+  <link href="css/loader.css" rel="stylesheet" type="text/css">
   <link href="css/normalize.css" rel="stylesheet" type="text/css">
   <link href="css/webflow.css" rel="stylesheet" type="text/css">
   <link href="css/avenida-cabildo-administrador.webflow.css" rel="stylesheet" type="text/css">
@@ -45,6 +46,16 @@
   </script>  
 </head>
 <body>
+  <div id="loading">
+  <div id="loading-center">
+  <div id="loading-center-absolute">
+  <div class="object" id="object_one"></div>
+  <div class="object" id="object_two"></div>
+  <div class="object" id="object_three"></div>
+  </div>
+  </div>
+  </div>
+
   <div class="header">
     <a class="header-brand w-inline-block" href="http://avenidacabildo.com.ar/" target="_blank"><img src="images/AvenidaCabildo.svg">
     </a>
@@ -214,8 +225,8 @@
   <div class="footer-inside">
     <div class="footer--a inside session-status">hola@avenidacabildo.com.ar</div>
   </div>
-
-  <script id="local" type="text/x-jsrender">
+  <!-- begin templates -->
+  <script id="locales" type="text/x-jsrender">
     <div class="td">
       <div class="tr">
         <p>{{:nombre_simple}}</p>
@@ -244,16 +255,18 @@
       <div class="actions tr">
         <div class="table-action ver" data-ix="open-viewlocal">Ver</div>
         <a class="w-inline-block" href="#">
-          <div class="edit table-action">Editar</div>
+          <div class="edit table-action" data-key="{{:key}}">Editar</div>
         </a>
-        <div class="eliminar table-action" data-ix="eliminar-show">Eliminar</div>
+        <div class="eliminar table-action" data-ix="eliminar-show" data-key="{{:key}}">Eliminar</div>
       </div>
     </div>  
   </script>
+  <!-- end templates -->
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js" type="text/javascript"></script>
   <script src="js/webflow.js" type="text/javascript"></script>
   <script src="js/jsrender.min.js"></script>
+  <script src="js/helpers.js"></script>
   <script src="js/main.js"></script>
   <script src="js/admin.js"></script>
 
