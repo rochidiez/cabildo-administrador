@@ -7,7 +7,22 @@
 			}
 		}
 		, tpl : {
-			toArray : function(object){
+			getHorario : function(index,entry){
+				if(!entry) return false
+				var parts = entry.horarios.split("\\n")
+				, parts = entry.horarios.split("\n")
+				, str = ""
+				parts.forEach(function(ln){
+					if(ln.toLowerCase().indexOf(index.toLowerCase())>-1){
+						str = ln.toLowerCase().replace(index.toLowerCase(),"")
+					}
+				})
+				return $.trim(str)
+			}
+			, toHorarios : function(){
+
+			}
+			, toArray : function(object){
 				if(!object) return false
 				var items = []
 				if(!$(object).length) return items;
@@ -18,10 +33,12 @@
 				}
 				return items
 			}
-			, prop : function(a,entry){
-				if(entry && entry[a]) return entry[a]
-				return ""
-			}
+			, prop : function(a,b,c){
+				var d = b
+				if(typeof b=='string') d = c
+				if(d && d[a]) return d[a]
+				return typeof b=='string' ? b : ""
+			} 
 		}
 		, setParameterByName : function(name,value,url){
 	        if(!url) url = window.location.hash.split('#').join('')
@@ -91,7 +108,7 @@
 		}
 		, render_extra_tpl : function(a,b,c,d,e) { // use to parse multiple objects
 	   		$(a).html($.templates(b).render({entry:c,extra:d}, helpers.tpl)).promise().done(function(){
-	   			if(typeof e == 'function') e.call(this)
+	   			if(typeof e == 'function') e.call(this,{entry:c,extra:d})
 	   		})
 		}
 	}

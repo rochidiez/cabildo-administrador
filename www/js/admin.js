@@ -14,9 +14,9 @@ $(function(){
 	helpers.render_tabs('locales','#locales',
 		{
 			"todos":[]
-			,"premium":[]
-			,"basico":[]
-			,"avenida":[]
+			,"Premium":[]
+			,"Básico":[]
+			,"Avenida Cabildo":[]
 		}, function(){
 			$('#loading').fadeOut(200)	
 		}
