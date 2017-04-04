@@ -78,7 +78,7 @@
   {{if user && user.uid == uid}}
     <a class="header-brand w-inline-block" href="http://avenidacabildo.com.ar/" target="_blank"><img src="images/AvenidaCabildo.svg">
     </a>
-    <div class="header-nav"><a class="nav-item" data-section="#nuevolocal" href="#">Agregar nuevo local</a><a class="nav-item" data-section="#locales" href="#">Ver locales</a><a class="nav-item salir" href="#">Cerrar Sesión</a>
+    <div class="header-nav"><a class="nav-item" data-section="#local" href="#">Agregar nuevo local</a><a class="nav-item" data-section="#locales" href="#">Ver locales</a><a class="nav-item salir" href="#">Cerrar Sesión</a>
     </div>
   {{else}}
     <a class="header-brand w-inline-block" href="#"><img src="images/AvenidaCabildo.svg">
@@ -103,8 +103,8 @@
   </script>
 
   <script id="descuento" type="text/x-jsrender">
-    <div class="descuento-cont">
-      <select class="_1 select w-select" data-name="Field 4" id="field-4" name="field-4">
+    <div class="descuento-cont descuentos">
+      <select class="_1 select w-select porcentaje">
         <option value="">Seleccionar</option>
         <option value="5%"{{if #data && #data.indexOf('5%')>-1}} selected{{/if}}>5%</option>
         <option value="10%"{{if #data && #data.indexOf('10%')>-1}} selected{{/if}}>10%</option>
@@ -127,12 +127,13 @@
         <option value="95%"{{if #data && #data.indexOf('95%')>-1}} selected{{/if}}>95%</option>
         <option value="2x1"{{if #data && #data.indexOf('2x1')>-1}} selected{{/if}}>2x1</option>
       </select>
-      <select class="_1 select w-select" data-name="Field 5" id="field-5" name="field-5">
+      <select class="_1 select w-select entidad">
         <option value="">Seleccionar</option>
         <option value="Club La Nación"{{if #data && #data.indexOf('La Nación')>-1}} selected{{/if}}>Club La Nación</option>
         <option value="Clarín 365"{{if #data && #data.indexOf('365')>-1}} selected{{/if}}>Clarín 365</option>
         <option value="Tarjeta Naranja"{{if #data && #data.indexOf('Naranja')>-1}} selected{{/if}}>Tarjeta Naranja</option>
         <option value="Club Personal"{{if #data && #data.indexOf('Personal')>-1}} selected{{/if}}>Club Personal</option>
+        <option value="Tarjeta Shopping"{{if #data && #data.indexOf('Shopping')>-1}} selected{{/if}}>Club Personal</option>
       </select>
       <a class="add-descuento w-inline-block" href="#"><img src="images/add-circle.svg">
       </a>
@@ -140,67 +141,73 @@
   </script>
   
   <script id="horario" type="text/x-jsrender">
-    <div class="descuento-cont">
-      <select class="select select-field-2 w-select" data-name="Dia" id="Dia" name="Dia">
+    <div class="descuento-cont horarios_filtro">
+      <select class="select select-field-2 w-select dia">
         <option value="">Día</option>
-        <option value="Lunes"{{if key=='lunes'}} selected{{/if}}>Lunes</option>
-        <option value="Martes"{{if key=='martes'}} selected{{/if}}>Martes</option>
-        <option value="Miércoles"{{if key=='miercoles'}} selected{{/if}}>Miércoles</option>
-        <option value="Jueves"{{if key=='jueves'}} selected{{/if}}>Jueves</option>
-        <option value="Viernes"{{if key=='viernes'}} selected{{/if}}>Viernes</option>
-        <option value="Sábado"{{if key=='sabado'}} selected{{/if}}>Sábado</option>
-        <option value="Domingo"{{if key=='domingo'}} selected{{/if}}>Domingo</option>
+        <option value="lunes"{{if #data&&key=='lunes'}} selected{{/if}}>Lunes</option>
+        <option value="martes"{{if #data&&key=='martes'}} selected{{/if}}>Martes</option>
+        <option value="miercoles"{{if #data&&key=='miercoles'}} selected{{/if}}>Miércoles</option>
+        <option value="jueves"{{if #data&&key=='jueves'}} selected{{/if}}>Jueves</option>
+        <option value="viernes"{{if #data&&key=='viernes'}} selected{{/if}}>Viernes</option>
+        <option value="sabado"{{if #data&&key=='sabado'}} selected{{/if}}>Sábado</option>
+        <option value="domingo"{{if #data&&key=='domingo'}} selected{{/if}}>Domingo</option>
       </select>
-      <select class="select select-field w-select" id="field-2" name="field-2">
+      <select class="select select-field w-select abre">
         <option value="">Horario</option>
-        <option value="7"{{if abre=='7'}} selected{{/if}}>7</option>
-        <option value="8"{{if abre=='8'}} selected{{/if}}>8</option>
-        <option value="9"{{if abre=='9'}} selected{{/if}}>9</option>
-        <option value="10"{{if abre=='10'}} selected{{/if}}>10</option>
-        <option value="11"{{if abre=='11'}} selected{{/if}}>11</option>
-        <option value="12"{{if abre=='12'}} selected{{/if}}>12</option>
-        <option value="13"{{if abre=='13'}} selected{{/if}}>13</option>
-        <option value="14"{{if abre=='14'}} selected{{/if}}>14</option>
-        <option value="15"{{if abre=='15'}} selected{{/if}}>15</option>
-        <option value="16"{{if abre=='16'}} selected{{/if}}>16</option>
-        <option value="17"{{if abre=='17'}} selected{{/if}}>17</option>
-        <option value="18"{{if abre=='18'}} selected{{/if}}>18</option>
-        <option value="19"{{if abre=='19'}} selected{{/if}}>19</option>
-        <option value="20"{{if abre=='20'}} selected{{/if}}>20</option>
-        <option value="21"{{if abre=='21'}} selected{{/if}}>21</option>
-        <option value="22"{{if abre=='22'}} selected{{/if}}>22</option>
-        <option value="23"{{if abre=='23'}} selected{{/if}}>23</option>
-        <option value="24"{{if abre=='24'}} selected{{/if}}>24</option>
+        <option value="7"{{if #data&&abre=='7'}} selected{{/if}}>7</option>
+        <option value="8"{{if #data&&abre=='8'}} selected{{/if}}>8</option>
+        <option value="9"{{if #data&&abre=='9'}} selected{{/if}}>9</option>
+        <option value="10"{{if #data&&abre=='10'}} selected{{/if}}>10</option>
+        <option value="11"{{if #data&&abre=='11'}} selected{{/if}}>11</option>
+        <option value="12"{{if #data&&abre=='12'}} selected{{/if}}>12</option>
+        <option value="13"{{if #data&&abre=='13'}} selected{{/if}}>13</option>
+        <option value="14"{{if #data&&abre=='14'}} selected{{/if}}>14</option>
+        <option value="15"{{if #data&&abre=='15'}} selected{{/if}}>15</option>
+        <option value="16"{{if #data&&abre=='16'}} selected{{/if}}>16</option>
+        <option value="17"{{if #data&&abre=='17'}} selected{{/if}}>17</option>
+        <option value="18"{{if #data&&abre=='18'}} selected{{/if}}>18</option>
+        <option value="19"{{if #data&&abre=='19'}} selected{{/if}}>19</option>
+        <option value="20"{{if #data&&abre=='20'}} selected{{/if}}>20</option>
+        <option value="21"{{if #data&&abre=='21'}} selected{{/if}}>21</option>
+        <option value="22"{{if #data&&abre=='22'}} selected{{/if}}>22</option>
+        <option value="23"{{if #data&&abre=='23'}} selected{{/if}}>23</option>
+        <option value="24"{{if #data&&abre=='24'}} selected{{/if}}>24</option>
       </select>
-      <select class="select select-field w-select" data-name="Field 8" id="field-8" name="field-8">
+      <select class="select select-field w-select cierra">
         <option value="">Horario</option>
-        <option value="7"{{if cierra=='7'}} selected{{/if}}>7</option>
-        <option value="8"{{if cierra=='8'}} selected{{/if}}>8</option>
-        <option value="9"{{if cierra=='9'}} selected{{/if}}>9</option>
-        <option value="10"{{if cierra=='10'}} selected{{/if}}>10</option>
-        <option value="11"{{if cierra=='11'}} selected{{/if}}>11</option>
-        <option value="12"{{if cierra=='12'}} selected{{/if}}>12</option>
-        <option value="13"{{if cierra=='13'}} selected{{/if}}>13</option>
-        <option value="14"{{if cierra=='14'}} selected{{/if}}>14</option>
-        <option value="15"{{if cierra=='15'}} selected{{/if}}>15</option>
-        <option value="16"{{if cierra=='16'}} selected{{/if}}>16</option>
-        <option value="17"{{if cierra=='17'}} selected{{/if}}>17</option>
-        <option value="18"{{if cierra=='18'}} selected{{/if}}>18</option>
-        <option value="19"{{if cierra=='19'}} selected{{/if}}>19</option>
-        <option value="20"{{if cierra=='20'}} selected{{/if}}>20</option>
-        <option value="21"{{if cierra=='21'}} selected{{/if}}>21</option>
-        <option value="22"{{if cierra=='22'}} selected{{/if}}>22</option>
-        <option value="23"{{if cierra=='23'}} selected{{/if}}>23</option>
-        <option value="24"{{if cierra=='24'}} selected{{/if}}>24</option>
+        <option value="7"{{if #data&&cierra=='7'}} selected{{/if}}>7</option>
+        <option value="8"{{if #data&&cierra=='8'}} selected{{/if}}>8</option>
+        <option value="9"{{if #data&&cierra=='9'}} selected{{/if}}>9</option>
+        <option value="10"{{if #data&&cierra=='10'}} selected{{/if}}>10</option>
+        <option value="11"{{if #data&&cierra=='11'}} selected{{/if}}>11</option>
+        <option value="12"{{if #data&&cierra=='12'}} selected{{/if}}>12</option>
+        <option value="13"{{if #data&&cierra=='13'}} selected{{/if}}>13</option>
+        <option value="14"{{if #data&&cierra=='14'}} selected{{/if}}>14</option>
+        <option value="15"{{if #data&&cierra=='15'}} selected{{/if}}>15</option>
+        <option value="16"{{if #data&&cierra=='16'}} selected{{/if}}>16</option>
+        <option value="17"{{if #data&&cierra=='17'}} selected{{/if}}>17</option>
+        <option value="18"{{if #data&&cierra=='18'}} selected{{/if}}>18</option>
+        <option value="19"{{if #data&&cierra=='19'}} selected{{/if}}>19</option>
+        <option value="20"{{if #data&&cierra=='20'}} selected{{/if}}>20</option>
+        <option value="21"{{if #data&&cierra=='21'}} selected{{/if}}>21</option>
+        <option value="22"{{if #data&&cierra=='22'}} selected{{/if}}>22</option>
+        <option value="23"{{if #data&&cierra=='23'}} selected{{/if}}>23</option>
+        <option value="24"{{if #data&&cierra=='24'}} selected{{/if}}>24</option>
       </select>
     </div>
   </script>
 
   <script id="local" type="text/x-jsrender">
     <div class="container">
+      <input type="hidden" name="key" value="{{:extra.key}}" />
 
-    {{if entry}}
-      <h3 class="heading"> {{:~prop('nombre_simple',entry)}} </h3>
+    {{if extra.key}}
+      <input type="hidden" name="visibilidad" value="{{:~prop('visibilidad',entry)}}" />
+      <input type="hidden" name="plan" value="{{:~prop('plan',entry)}}" />
+      <input type="hidden" name="ubicacion" value="{{:~prop('ubicacion',entry)}}" />
+      <input type="hidden" name="en_promocion" value="{{:entry['en promocion']}}" />
+
+      <h3 class="heading"> {{:~prop('nombre_simple',entry)}}</h3>
     {{else}}
       <h3 class="heading">Cargá un nuevo local</h3>
     {{/if}}
@@ -214,14 +221,14 @@
 
       <div class="publish__uploadimages--preview section-photos">
         <div class="profile-picture">
-          <a class="link-block w-inline-block" href="#"><img class="foto-perfil" src="{{if ~prop('imagen logo',entry)}}{{:entry['imagen logo']}}{{else}}images/profile-medidas.png{{/if}}">
+          <a class="link-block w-inline-block" href="#"><img class="foto-perfil imagen_logo" src="{{if ~prop('imagen logo',entry)}}{{:entry['imagen logo']}}{{else}}images/profile-medidas.png{{/if}}">
           </a>
           <div class="button-container"><a class="picture-button w-button" data-name="imagen_logo" href="#">Subi una foto de perfil</a>
             <p class="picture-span">Subí una imagen en jpg o png de 500px x 500px aprox.</p>
           </div>
         </div>
         <div class="portada">
-          <a class="link-block w-inline-block" href="#"><img class="foto-perfil" src="{{if ~prop('imagen fondo',entry)}}{{:entry['imagen fondo']}}{{else}}images/portada-medidas.png{{/if}}">
+          <a class="link-block w-inline-block" href="#"><img class="foto-perfil imagen_fondo" src="{{if ~prop('imagen fondo',entry)}}{{:entry['imagen fondo']}}{{else}}images/portada-medidas.png{{/if}}">
           </a>
           <div class="button-container"><a class="picture-button w-button" data-name="imagen_fondo" href="#">Subi una foto de portada</a>
             <p class="picture-span">Subí una imagen en jpg o png de 800px x 458px aprox.</p>
@@ -233,29 +240,29 @@
           <div class="title-section">Información básica</div>
           <div class="w-form">
             <label for="nombre">Nombre del negocio</label>
-            <input class="input w-input" data-name="nombre" id="nombre" maxlength="256" name="nombre" placeholder="Avenida Cabildo" required="required" type="text" value="{{:~prop('nombre_simple',entry)}}">
+            <input class="input w-input" maxlength="256" name="nombre_simple" placeholder="Avenida Cabildo" required="required" type="text" value="{{:~prop('nombre_simple',entry)}}">
             <label for="direcci-n">Dirección</label>
-            <input class="input w-input" data-name="dirección" id="direcci-n" maxlength="256" name="direcci-n" placeholder="Av. Cabildo 1394" required="required" type="text" value="{{:~prop('direccion',entry)}}">
+            <input class="input w-input" maxlength="256" name="direccion" placeholder="Av. Cabildo 1394" required="required" type="text" value="{{:~prop('direccion',entry)}}">
             <label for="descripci-n">Descripción sobre tu negocio</label>
-            <textarea class="input w-input" data-name="descripción" id="descripci-n-2" maxlength="5000" name="descripci-n" placeholder="Toda la AVENIDA en una sola aplicación."></textarea>
+            <textarea class="input w-input" maxlength="5000" name="descripcion" placeholder="Toda la AVENIDA en una sola aplicación.">{{:~prop('descripcion',entry)}}</textarea>
             <label for="categoria">Categoría</label>
-            <select class="select w-select" data-name="categoria" id="categoria" name="categoria" required="required">
+            <select class="select w-select" name="categoria" required="required">
               <option value="">Seleccionar</option>
               {{for ~toArray(extra.categorias.val())}}
               <option value="{{:key}}"{{if ~root.entry.categoria==key}} selected{{/if}}>{{:key}}</option>
               {{/for}}
             </select>
             <label for="web">Sitio Web</label>
-            <input class="input w-input" data-name="web" id="web" maxlength="256" name="web" placeholder="avenicacabildo.com.ar" required="required" type="text" value="{{:~prop('web',entry)}}">
+            <input class="input w-input" maxlength="256" name="web" placeholder="avenicacabildo.com.ar" required="required" type="text" value="{{:~prop('web',entry)}}">
           </div>
         </div>
         <div class="conteiner-info">
           <div class="title-section">Tu suscripción</div>
           <div class="w-form">
               <label for="nombre-2">Nombre</label>
-              <input class="input w-input" data-name="nombre" id="nombre-2" maxlength="256" name="nombre" placeholder="María Fernanda" type="text"  value="{{:~prop('nombre_suscriptor',entry)}}">
+              <input class="input w-input" data-name="nombre" name="nombre_suscriptor" placeholder="María Fernanda" type="text"  value="{{:~prop('nombre_suscriptor',entry)}}">
               <label for="email-18">Email</label>
-              <input class="input w-input" data-name="email" id="email-18" maxlength="256" name="email" placeholder="maria@avenidacabildo.com.ar" required="required" type="email" value="{{:~prop('mail_suscriptor',entry)}}">
+              <input class="input w-input" maxlength="256" name="mail_suscriptor" placeholder="maria@avenidacabildo.com.ar" required="required" type="email" value="{{:~prop('mail_suscriptor',entry)}}">
           </div>
           <div class="plan">{{:~prop('plan','Plan Básico',entry)}}</div>
           <div class="plan-span">Para cambiar el plan escribinos a hola@avenidacabildo.com.ar</div>
@@ -276,11 +283,11 @@
           <div class="title-section">Horarios</div>
           <div class="w-form">
               <label for="de-lunes-a-viernes">Lunes a viernes</label>
-              <input class="input w-input" data-name="de lunes a viernes" id="de-lunes-a-viernes" maxlength="256" name="de-lunes-a-viernes" placeholder="Ej: de 9 a 22hs" required="required" type="text" value="{{:~getHorario('Lunes a viernes',entry)}}">
+              <input class="input w-input" maxlength="256" name="de-lunes-a-viernes" placeholder="Ej: de 9 a 22hs" required="required" type="text" value="{{:~getHorario('Lunes a viernes',entry)}}">
               <label for="sabado">Sábados</label>
-              <input class="input w-input" data-name="sabado" id="sabado" maxlength="256" name="sabado" placeholder="Ej: de 9 a 12" type="text" value="{{:~getHorario('Sábados',entry)}}">
+              <input class="input w-input" maxlength="256" name="sabado" placeholder="Ej: de 9 a 12" type="text" value="{{:~getHorario('Sábados',entry)}}">
               <label for="domingo">Domingos</label>
-              <input class="input w-input" data-name="domingo" id="domingo" maxlength="256" name="domingo" placeholder="ej: cerrado" type="text" value="{{:~getHorario('Feriados',entry)}}">
+              <input class="input w-input" maxlength="256" name="feriados" placeholder="ej: cerrado" type="text" value="{{:~getHorario('Feriados',entry)}}">
           </div>
         </div>
         <div class="conteiner-info">
@@ -304,26 +311,27 @@
           <div class="title-section">¿Cómo te contactan tus clientes?</div>
           <div class="w-form">
               <label for="telefono">Teléfono</label>
-              <input class="input w-input" data-name="telefono" id="telefono" maxlength="256" name="telefono" placeholder="4544-4674" type="text" value="{{:~prop('telefono',entry)}}">
+              <input class="input w-input" maxlength="256" name="telefono" placeholder="4544-4674" type="text" value="{{:~prop('telefono',entry)}}">
               <label for="email-clientes">Email</label>
-              <input class="input w-input" data-name="email-clientes" id="email-clientes" maxlength="256" name="email-clientes" placeholder="hola@avenidacabildo.com.ar" type="email" value="{{:~prop('mail',entry)}}">
+              <input class="input w-input" maxlength="256" name="mail" placeholder="hola@avenidacabildo.com.ar" type="email" value="{{:~prop('mail',entry)}}">
               <label for="facebook">Facebook</label>
-              <input class="input w-input" data-name="facebook" id="facebook" maxlength="256" name="facebook" placeholder="www.facebook.com/AvenidaCabildoApp" type="text" value="{{:~prop('facebook',entry)}}">
+              <input class="input w-input" maxlength="256" name="facebook" placeholder="www.facebook.com/AvenidaCabildoApp" type="text" value="{{:~prop('facebook',entry)}}">
               <label for="instagram">Instagram</label>
-              <input class="input w-input" data-name="instagram" id="instagram" maxlength="256" name="instagram" placeholder="instagram.com/avenidacabildo" type="text" value="{{:~prop('instagram',entry)}}">
+              <input class="input w-input" maxlength="256" name="instagram" placeholder="instagram.com/avenidacabildo" type="text" value="{{:~prop('instagram',entry)}}">
           </div>
         </div>
         <div class="conteiner-info">
           <div class="title-section">Descuentos</div>
           <div class="w-form">
             <label for="descuento-av">Para quienes usen Avenida Cabildo</label>
-            <input class="input w-input" data-name="descuento-av" id="descuento-av" maxlength="256" name="descuento-av" placeholder="20%" type="text" value="{{:~prop('efectivo',entry)}}">
+            <input class="input w-input" maxlength="256" name="descuento_av" placeholder="20%" type="text" value="{{:~prop('descuento_av',entry)}}">
             <label for="email-13">Descuento con tarjetas</label>
+
             <div class="descuento--container">
             </div>
 
             <div class="descuento-cont">
-              <select class="_1 select w-select" data-name="Field 6" id="field-6" name="field-6">
+              <select class="_1 select w-select" name="field-6">
                 <option value="">Seleccionar</option>
                 <option value="5%">5%</option>
                 <option value="10%">10%</option>
@@ -350,7 +358,7 @@
             </div>
           </div>
         </div>
-      </div><a class="save submit-button w-button" href="#">{{if entry}}Actualizar {{:~prop('nombre_simple',entry)}}{{else}}Cargar nuevo local{{/if}}</a>
+      </div><a class="save submit-button w-button" href="#">{{if extra.key}}Actualizar {{:~prop('nombre_simple',entry)}}{{else}}Cargar nuevo local{{/if}}</a>
     </div>
   </script>
 
@@ -509,7 +517,7 @@
       <div class="pago tr">
         <p class="enfecha">
         {{if pagos && pagos.p1}}
-          {{:pagos.p1.fecha}}
+          {{:~toDate(pagos.p1.fecha,'MM/DD')}}
         {{else}}
           &mdash;
         {{/if}}
@@ -621,6 +629,7 @@
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js" type="text/javascript"></script>
   <script src="js/webflow.js" type="text/javascript"></script>
+  <script src="js/moment.js" type="text/javascript"></script>
   <script src="js/jsrender.min.js"></script>
   <script src="js/main.js"></script>
 

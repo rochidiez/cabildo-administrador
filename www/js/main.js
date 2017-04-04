@@ -21,33 +21,18 @@ $(function(){
 				$('#loading').fadeOut(200)
 			})
 		}
-		, nuevolocal : function(){
-			var position = 0
-			helpers.firebase_once('categorias', function(categorias){ 
-				helpers.render_row(null,'.content', '#local', {categorias: categorias}, function(res){
-					$('.horarios--container').html($.templates('#horario').render(helpers.tpl.toArray(res.entry['horarios para filtro']))).promise().done(function(){
-						$('.descuento--container').html($.templates('#descuento').render(res.entry.descuentos)).promise().done(function(){
-							if($('.horarios--container').children().length > 6){
-								$('.add-time').addClass('w-hidden')
-							}
-							$('#loading').fadeOut(200)
-						})
-					})			
-				})
-			})			
-		}
 		, local : function(){
 			var position = 0
+			, key = helpers.getParameterByName('key')
 
 			if(settings.user.uid==settings.admin.uid){
-				var key = helpers.getParameterByName('key')
-				, edit = key ? 'locales/' + key : null
+				key = key ? 'locales/' + key : null
 			} else {
-				edit = 'locales/' + settings.user.displayName
+				key = 'locales/' + settings.user.displayName
 			}
 
 			helpers.firebase_once('categorias', function(categorias){ 
-				helpers.render_row(edit,'.content', '#local', {categorias: categorias}, function(res){
+				helpers.render_row(key,'.content', '#local', {categorias: categorias, key : key}, function(res){
 					$('.horarios--container').html($.templates('#horario').render(helpers.tpl.toArray(res.entry['horarios para filtro']))).promise().done(function(){
 						$('.descuento--container').html($.templates('#descuento').render(res.entry.descuentos)).promise().done(function(){
 							if($('.horarios--container').children().length > 6){
@@ -64,17 +49,15 @@ $(function(){
 			// bring all and sort.
 			
 			helpers.render_tpl('.content','#locales',{}, function(){
-				helpers.render_tabs('locales','#listadolocales',
-					{
-						"todos":[]
-						,"Premium":[]
-						,"Básico":[]
-						,"Avenida Cabildo":[]
-					}, function(){
-						helpers.tpl.resetWebflow()
-						$('#loading').fadeOut(200)	
-					}
-				)
+				helpers.render_tabs('locales','#listadolocales',{
+					"todos":[]
+					,"Premium":[]
+					,"Básico":[]
+					,"Avenida Cabildo":[]
+				}, function(){
+					helpers.tpl.resetWebflow()
+					$('#loading').fadeOut(200)	
+				})
 			})
 		}
 	}
@@ -118,8 +101,11 @@ $(function(){
 			}
 		}
 		, tpl : {
-			resetWebflow : function(){
-				if(typeof Webflow == undefined) return false;
+			toDate : function(date,format){
+				return moment(date).format(format||'DD/MM/YY')
+			}
+			, resetWebflow : function(){
+				if(typeof Webflow == undefined) return false
 				Webflow.require("tabs").ready()
 				Webflow.require('ix').init([
 				  {"slug":"close-viewlocal","name":"close-viewlocal","value":{"style":{},"triggers":[{"type":"click","selector":".viewlocal","stepsA":[{"display":"none","opacity":0,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
@@ -129,15 +115,23 @@ $(function(){
 				])
 			}
 			, getHorario : function(index,entry){
-				if(!entry || !entry.horarios) return false
-				var parts = entry.horarios.split("\\n")
-				, parts = entry.horarios.split("\n")
+				if(!entry || !entry.horarios) return ""
+
+				var parts = []
 				, str = ""
+
+				if(entry.horarios.indexOf("\\n")>-1)
+					parts = entry.horarios.split("\\n")
+				else if(entry.horarios.indexOf("\n")>-1)
+					parts = entry.horarios.split("\n")
+				
 				parts.forEach(function(ln){
-					if(ln.toLowerCase().indexOf(index.toLowerCase())>-1){
-						str = ln.toLowerCase().replace(index.toLowerCase(),"")
+					ln = ln.toLowerCase()
+					if(ln.indexOf(index.toLowerCase())>-1){
+						str = ln.replace(index.toLowerCase(),"")
 					}
 				})
+
 				return $.trim(str)
 			}
 			, toHorarios : function(){
@@ -213,7 +207,7 @@ $(function(){
 			})
 		}
 		, render_row : function(a,b,c,d,e){
-			if(!a) return helpers.render_extra_tpl(b,c,{},d,e)//helpers.render_tpl(b,c,{},e)
+			if(!a) return helpers.render_extra_tpl(b,c,{},d,e)
 			helpers.firebase_once(a, function(snapshot){
 				if($(d).length){
 					helpers.render_extra_tpl(b,c,snapshot.val(),d,e)
@@ -285,6 +279,98 @@ $(function(){
 	// ~local
 	// pagos
 
+	$(document).on('click','.save',function(){
+
+		console.log("save")
+		// uploads
+
+		var key = $('input[name="key"]').val()?$('input[name=key]').val():'locales/'+$('input[name=nombre_simple]').val()
+		, horarios = "Lunes a Viernes " + $('input[name=de-lunes-a-viernes]').val() + " \nSábados " + $('input[name=sabado]').val()  + " \nFeriados " + $('input[name=feriados]').val()
+		, horarios_filtro = {}
+		, descuentos = []
+
+
+		$('.horarios_filtro').each(function() {
+			var dia = $(this).find('.dia').val()
+			, abre = $(this).find('.abre').val()
+			, cierra = $(this).find('.cierra').val()
+
+			if(dia!="" && abre!="" && cierra!=""){
+				horarios_filtro[dia] = {
+					abre: abre
+					, cierra : cierra
+				}
+			}
+		})
+
+		$('.descuentos').each(function() {
+			var porcentaje = $(this).find('.porcentaje').val()
+			, entidad = $(this).find('.entidad').val()
+
+			if(porcentaje!="" && entidad!=""){
+				descuentos.push(porcentaje + ' con ' + entidad)
+			}
+		})
+
+
+		$('#loader').fadeIn()
+		firebase.database().ref(key).set({
+			nombre_simple: $('input[name=nombre_simple]').val()||""
+			, direccion : $('input[name=direccion]').val()||""
+			, descripcion : $('textarea[name=descripcion]').val()||""
+			, categoria : $('select[name=categoria]').val()||""
+			, web : $('input[name=web]').val()||""
+			, nombre_suscriptor : $('input[name=nombre_suscriptor]').val()||""
+			, mail_suscriptor : $('input[name=mail_suscriptor]').val()||""
+			, telefono : $('input[name=telefono]').val()||""
+			, mail_suscriptor : $('input[name=mail_suscriptor]').val()||""
+			, mail : $('input[name=mail]').val()||""
+			, facebook : $('input[name=facebook]').val()||""
+			, instagram : $('input[name=instagram]').val()||""
+			, descuento_av : $('input[name=descuento_av]').val()||""
+			, descuentos : descuentos
+			, 'horarios' : horarios
+			, 'horarios para filtro' : horarios_filtro
+			, 'imagen logo' : $('.imagen_logo').attr('src')||""
+			, 'imagen fondo' : $('.imagen_fondo').attr('src')||""
+			, visibilidad : $('input[name=visibilidad]').val()||""
+			, plan : $('input[name=plan]').val()||""
+			, ubicacion : $('input[name=ubicacion]').val()||""
+			, 'en promocion' : $('input[name=en_promocion]').val()||""
+		})
+		.then(function(a){
+			$('#loader').fadeOut()
+		})
+		.catch(function(a){
+			$('#loader').fadeOut()
+		})
+
+		// uploads
+
+
+		$('.photo').each(function(){
+			if($(this).get(0).files.length){
+				var name = $(this).attr('name')
+				, file = $(this).get(0).files[0]
+				, metadata = {
+					customMetadata : {
+						'name' : name
+						, 'key' : key
+					}
+				}
+
+				$('#upload').fadeIn()
+				firebase.storage().ref().child('images/' + file.name).put(file,metadata).then(function(snapshot){
+					var i = snapshot.metadata.customMetadata.name.replace('_',' ')
+					, value = snapshot.downloadURL
+
+					firebase.database().ref(key + '/' + i).set(value)
+					$('#upload').fadeOut()
+				})
+			}
+		})		
+	})
+
 	$(document).on('click','.pago-btn.open',function(e) {
 		$(this).toggle()
 		$('.proximo-pago-input').slideToggle()
@@ -299,8 +385,8 @@ $(function(){
 	// horarios
 
 	$(document).on('click','.add-descuento',function(e) {
-		if($('.horarios--container').children().length < 7){
-			$('.horarios--container').append($.templates('#horario').render())
+		if($('.descuento--container').children().length < 99){
+			$('.descuento--container').append($.templates('#descuento').render())
 		}
 		e.preventDefault()
 	})
@@ -344,7 +430,7 @@ $(function(){
 	    $('.publish__uploadimages--info').text("Iniciando carga de fotos...");
 
 	    // Upload file and metadata to the object 'images/mountains.jpg'
-		var uploadTask = storageRef.child('images/' + file.name).put(file, metadata);
+		var uploadTask = storageRef.child('images/' + file.name).put(file);
 
 		// Listen for state changes, errors, and completion of the upload.
 		uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
@@ -376,6 +462,7 @@ $(function(){
 				}
 			}, function() {
 				// Upload completed successfully, now we can get the download URL
+				console.log("proceed to save " + uploadTask.snapshot)
 				console.log("proceed to save " + uploadTask.snapshot.downloadURL)
 				var downloadURL = uploadTask.snapshot.downloadURL;
 			});
@@ -397,11 +484,12 @@ $(function(){
 		}
 
 		helpers.updateHeader()
+		$(window).trigger('hashchange')
 	})
 
     $(window).on('hashchange', function(){
     	helpers.views.render()
-    }).trigger('hashchange')
+    })
 })
 
 /*
