@@ -169,6 +169,7 @@ label {
   display: flex;
   padding-top: 10px;
   padding-left: 10px;
+  min-height: 56px;
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   -ms-flex-pack: justify;

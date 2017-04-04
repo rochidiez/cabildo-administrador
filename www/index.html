@@ -4,11 +4,12 @@
 <html data-wf-page="58d4141143c5fd5a630968a2" data-wf-site="58d4141143c5fd5a630968a1">
 <head>
   <meta charset="utf-8">
-  <title>Avenida Cabildo :: Administrador</title>
+  <title>Avenida Cabildo :: locales</title>
   <meta content="Administra la información de tu local para mejorar las visitas a tu local!" name="description">
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <link href="css/normalize.css" rel="stylesheet" type="text/css">
   <link href="css/webflow.css" rel="stylesheet" type="text/css">
+  <link href="css/loader.css" rel="stylesheet" type="text/css">
   <link href="css/avenida-cabildo-administrador.webflow.css" rel="stylesheet" type="text/css">
   <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js"></script>
   <script type="text/javascript">
@@ -34,29 +35,590 @@
     firebase.initializeApp(config);
   </script>  
 </head>
-<body class="login-body">
-  <div class="login-section"><img class="login--img" src="images/AvenidaCabildoBlanco.svg">
-    <div class="login-conteiner">
-      <h3 class="login-title">Iniciar sesión</h3>
-      <div class="w-form">
-        <form data-name="login" id="wf-form-login" name="wf-form-login">
-          <label for="email">Email</label>
-          <input class="input w-input" data-name="email" id="email" maxlength="256" name="email" placeholder="Ej: Alejandro@avenidacabildo.com.ar" type="email">
-          <label for="password">Contraseña</label>
-          <input class="input w-input" data-name="Contraseña" id="password" maxlength="256" name="Contrase-a" placeholder="Tu contraseña" type="password"><a class="login--link" href="recuperarpass.html">¿No te acordás tu contraseña?</a>
-        </form>
+<body>
+  <div id="loading">
+    <div id="loading-center">
+      <div id="loading-center-absolute">
+        <div class="object" id="object_one"></div>
+        <div class="object" id="object_two"></div>
+        <div class="object" id="object_three"></div>
+      </div>
+    </div>
+  </div>
 
-        <div class="error-message w-form-fail">
-          <div>Ui, tu email y contraseña no coinciden.</div>
+  <div class="header"></div>
+
+  <div class="content"></div>
+
+  <div class="footer--container"></div>
+
+  <!-- begin templates -->
+  
+  <script id="index" type="text/x-jsrender">
+    <div class="login-section"><img class="login--img" src="images/AvenidaCabildoBlanco.svg">
+      <div class="login-conteiner">
+        <h3 class="login-title">Iniciar sesión</h3>
+        <div class="w-form">
+          <form data-name="login" id="wf-form-login" name="wf-form-login">
+            <label for="email">Email</label>
+            <input class="input w-input" data-name="email" id="email" maxlength="256" name="email" placeholder="Ej: Alejandro@avenidacabildo.com.ar" type="email">
+            <label for="password">Contraseña</label>
+            <input class="input w-input" data-name="Contraseña" id="password" maxlength="256" name="Contrase-a" placeholder="Tu contraseña" type="password"><a class="login--link" href="recuperarpass.html">¿No te acordás tu contraseña?</a>
+          </form>
+
+          <div class="error-message w-form-fail">
+            <div>Ui, tu email y contraseña no coinciden.</div>
+          </div>
+        </div><a class="submit-button login w-button" href="#">Continuar</a>
+      </div>
+    </div>
+  </script>
+
+  <script id="header" type="text/x-jsrender">
+  {{if user && user.uid == uid}}
+    <a class="header-brand w-inline-block" href="http://avenidacabildo.com.ar/" target="_blank"><img src="images/AvenidaCabildo.svg">
+    </a>
+    <div class="header-nav"><a class="nav-item" data-section="#nuevolocal" href="#">Agregar nuevo local</a><a class="nav-item" data-section="#locales" href="#">Ver locales</a><a class="nav-item salir" href="#">Cerrar Sesión</a>
+    </div>
+  {{else}}
+    <a class="header-brand w-inline-block" href="#"><img src="images/AvenidaCabildo.svg">
+    </a>
+    <div class="header-nav"><a class="nav-item" data-section="#local" href="#">Tu negocio</a><a class="nav-item" data-section="#estadisticas" href="#">Estádisticas</a><a class="nav-item salir" href="#">Cerrar sesión</a>
+    </div>  
+  {{/if}}
+  </script>
+
+  <script id="footer" type="text/x-jsrender">
+  {{if user && user.uid}}
+    <div class="footer-inside">
+      <div class="footer--a inside session-status"></div>
+    </div>
+  {{else}}
+    <div class="footer">
+      <div><a href="http://avenidacabildo.com.ar/terminos-y-condiciones-para-comercio.html" target="_blank" class="footer--a">Términos y condiciones</a>
+      </div>
+      <p class="footer--p session-status">Sin inicio de sesión</p>
+    </div>
+  {{/if}}
+  </script>
+
+  <script id="descuento" type="text/x-jsrender">
+    <div class="descuento-cont">
+      <select class="_1 select w-select" data-name="Field 4" id="field-4" name="field-4">
+        <option value="">Seleccionar</option>
+        <option value="5%"{{if #data && #data.indexOf('5%')>-1}} selected{{/if}}>5%</option>
+        <option value="10%"{{if #data && #data.indexOf('10%')>-1}} selected{{/if}}>10%</option>
+        <option value="15%"{{if #data && #data.indexOf('15%')>-1}} selected{{/if}}>15%</option>
+        <option value="20%"{{if #data && #data.indexOf('20%')>-1}} selected{{/if}}>20%</option>
+        <option value="25%"{{if #data && #data.indexOf('25%')>-1}} selected{{/if}}>25%</option>
+        <option value="30%"{{if #data && #data.indexOf('30%')>-1}} selected{{/if}}>30%</option>
+        <option value="35%"{{if #data && #data.indexOf('35%')>-1}} selected{{/if}}>35%</option>
+        <option value="40%"{{if #data && #data.indexOf('40%')>-1}} selected{{/if}}>40%</option>
+        <option value="45%"{{if #data && #data.indexOf('45%')>-1}} selected{{/if}}>45%</option>
+        <option value="55%"{{if #data && #data.indexOf('50%')>-1}} selected{{/if}}>50%</option>
+        <option value="60%"{{if #data && #data.indexOf('55%')>-1}} selected{{/if}}>55%</option>
+        <option value="65%"{{if #data && #data.indexOf('60%')>-1}} selected{{/if}}>60%</option>
+        <option value="70%"{{if #data && #data.indexOf('65%')>-1}} selected{{/if}}>65%</option>
+        <option value="75%"{{if #data && #data.indexOf('70%')>-1}} selected{{/if}}>70%</option>
+        <option value="80%"{{if #data && #data.indexOf('75%')>-1}} selected{{/if}}>75%</option>
+        <option value="85%"{{if #data && #data.indexOf('80%')>-1}} selected{{/if}}>80%</option>
+        <option value="90%"{{if #data && #data.indexOf('85%')>-1}} selected{{/if}}>85%</option>
+        <option value="95%"{{if #data && #data.indexOf('90%')>-1}} selected{{/if}}>90%</option>
+        <option value="95%"{{if #data && #data.indexOf('95%')>-1}} selected{{/if}}>95%</option>
+        <option value="2x1"{{if #data && #data.indexOf('2x1')>-1}} selected{{/if}}>2x1</option>
+      </select>
+      <select class="_1 select w-select" data-name="Field 5" id="field-5" name="field-5">
+        <option value="">Seleccionar</option>
+        <option value="Club La Nación"{{if #data && #data.indexOf('La Nación')>-1}} selected{{/if}}>Club La Nación</option>
+        <option value="Clarín 365"{{if #data && #data.indexOf('365')>-1}} selected{{/if}}>Clarín 365</option>
+        <option value="Tarjeta Naranja"{{if #data && #data.indexOf('Naranja')>-1}} selected{{/if}}>Tarjeta Naranja</option>
+        <option value="Club Personal"{{if #data && #data.indexOf('Personal')>-1}} selected{{/if}}>Club Personal</option>
+      </select>
+      <a class="add-descuento w-inline-block" href="#"><img src="images/add-circle.svg">
+      </a>
+    </div> 
+  </script>
+  
+  <script id="horario" type="text/x-jsrender">
+    <div class="descuento-cont">
+      <select class="select select-field-2 w-select" data-name="Dia" id="Dia" name="Dia">
+        <option value="">Día</option>
+        <option value="Lunes"{{if key=='lunes'}} selected{{/if}}>Lunes</option>
+        <option value="Martes"{{if key=='martes'}} selected{{/if}}>Martes</option>
+        <option value="Miércoles"{{if key=='miercoles'}} selected{{/if}}>Miércoles</option>
+        <option value="Jueves"{{if key=='jueves'}} selected{{/if}}>Jueves</option>
+        <option value="Viernes"{{if key=='viernes'}} selected{{/if}}>Viernes</option>
+        <option value="Sábado"{{if key=='sabado'}} selected{{/if}}>Sábado</option>
+        <option value="Domingo"{{if key=='domingo'}} selected{{/if}}>Domingo</option>
+      </select>
+      <select class="select select-field w-select" id="field-2" name="field-2">
+        <option value="">Horario</option>
+        <option value="7"{{if abre=='7'}} selected{{/if}}>7</option>
+        <option value="8"{{if abre=='8'}} selected{{/if}}>8</option>
+        <option value="9"{{if abre=='9'}} selected{{/if}}>9</option>
+        <option value="10"{{if abre=='10'}} selected{{/if}}>10</option>
+        <option value="11"{{if abre=='11'}} selected{{/if}}>11</option>
+        <option value="12"{{if abre=='12'}} selected{{/if}}>12</option>
+        <option value="13"{{if abre=='13'}} selected{{/if}}>13</option>
+        <option value="14"{{if abre=='14'}} selected{{/if}}>14</option>
+        <option value="15"{{if abre=='15'}} selected{{/if}}>15</option>
+        <option value="16"{{if abre=='16'}} selected{{/if}}>16</option>
+        <option value="17"{{if abre=='17'}} selected{{/if}}>17</option>
+        <option value="18"{{if abre=='18'}} selected{{/if}}>18</option>
+        <option value="19"{{if abre=='19'}} selected{{/if}}>19</option>
+        <option value="20"{{if abre=='20'}} selected{{/if}}>20</option>
+        <option value="21"{{if abre=='21'}} selected{{/if}}>21</option>
+        <option value="22"{{if abre=='22'}} selected{{/if}}>22</option>
+        <option value="23"{{if abre=='23'}} selected{{/if}}>23</option>
+        <option value="24"{{if abre=='24'}} selected{{/if}}>24</option>
+      </select>
+      <select class="select select-field w-select" data-name="Field 8" id="field-8" name="field-8">
+        <option value="">Horario</option>
+        <option value="7"{{if cierra=='7'}} selected{{/if}}>7</option>
+        <option value="8"{{if cierra=='8'}} selected{{/if}}>8</option>
+        <option value="9"{{if cierra=='9'}} selected{{/if}}>9</option>
+        <option value="10"{{if cierra=='10'}} selected{{/if}}>10</option>
+        <option value="11"{{if cierra=='11'}} selected{{/if}}>11</option>
+        <option value="12"{{if cierra=='12'}} selected{{/if}}>12</option>
+        <option value="13"{{if cierra=='13'}} selected{{/if}}>13</option>
+        <option value="14"{{if cierra=='14'}} selected{{/if}}>14</option>
+        <option value="15"{{if cierra=='15'}} selected{{/if}}>15</option>
+        <option value="16"{{if cierra=='16'}} selected{{/if}}>16</option>
+        <option value="17"{{if cierra=='17'}} selected{{/if}}>17</option>
+        <option value="18"{{if cierra=='18'}} selected{{/if}}>18</option>
+        <option value="19"{{if cierra=='19'}} selected{{/if}}>19</option>
+        <option value="20"{{if cierra=='20'}} selected{{/if}}>20</option>
+        <option value="21"{{if cierra=='21'}} selected{{/if}}>21</option>
+        <option value="22"{{if cierra=='22'}} selected{{/if}}>22</option>
+        <option value="23"{{if cierra=='23'}} selected{{/if}}>23</option>
+        <option value="24"{{if cierra=='24'}} selected{{/if}}>24</option>
+      </select>
+    </div>
+  </script>
+
+  <script id="local" type="text/x-jsrender">
+    <div class="container">
+
+    {{if entry}}
+      <h3 class="heading"> {{:~prop('nombre_simple',entry)}} </h3>
+    {{else}}
+      <h3 class="heading">Cargá un nuevo local</h3>
+    {{/if}}
+    
+      <form class="publish__uploadimages--form" method="post" action="" name="photo" enctype="multipart/form-data">
+        <input hidden="true" class="photo" type="file" name="imagen_logo" accept="image/*">
+        <input hidden="true" class="photo" type="file" name="imagen_fondo" accept="image/*">
+      </form>
+
+      <div class="publish__uploadimages--info"></div>
+
+      <div class="publish__uploadimages--preview section-photos">
+        <div class="profile-picture">
+          <a class="link-block w-inline-block" href="#"><img class="foto-perfil" src="{{if ~prop('imagen logo',entry)}}{{:entry['imagen logo']}}{{else}}images/profile-medidas.png{{/if}}">
+          </a>
+          <div class="button-container"><a class="picture-button w-button" data-name="imagen_logo" href="#">Subi una foto de perfil</a>
+            <p class="picture-span">Subí una imagen en jpg o png de 500px x 500px aprox.</p>
+          </div>
         </div>
-      </div><a class="submit-button login w-button" href="#">Continuar</a>
+        <div class="portada">
+          <a class="link-block w-inline-block" href="#"><img class="foto-perfil" src="{{if ~prop('imagen fondo',entry)}}{{:entry['imagen fondo']}}{{else}}images/portada-medidas.png{{/if}}">
+          </a>
+          <div class="button-container"><a class="picture-button w-button" data-name="imagen_fondo" href="#">Subi una foto de portada</a>
+            <p class="picture-span">Subí una imagen en jpg o png de 800px x 458px aprox.</p>
+          </div>
+        </div>
+      </div>
+      <div class="section-info">
+        <div class="conteiner-info">
+          <div class="title-section">Información básica</div>
+          <div class="w-form">
+            <label for="nombre">Nombre del negocio</label>
+            <input class="input w-input" data-name="nombre" id="nombre" maxlength="256" name="nombre" placeholder="Avenida Cabildo" required="required" type="text" value="{{:~prop('nombre_simple',entry)}}">
+            <label for="direcci-n">Dirección</label>
+            <input class="input w-input" data-name="dirección" id="direcci-n" maxlength="256" name="direcci-n" placeholder="Av. Cabildo 1394" required="required" type="text" value="{{:~prop('direccion',entry)}}">
+            <label for="descripci-n">Descripción sobre tu negocio</label>
+            <textarea class="input w-input" data-name="descripción" id="descripci-n-2" maxlength="5000" name="descripci-n" placeholder="Toda la AVENIDA en una sola aplicación."></textarea>
+            <label for="categoria">Categoría</label>
+            <select class="select w-select" data-name="categoria" id="categoria" name="categoria" required="required">
+              <option value="">Seleccionar</option>
+              {{for ~toArray(extra.categorias.val())}}
+              <option value="{{:key}}"{{if ~root.entry.categoria==key}} selected{{/if}}>{{:key}}</option>
+              {{/for}}
+            </select>
+            <label for="web">Sitio Web</label>
+            <input class="input w-input" data-name="web" id="web" maxlength="256" name="web" placeholder="avenicacabildo.com.ar" required="required" type="text" value="{{:~prop('web',entry)}}">
+          </div>
+        </div>
+        <div class="conteiner-info">
+          <div class="title-section">Tu suscripción</div>
+          <div class="w-form">
+              <label for="nombre-2">Nombre</label>
+              <input class="input w-input" data-name="nombre" id="nombre-2" maxlength="256" name="nombre" placeholder="María Fernanda" type="text"  value="{{:~prop('nombre_suscriptor',entry)}}">
+              <label for="email-18">Email</label>
+              <input class="input w-input" data-name="email" id="email-18" maxlength="256" name="email" placeholder="maria@avenidacabildo.com.ar" required="required" type="email" value="{{:~prop('mail_suscriptor',entry)}}">
+          </div>
+          <div class="plan">{{:~prop('plan','Plan Básico',entry)}}</div>
+          <div class="plan-span">Para cambiar el plan escribinos a hola@avenidacabildo.com.ar</div>
+          <div class="proximo-pago">El próximo vencimiento es el 20/4</div><a class="pago-btn open w-button" href="#">Realizar pago</a>
+          <div class="proximo-pago-input w-hidden">
+            <label for="email-18">Medio</label>
+              <input class="input w-input" maxlength="256" name="medio" placeholder="Transferencia electrónica" type="text">
+            <label for="email-18">Origen</label>
+              <input class="input w-input" maxlength="256" name="origen" placeholder="Banco Santander" type="text">
+            <label for="email-18">Comprobante</label>
+              <input class="input w-input" maxlength="256" name="comprobante" placeholder="22928363" type="text">
+              <a class="pago-btn do w-button" href="#">Realizar pago</a>
+          </div>
+        </div>
+      </div>
+      <div class="section-redes">
+        <div class="conteiner-info">
+          <div class="title-section">Horarios</div>
+          <div class="w-form">
+              <label for="de-lunes-a-viernes">Lunes a viernes</label>
+              <input class="input w-input" data-name="de lunes a viernes" id="de-lunes-a-viernes" maxlength="256" name="de-lunes-a-viernes" placeholder="Ej: de 9 a 22hs" required="required" type="text" value="{{:~getHorario('Lunes a viernes',entry)}}">
+              <label for="sabado">Sábados</label>
+              <input class="input w-input" data-name="sabado" id="sabado" maxlength="256" name="sabado" placeholder="Ej: de 9 a 12" type="text" value="{{:~getHorario('Sábados',entry)}}">
+              <label for="domingo">Domingos</label>
+              <input class="input w-input" data-name="domingo" id="domingo" maxlength="256" name="domingo" placeholder="ej: cerrado" type="text" value="{{:~getHorario('Feriados',entry)}}">
+          </div>
+        </div>
+        <div class="conteiner-info">
+          <div class="title-section">Personalizá tu horario</div>
+          <div class="w-form">
+            <div class="descuento-cont">
+              <label class="field-label-2" for="email-13">Día</label>
+              <label class="field-label" for="email-13">Abre</label>
+              <label class="field-label" for="email-13">Cierra</label>
+            </div>
+
+            <div class="horarios--container">
+            </div>
+
+            <a class="add-time" href="#">Agregar un horario más</a>
+          </div>
+        </div>
+      </div>
+      <div class="section-redes">
+        <div class="conteiner-info">
+          <div class="title-section">¿Cómo te contactan tus clientes?</div>
+          <div class="w-form">
+              <label for="telefono">Teléfono</label>
+              <input class="input w-input" data-name="telefono" id="telefono" maxlength="256" name="telefono" placeholder="4544-4674" type="text" value="{{:~prop('telefono',entry)}}">
+              <label for="email-clientes">Email</label>
+              <input class="input w-input" data-name="email-clientes" id="email-clientes" maxlength="256" name="email-clientes" placeholder="hola@avenidacabildo.com.ar" type="email" value="{{:~prop('mail',entry)}}">
+              <label for="facebook">Facebook</label>
+              <input class="input w-input" data-name="facebook" id="facebook" maxlength="256" name="facebook" placeholder="www.facebook.com/AvenidaCabildoApp" type="text" value="{{:~prop('facebook',entry)}}">
+              <label for="instagram">Instagram</label>
+              <input class="input w-input" data-name="instagram" id="instagram" maxlength="256" name="instagram" placeholder="instagram.com/avenidacabildo" type="text" value="{{:~prop('instagram',entry)}}">
+          </div>
+        </div>
+        <div class="conteiner-info">
+          <div class="title-section">Descuentos</div>
+          <div class="w-form">
+            <label for="descuento-av">Para quienes usen Avenida Cabildo</label>
+            <input class="input w-input" data-name="descuento-av" id="descuento-av" maxlength="256" name="descuento-av" placeholder="20%" type="text" value="{{:~prop('efectivo',entry)}}">
+            <label for="email-13">Descuento con tarjetas</label>
+            <div class="descuento--container">
+            </div>
+
+            <div class="descuento-cont">
+              <select class="_1 select w-select" data-name="Field 6" id="field-6" name="field-6">
+                <option value="">Seleccionar</option>
+                <option value="5%">5%</option>
+                <option value="10%">10%</option>
+                <option value="15%">15%</option>
+                <option value="20%">20%</option>
+                <option value="25%">25%</option>
+                <option value="30%">30%</option>
+                <option value="35%">35%</option>
+                <option value="40%">40%</option>
+                <option value="50%">50%</option>
+                <option value="55%">55%</option>
+                <option value="60%">60%</option>
+                <option value="65%">65%</option>
+                <option value="70%">70%</option>
+                <option value="75%">75%</option>
+                <option value="80%">80%</option>
+                <option value="85%">85%</option>
+                <option value="90%">90%</option>
+                <option value="95%">95%</option>
+              </select>
+              <input class="_1 input w-input" data-name="Descuento" id="Descuento-3" maxlength="256" name="Descuento" placeholder="otro descuento" type="text">
+              <a class="add-descuento w-inline-block" href="#"><img src="images/add-circle.svg">
+              </a>
+            </div>
+          </div>
+        </div>
+      </div><a class="save submit-button w-button" href="#">{{if entry}}Actualizar {{:~prop('nombre_simple',entry)}}{{else}}Cargar nuevo local{{/if}}</a>
+    </div>
+  </script>
+
+  <script id="locales" type="text/x-jsrender">
+    <div class="container">
+      <div class="tabs w-tabs" data-duration-in="300" data-duration-out="100">
+        <div class="w-tab-menu">
+          <a class="tab w--current w-inline-block w-tab-link" data-w-tab="todos">
+            <div>Todos los locales</div>
+          </a>
+          <a class="tab w-inline-block w-tab-link" data-w-tab="Básico">
+            <div>Plan Basico</div>
+          </a>
+          <a class="tab w-inline-block w-tab-link" data-w-tab="Premium">
+            <div>Plan Premium</div>
+          </a>
+          <a class="tab w-inline-block w-tab-link" data-w-tab="Avenida Cabildo">
+            <div>Plan Avenida Cabildo</div>
+          </a>
+        </div>
+        <div class="w-tab-content">
+          <div class="w--tab-active w-tab-pane" data-w-tab="todos">
+            <div class="table">
+              <div class="headerline td">
+                <div class="tr">
+                  <p>Local</p>
+                </div>
+                <div class="tr w-hidden-medium w-hidden-small w-hidden-tiny">
+                  <p>Dirección</p>
+                </div>
+                <div class="tr w-hidden-small w-hidden-tiny">
+                  <p>Email</p>
+                </div>
+                <div class="tr w-hidden-small w-hidden-tiny">
+                  <p>Plan</p>
+                </div>
+                <div class="tr w-hidden-small w-hidden-tiny">
+                  <p>Teléfono</p>
+                </div>
+                <div class="pago tr">
+                  <p>Último pago</p>
+                </div>
+                <div class="actions tr">
+                  <p>Acciones</p>
+                </div>
+              </div>
+              <div class="locales"></div>
+            </div>
+          </div>
+          <div class="w-tab-pane" data-w-tab="Básico">
+            <div class="table">
+              <div class="headerline td">
+                <div class="tr">
+                  <p>Local</p>
+                </div>
+                <div class="tr">
+                  <p>Dirección</p>
+                </div>
+                <div class="tr">
+                  <p>Email</p>
+                </div>
+                <div class="tr">
+                  <p>Promo</p>
+                </div>
+                <div class="tr">
+                  <p>Teléfono</p>
+                </div>
+                <div class="pago tr">
+                  <p>Último pago</p>
+                </div>
+                <div class="actions tr">
+                  <p>Acciones</p>
+                </div>
+              </div>
+              <div class="locales"></div>
+            </div>
+          </div>
+          <div class="w-tab-pane" data-w-tab="Premium">
+            <div class="table">
+              <div class="headerline td">
+                <div class="tr">
+                  <p>Local</p>
+                </div>
+                <div class="tr">
+                  <p>Dirección</p>
+                </div>
+                <div class="tr">
+                  <p>Email</p>
+                </div>
+                <div class="tr">
+                  <p>Promo</p>
+                </div>
+                <div class="tr">
+                  <p>Teléfono</p>
+                </div>
+                <div class="pago tr">
+                  <p>Último pago</p>
+                </div>
+                <div class="actions tr">
+                  <p>Acciones</p>
+                </div>
+              </div>
+              <div class="locales"></div>
+            </div>
+          </div>
+          <div class="w-tab-pane" data-w-tab="Avenida Cabildo">
+            <div class="table">
+              <div class="headerline td">
+                <div class="tr">
+                  <p>Local</p>
+                </div>
+                <div class="tr">
+                  <p>Dirección</p>
+                </div>
+                <div class="tr">
+                  <p>Email</p>
+                </div>
+                <div class="tr">
+                  <p>Promo</p>
+                </div>
+                <div class="tr">
+                  <p>Teléfono</p>
+                </div>
+                <div class="pago tr">
+                  <p>Último pago</p>
+                </div>
+                <div class="actions tr">
+                  <p>Acciones</p>
+                </div>
+              </div>
+              <div class="items"></div>            
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> 
+  </script>
+
+  <script id="listadolocales" type="text/x-jsrender">
+    <div class="td">
+      <div class="tr">
+        <p>{{:nombre_simple}}</p>
+      </div>
+      <div class="tr w-hidden-medium w-hidden-small w-hidden-tiny">
+        <p>{{:direccion}}</p>
+      </div>
+      <div class="tr w-hidden-small w-hidden-tiny">
+        <p>{{:mail}}</p>
+      </div>
+      <div class="tr w-hidden-small w-hidden-tiny">
+        <p>{{:plan}}</p>
+      </div>
+      <div class="tr w-hidden-small w-hidden-tiny">
+        <p>{{:telefono}}</p>
+      </div>
+      <div class="pago tr">
+        <p class="enfecha">
+        {{if pagos && pagos.p1}}
+          {{:pagos.p1.fecha}}
+        {{else}}
+          &mdash;
+        {{/if}}
+        </p>
+      </div>
+      <div class="actions tr">
+        <div class="table-action ver" data-ix="open-viewlocal">Ver</div>
+        <a class="w-inline-block" href="#">
+          <div class="edit table-action" data-key="{{:key}}">Editar</div>
+        </a>
+        <div class="eliminar table-action" data-ix="eliminar-show" data-key="{{:key}}">Eliminar</div>
+      </div>
+    </div>   
+  </script>
+
+  <script id="estadisticas" type="text/x-jsrender">
+    <div class="head-section"></div>
+    <div class="estadisticas">
+      <h1 class="title-stats">Tus estadísticas</h1>
+      <div class="w-tabs" data-duration-in="300" data-duration-out="100">
+        <div class="w-tab-menu">
+          <a class="tab w-inline-block w-tab-link" data-w-tab="estemes">
+            <div>Este mes</div>
+          </a>
+          <a class="tab w--current w-inline-block w-tab-link" data-w-tab="esta-semana">
+            <div>Esta semana</div>
+          </a>
+          <a class="tab w-inline-block w-tab-link" data-w-tab="ultimo-trimestre">
+            <div>El último trimestre</div>
+          </a>
+        </div>
+        <div class="tab-container w-tab-content">
+          <div class="tab-stat w-tab-pane" data-w-tab="estemes">
+            <div class="stat-tab-cont">
+              <div class="stat-container">
+                <div class="people">380 personas</div>
+                <div class="p-stat">Vieron tu perfil</div>
+              </div>
+              <div class="stat-container">
+                <div class="favs people">200 personas</div>
+                <div class="p-stat">Te agregaron a sus favoritos</div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-stat w--tab-active w-tab-pane" data-w-tab="esta-semana">
+            <div class="stat-tab-cont">
+              <div class="stat-container">
+                <div class="people">780 personas</div>
+                <div class="p-stat">Vieron tu perfil</div>
+              </div>
+              <div class="stat-container">
+                <div class="favs people">98 personas</div>
+                <div class="p-stat">Te agregaron a sus favoritos</div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-stat w-tab-pane" data-w-tab="ultimo-trimestre">
+            <div class="stat-tab-cont">
+              <div class="stat-container">
+                <div class="people">678837 personas</div>
+                <div class="p-stat">Vieron tu perfil</div>
+              </div>
+              <div class="stat-container">
+                <div class="favs people">987 personas</div>
+                <div class="p-stat">Te agregaron a sus favoritos</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </script>
+
+  <!-- end templates -->    
+
+  <!-- begin modals -->
+
+  <div class="modal viewlocal" id="viewlocal">
+    <div class="modal-contenedor"><img class="close" data-ix="close-viewlocal" src="images/icono-close.svg">
+      <div class="informacion-local">
+        <div><img class="foto-local" src="images/5877e0a09ac381814417974d_webclip.png">
+        </div>
+        <div class="infolocal-txt">
+          <p><strong>En promoción</strong>: No</p>
+          <p><strong>Nombre</strong>: Bensimon</p>
+          <p><strong>Quién administra</strong>: Rosa Dominguez</p>
+          <p><strong>Email</strong>: rosa@bensimon.com</p>
+          <p><strong>Teléfono</strong>: 156 789 0273</p>
+          <p><strong>Dirección</strong>: Av. Cabildo 1204</p>
+          <p><strong>Horarios&nbsp;</strong>: Lunes a Domingos 24hs</p>
+          <p><strong>Categoría</strong>: Medicina y salud</p>
+          <p><strong>Descuentos</strong>: 10% Clarín, 20% La Nación, 10% Avenida Cabildo</p>
+          <p><strong>Descripción</strong>: Farmacity 2x1 llevas dos y pagas 1</p>
+          <p><strong>Facebook&nbsp;</strong>: https://www.facebook.com/Farmacity/</p>
+          <p><strong>Instagram&nbsp;</strong>: https://www.facebook.com/Farmacity/</p>
+          <p><strong>Web&nbsp;</strong>: bensimo.com.ar</p>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="footer">
-    <div><a href="http://avenidacabildo.com.ar/terminos-y-condiciones-para-comercio.html" target="_blank" class="footer--a">Términos y condiciones</a>
+
+  <div class="eliminarlocal modal" id="viewlocal">
+    <div class="modal-contenedor"><img class="close" data-ix="close-delete" src="images/icono-close.svg">
+      <p class="modal--pcenter">¿Estás seguro que deseas eliminar este local?</p><a class="modalbutton w-button" href="#">No</a><a class="modalbutton w-button yes" href="#">Si</a>
     </div>
-    <p class="footer--p session-status"></p>
   </div>
+
+  <!-- end modals -->
+
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js" type="text/javascript"></script>
   <script src="js/webflow.js" type="text/javascript"></script>
   <script src="js/jsrender.min.js"></script>

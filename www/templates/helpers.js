@@ -38,7 +38,7 @@
 				if(typeof b=='string') d = c
 				if(d && d[a]) return d[a]
 				return typeof b=='string' ? b : ""
-			} 
+			}
 		}
 		, setParameterByName : function(name,value,url){
 	        if(!url) url = window.location.hash.split('#').join('')
@@ -59,7 +59,7 @@
 		    if (!results) return null;
 		    if (!results[2]) return '';
 		    return decodeURIComponent(results[2].replace(/\+/g, " "));
-	    }  		
+	    }  	
 		, firebase_once : function(a, b){    
 			firebase.database().ref(a).once('value').then(function(snapshot) {
 				if(typeof b == 'function') b.call(this,snapshot)

@@ -1,4 +1,7 @@
 $(function(){
+
+	console.log(account)
+	
 	var key = helpers.getParameterByName('key')
 	, position = 0
 	, edit = key ? 'locales/' + key : null
@@ -31,16 +34,20 @@ $(function(){
 
 	// horarios
 
-	$(document).on('click','.add-time',function(e) {
+	$(document).on('click','.add-descuento',function(e) {
 		if($('.horarios--container').children().length < 7){
-			$('.horarios--container').append($.templates('#horario').render({}))
+			$('.horarios--container').append($.templates('#horario').render())
 		}
 		e.preventDefault()
 	})
 
-
 	// descuentos
-
+	$(document).on('click','.add-time',function(e) {
+		if($('.horarios--container').children().length < 7){
+			$('.horarios--container').append($.templates('#horario').render())
+		}
+		e.preventDefault()
+	})
 
 	// fotos
 	$(document).on('click','.link-block',function(e) {
