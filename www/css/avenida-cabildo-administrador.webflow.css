@@ -21,10 +21,6 @@ label {
   text-transform: uppercase;
 }
 
-.content {
-  padding-bottom: 5rem;
-}
-
 .container-login {
   display: -webkit-box;
   display: -webkit-flex;
@@ -113,11 +109,6 @@ label {
 }
 
 .footer {
-  position: absolute;
-  left: 0px;
-  right: 0px;
-  bottom: 0px;
-  width: 100%;
   margin-top: 50px;
   color: #fff;
   text-align: right;
