@@ -1,7 +1,10 @@
 $(function(){
 
 	var settings = {
-		user : undefined
+		pagos : {
+			dia_vencimiento : 20
+		}
+		, user : undefined
 		, admin : { 
 			paths : ['/admin.html']
 			, uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2'
@@ -99,7 +102,19 @@ $(function(){
 			}
 		}
 		, tpl : {
-			toDate : function(date,format){
+			getProxVencimiento : function(format){
+				var now = moment()
+				, then = moment([now.format('YY'), now.format('MM')-1, settings.pagos.dia_vencimiento])
+				, date = then
+
+				if(now < then){
+					console.log("2")
+					date = moment([now.format('YY'), now.format('MM'), settings.pagos.dia_vencimiento])
+				}
+
+				return moment(date).format(format||'DD/MM')
+			}
+			, toDate : function(date,format){
 				return moment(date).format(format||'DD/MM/YY')
 			}
 			, resetWebflow : function(){
@@ -486,6 +501,8 @@ $(function(){
 	})
 
     $(window).on('hashchange', function(){
-    	helpers.views.render()
+    	if(!settings.user && location.hash != '') 
+    		return location.hash = ''
+   		helpers.views.render()
     }).trigger('hashchange')
 })

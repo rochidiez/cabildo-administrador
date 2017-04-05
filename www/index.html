@@ -268,7 +268,7 @@
           </div>
           <div class="plan">{{:~prop('plan','Plan Básico',entry)}}</div>
           <div class="plan-span">Para cambiar el plan escribinos a hola@avenidacabildo.com.ar</div>
-          <div class="proximo-pago">El próximo vencimiento es el 20/4</div><a class="pago-btn open w-button" href="#">Realizar pago</a>
+          <div class="proximo-pago">El próximo vencimiento es el {{:~getProxVencimiento()}}</div><a class="pago-btn open w-button" href="#">Realizar pago</a>
           <div class="proximo-pago-input w-hidden">
             <label for="email-18">Medio</label>
               <input class="input w-input" maxlength="256" name="medio" placeholder="Transferencia electrónica" type="text">
@@ -593,6 +593,8 @@
     </div>
   </script>
 
+  <script id="modal_viewlocal" type="text/x-jsrender">
+  </script>
   <!-- end templates -->    
 
   <!-- begin modals -->
