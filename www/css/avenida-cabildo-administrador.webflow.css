@@ -21,6 +21,14 @@ label {
   text-transform: uppercase;
 }
 
+.content {
+  padding-bottom: 5rem;
+}
+
+.footer--container {
+  display: inline-block;
+}
+
 .container-login {
   display: -webkit-box;
   display: -webkit-flex;
@@ -273,6 +281,7 @@ label {
   width: 10%;
   max-width: 10%;
   min-width: 10%;
+  white-space: nowrap;
 }
 
 .p-intable {
