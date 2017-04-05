@@ -72,32 +72,30 @@ $(function(){
 		, views : {
 			render : function(){
 
-				$('body').removeClass()
-				$('#loading').fadeIn()
+				$('#loading').fadeIn(300, function(){
 
+					$('body').removeClass()
+					
+					var user = firebase.auth().currentUser;
 
-				var user = firebase.auth().currentUser;
+					$('.footer--container').html($.templates('#footer').render({user:user}))
 
-				$('.footer--container').html($.templates('#footer').render({user:user}))
+					if(user){
+						$('.session-status').html(user.email + ' <a href="#" class="salir">Cerrar sesión</a>')
+					}
 
-				if(user){
-					$('.session-status').html(user.email + ' <a href="#" class="salir">Cerrar sesión</a>')
-				}
+					var route = location.hash.replace('#','')||'index'
+					, route = route.indexOf('?') > -1 ? route.substring(0, route.indexOf('?')) : route
 
-				var route = location.hash.replace('#','')||'index'
-				, route = route.indexOf('?') > -1 ? route.substring(0, route.indexOf('?')) : route
-
-    			if(route){
-			    	if(typeof routes[route] == 'function'){
-			    		routes[route].call(this)
-			    		helpers.updateHeader()
-			    	} else {
-			    		$('.container').html("No existe la página")
-			    	}
-			    }
-
-
-		    	//$('#loading').fadeOut()
+	    			if(route){
+				    	if(typeof routes[route] == 'function'){
+				    		routes[route].call(this)
+				    		helpers.updateHeader()
+				    	} else {
+				    		$('.container').html("No existe la página")
+				    	}
+				    }
+				})
 			}
 		}
 		, tpl : {
@@ -251,7 +249,7 @@ $(function(){
 		, pass = $.trim($('#password').val())
 		$(this).text("Por favor espere ... ")
 		firebase.auth().signInWithEmailAndPassword(email, pass).then(function(res){
-			location.hash = (res.uid == settings.admin.uid ? 'locales' : 'estadisticas')
+			
 		}).catch(function(err) {
 			alert(err.message)
 		})		
@@ -313,7 +311,7 @@ $(function(){
 		})
 
 
-		$('#loader').fadeIn()
+		$('#loading').fadeIn()
 		firebase.database().ref(key).set({
 			nombre_simple: $('input[name=nombre_simple]').val()||""
 			, direccion : $('input[name=direccion]').val()||""
@@ -339,10 +337,10 @@ $(function(){
 			, 'en promocion' : $('input[name=en_promocion]').val()||""
 		})
 		.then(function(a){
-			$('#loader').fadeOut()
+			$('#loading').fadeOut()
 		})
 		.catch(function(a){
-			$('#loader').fadeOut()
+			$('#loading').fadeOut()
 		})
 
 		// uploads
@@ -473,10 +471,11 @@ $(function(){
 	firebase.auth().onAuthStateChanged(function(user) {
 		if (user) {
 			settings.user = user
+			location.hash = (settings.user.uid == settings.admin.uid ? 'locales' : 'estadisticas')
 		} else {
-			location.hash = ''
 			$('.header').html('')
 			$('.session-status').text("Sin inicio de sesión")
+			location.hash = ''
 		}
 
 		if(location.hash!=''){
@@ -484,37 +483,9 @@ $(function(){
 		}
 
 		helpers.updateHeader()
-		$(window).trigger('hashchange')
 	})
 
     $(window).on('hashchange', function(){
     	helpers.views.render()
-    })
+    }).trigger('hashchange')
 })
-
-/*
-firebase.auth().createUserWithEmailAndPassword('ay@gmail.com', '4yn0td34d').then(function(user) {
-    // [END createwithemail]
-    // callSomeFunction(); Optional
-    // var user = firebase.auth().currentUser;
-    user.updateProfile({
-        displayName: 'AY Not Dead',
-        photoURL: 'http://www.cordobashopping.com.ar/img/locales/logos/1452183858_aynot.jpg'
-    }).then(function() {
-        // Update successful.
-    }, function(error) {
-        // An error happened.
-    });        
-}, function(error) {
-    // Handle Errors here.
-    var errorCode = error.code;
-    var errorMessage = error.message;
-    // [START_EXCLUDE]
-    if (errorCode == 'auth/weak-password') {
-        alert('The password is too weak.');
-    } else {
-        console.error(error);
-    }
-    // [END_EXCLUDE]
-});	
-*/
