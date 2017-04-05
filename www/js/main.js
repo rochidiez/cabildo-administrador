@@ -247,11 +247,11 @@ $(function(){
 	$(document).on('click','.login',function(){
 		var email = $.trim($('#email').val())
 		, pass = $.trim($('#password').val())
-		$(this).text("Por favor espere ... ")
-		firebase.auth().signInWithEmailAndPassword(email, pass).then(function(res){
-			
-		}).catch(function(err) {
+		, that = this
+		$(this).animate({opacity:0.7}).text("Por favor espere ... ")
+		firebase.auth().signInWithEmailAndPassword(email, pass).catch(function(err) {
 			alert(err.message)
+			$(that).animate({opacity:1}).text("Continuar")
 		})		
 	})
 
