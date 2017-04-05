@@ -204,11 +204,6 @@
       <input type="hidden" name="key" value="{{:extra.key}}" />
 
     {{if extra.key}}
-      <input type="hidden" name="visibilidad" value="{{:~prop('visibilidad',entry)}}" />
-      <input type="hidden" name="plan" value="{{:~prop('plan',entry)}}" />
-      <input type="hidden" name="ubicacion" value="{{:~prop('ubicacion',entry)}}" />
-      <input type="hidden" name="en_promocion" value="{{:entry['en promocion']}}" />
-
       <h3 class="heading"> {{:~prop('nombre_simple',entry)}}</h3>
     {{else}}
       <h3 class="heading">Cargá un nuevo local</h3>
@@ -266,9 +261,30 @@
               <label for="email-18">Email</label>
               <input class="input w-input" maxlength="256" name="mail_suscriptor" placeholder="maria@avenidacabildo.com.ar" required="required" type="email" value="{{:~prop('mail_suscriptor',entry)}}">
           </div>
+        {{if ~isAdmin()}}
+          <div class="w-form">
+            <label for="nombre-2">Plan</label>          
+            <select class="select w-select">
+              <option value="">Elegí un plan</option>
+              <option value="Básico"{{if entry.plan == 'Básico'}} selected{{/if}}>Básico</option>
+              <option value="Premium"{{if entry.plan == 'Premium'}} selected{{/if}}>Premium</option>
+              <option value="Avenida Cabildo"{{if entry.plan == 'Avenida Cabildo'}} selected{{/if}}>Avenida Cabildo</option>
+            </select>          
+          </div>
+        {{else}}
           <div class="plan">{{:~prop('plan','Plan Básico',entry)}}</div>
           <div class="plan-span">Para cambiar el plan escribinos a hola@avenidacabildo.com.ar</div>
-          <div class="proximo-pago">El próximo vencimiento es el {{:~getProxVencimiento()}}</div><a class="pago-btn open w-button" href="#">Realizar pago</a>
+        {{/if}}
+          <div class="proximo-pago">El próximo vencimiento es el {{:~getProxVencimiento()}}</div>
+          <a class="pago-btn open w-button" href="#">Realizar pago</a>
+        {{if entry.pagos}}
+          <a class="pago-btn w-button" href="#" onclick="$('.historico-pagos').slideToggle()">Ver pagos</a>
+          <div class="historico-pagos w-hidden">
+          {{for entry.pagos}}
+            <label for="email-18">{{:~toDate(creado,'DD/MM/YY')}}</label>{{:origen}} {{:comprobante}}
+          {{/for}}
+          </div>
+        {{/if}}
           <div class="proximo-pago-input w-hidden">
             <label for="email-18">Medio</label>
               <input class="input w-input" maxlength="256" name="medio" placeholder="Transferencia electrónica" type="text">
@@ -517,13 +533,7 @@
         <p>{{:telefono}}</p>
       </div>
       <div class="pago tr">
-        <p class="enfecha">
-        {{if pagos && pagos.p1}}
-          {{:~toDate(pagos.p1.fecha,'MM/DD')}}
-        {{else}}
-          &mdash;
-        {{/if}}
-        </p>
+        <p class="enfecha">{{if pagos}}{{:~toDate(pagos[pagos.length-1].creado,'DD/MM')}}{{else}}&mdash;{{/if}}</p>
       </div>
       <div class="actions tr">
         <div class="table-action ver" data-ix="open-viewlocal">Ver</div>

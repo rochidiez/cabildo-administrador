@@ -10,6 +10,12 @@ $(function(){
 			, uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2'
 		}
 	}
+	, isAdmin = function(){
+		return settings.user.uid==settings.admin.uid
+	}
+	, isGuest = function(){
+		return !settings.user
+	}
 	, routes = {
 		index : function(){
 	    	helpers.render_tpl('.content','#index',{}, function(){
@@ -28,7 +34,7 @@ $(function(){
 			var position = 0
 			, key = helpers.getParameterByName('key')
 
-			if(settings.user.uid==settings.admin.uid){
+			if(isAdmin()){
 				key = key ? 'locales/' + key : null
 			} else {
 				key = 'locales/' + settings.user.displayName
@@ -75,7 +81,7 @@ $(function(){
 		, views : {
 			render : function(){
 
-				$('#loading').fadeIn(300, function(){
+				$('#loading').fadeIn(200, function(){
 
 					$('body').removeClass()
 					
@@ -102,7 +108,10 @@ $(function(){
 			}
 		}
 		, tpl : {
-			getProxVencimiento : function(format){
+			isAdmin : function(){
+				return isAdmin()
+			}
+			, getProxVencimiento : function(format){
 				var now = moment()
 				, then = moment([now.format('YY'), now.format('MM')-1, settings.pagos.dia_vencimiento])
 				, date = then
@@ -325,38 +334,38 @@ $(function(){
 			}
 		})
 
+		$('#loading').fadeIn(200, function(){
+			var updates = {
+				nombre_simple: $('input[name=nombre_simple]').val()||""
+				, direccion : $('input[name=direccion]').val()||""
+				, descripcion : $('textarea[name=descripcion]').val()||""
+				, categoria : $('select[name=categoria]').val()||""
+				, web : $('input[name=web]').val()||""
+				, nombre_suscriptor : $('input[name=nombre_suscriptor]').val()||""
+				, mail_suscriptor : $('input[name=mail_suscriptor]').val()||""
+				, telefono : $('input[name=telefono]').val()||""
+				, mail_suscriptor : $('input[name=mail_suscriptor]').val()||""
+				, mail : $('input[name=mail]').val()||""
+				, facebook : $('input[name=facebook]').val()||""
+				, instagram : $('input[name=instagram]').val()||""
+				, descuento_av : $('input[name=descuento_av]').val()||""
+				, descuentos : descuentos
+				, 'horarios' : horarios
+				, 'horarios para filtro' : horarios_filtro
+				, 'imagen logo' : $('.imagen_logo').attr('src')||""
+				, 'imagen fondo' : $('.imagen_fondo').attr('src')||""
+			}
 
-		$('#loading').fadeIn()
-		firebase.database().ref(key).set({
-			nombre_simple: $('input[name=nombre_simple]').val()||""
-			, direccion : $('input[name=direccion]').val()||""
-			, descripcion : $('textarea[name=descripcion]').val()||""
-			, categoria : $('select[name=categoria]').val()||""
-			, web : $('input[name=web]').val()||""
-			, nombre_suscriptor : $('input[name=nombre_suscriptor]').val()||""
-			, mail_suscriptor : $('input[name=mail_suscriptor]').val()||""
-			, telefono : $('input[name=telefono]').val()||""
-			, mail_suscriptor : $('input[name=mail_suscriptor]').val()||""
-			, mail : $('input[name=mail]').val()||""
-			, facebook : $('input[name=facebook]').val()||""
-			, instagram : $('input[name=instagram]').val()||""
-			, descuento_av : $('input[name=descuento_av]').val()||""
-			, descuentos : descuentos
-			, 'horarios' : horarios
-			, 'horarios para filtro' : horarios_filtro
-			, 'imagen logo' : $('.imagen_logo').attr('src')||""
-			, 'imagen fondo' : $('.imagen_fondo').attr('src')||""
-			, visibilidad : $('input[name=visibilidad]').val()||""
-			, plan : $('input[name=plan]').val()||""
-			, ubicacion : $('input[name=ubicacion]').val()||""
-			, 'en promocion' : $('input[name=en_promocion]').val()||""
+			if($('input[name=plan]').val()){
+				updates.plan = $('input[name=plan]').val()
+			}
+
+			firebase.database().ref(key).update(updates)
+			.then(function(a){
+				$('#loading').fadeOut()
+			})
 		})
-		.then(function(a){
-			$('#loading').fadeOut()
-		})
-		.catch(function(a){
-			$('#loading').fadeOut()
-		})
+
 
 		// uploads
 
@@ -391,7 +400,34 @@ $(function(){
 	})
 
 	$(document).on('click','.pago-btn.do',function(e) {
-		alert("pago")
+
+		var comprobante = $('input[name=medio]').val()
+		, key = $('input[name=key]').val()
+
+		if($.trim(comprobante)==''){
+			alert("Por favor indique comprobante del pago")
+			return false
+		}
+
+		$('#loading').fadeIn(200, function(){
+			var pagoData = {
+				origen: $('input[name=origen]').val()
+				, medio: $('input[name=medio]').val()
+				, comprobante: $('input[name=comprobante]').val()
+				, creado: new Date().toString()
+			}
+
+			$('.proximo-pago-input').slideToggle()
+
+			firebase.database().ref(key + '/pagos').once('value').then(function(snapshot) {
+			 	var nextKey = snapshot.numChildren()
+			 	, updates = {}
+				updates['/pagos/' + nextKey] = pagoData;
+				firebase.database().ref(key).update(updates).then(function(){
+					$('#loading').fadeOut()
+				})
+			})
+		})
 		e.preventDefault()
 	})
 
@@ -486,7 +522,7 @@ $(function(){
 	firebase.auth().onAuthStateChanged(function(user) {
 		if (user) {
 			settings.user = user
-			location.hash = (settings.user.uid == settings.admin.uid ? 'locales' : 'estadisticas')
+			location.hash = (isAdmin() ? 'locales' : 'estadisticas')
 		} else {
 			$('.header').html('')
 			$('.session-status').text("Sin inicio de sesión")
@@ -501,7 +537,7 @@ $(function(){
 	})
 
     $(window).on('hashchange', function(){
-    	if(!settings.user && location.hash != '') 
+    	if(isGuest() && location.hash != '') 
     		return location.hash = ''
    		helpers.views.render()
     }).trigger('hashchange')
