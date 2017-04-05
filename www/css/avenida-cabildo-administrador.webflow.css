@@ -25,10 +25,6 @@ label {
   padding-bottom: 5rem;
 }
 
-.footer--container {
-  display: inline-block;
-}
-
 .container-login {
   display: -webkit-box;
   display: -webkit-flex;
