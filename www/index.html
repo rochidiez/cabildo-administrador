@@ -48,14 +48,14 @@
     </div>
   </div>
 
+  <div class="notification w-hidden"></div>
   <div class="header"></div>
-
   <div class="content"></div>
-
   <div class="footer--container"></div>
 
   <!-- begin templates -->
   
+  <!-- ~page ~index -->  
   <script id="index" type="text/x-jsrender">
     <div class="login-section"><img class="login--img" src="images/AvenidaCabildoBlanco.svg">
       <div class="login-conteiner">
@@ -76,6 +76,7 @@
     </div>
   </script>
 
+  <!-- ~component ~header -->
   <script id="header" type="text/x-jsrender">
   {{if user && user.uid == uid}}
     <a class="header-brand w-inline-block" href="http://avenidacabildo.com.ar/" target="_blank"><img src="images/AvenidaCabildo.svg">
@@ -90,6 +91,7 @@
   {{/if}}
   </script>
 
+  <!-- ~component ~footer -->
   <script id="footer" type="text/x-jsrender">
   {{if user && user.uid}}
     <div class="footer-inside">
@@ -104,6 +106,7 @@
   {{/if}}
   </script>
 
+  <!-- ~component ~descuento -->
   <script id="descuento" type="text/x-jsrender">
     <div class="descuento-cont descuentos">
       <select class="_1 select w-select porcentaje">
@@ -142,6 +145,7 @@
     </div> 
   </script>
   
+  <!-- ~component ~horario -->
   <script id="horario" type="text/x-jsrender">
     <div class="descuento-cont horarios_filtro">
       <select class="select select-field-2 w-select dia">
@@ -199,6 +203,7 @@
     </div>
   </script>
 
+  <!-- ~page ~local -->
   <script id="local" type="text/x-jsrender">
     <div class="container">
       <input type="hidden" name="key" value="{{:extra.key}}" />
@@ -245,8 +250,8 @@
             <label for="categoria">Categoría</label>
             <select class="select w-select" name="categoria" required="required">
               <option value="">Seleccionar</option>
-              {{for ~toArray(extra.categorias.val())}}
-              <option value="{{:key}}"{{if ~root.entry.categoria==key}} selected{{/if}}>{{:key}}</option>
+              {{for ~toArray(extra.categorias)}}
+              <option value="{{:key}}"{{if ~root.data.categoria==key}} selected{{/if}}>{{:key}}</option>
               {{/for}}
             </select>
             <label for="web">Sitio Web</label>
@@ -264,23 +269,23 @@
         {{if ~isAdmin()}}
           <div class="w-form">
             <label for="nombre-2">Plan</label>          
-            <select class="select w-select">
+            <select class="select w-select" name="plan">
               <option value="">Elegí un plan</option>
-              <option value="Básico"{{if entry.plan == 'Básico'}} selected{{/if}}>Básico</option>
-              <option value="Premium"{{if entry.plan == 'Premium'}} selected{{/if}}>Premium</option>
-              <option value="Avenida Cabildo"{{if entry.plan == 'Avenida Cabildo'}} selected{{/if}}>Avenida Cabildo</option>
+              <option value="Básico"{{if extra.cliente.plan == 'Básico'}} selected{{/if}}>Básico</option>
+              <option value="Premium"{{if extra.cliente.plan == 'Premium'}} selected{{/if}}>Premium</option>
+              <option value="Avenida Cabildo"{{if extra.cliente.plan == 'Avenida Cabildo'}} selected{{/if}}>Avenida Cabildo</option>
             </select>          
           </div>
         {{else}}
-          <div class="plan">{{:~prop('plan','Plan Básico',entry)}}</div>
+          <div class="plan">{{:~prop('plan','Plan Básico',extra.cliente)}}</div>
           <div class="plan-span">Para cambiar el plan escribinos a hola@avenidacabildo.com.ar</div>
         {{/if}}
           <div class="proximo-pago">El próximo vencimiento es el {{:~getProxVencimiento()}}</div>
           <a class="pago-btn open w-button" href="#">Realizar pago</a>
-        {{if entry.pagos}}
+        {{if extra.cliente.pagos}}
           <a class="pago-btn w-button" href="#" onclick="$('.historico-pagos').slideToggle()">Ver pagos</a>
           <div class="historico-pagos w-hidden">
-          {{for entry.pagos}}
+          {{for extra.cliente.pagos}}
             <label for="email-18">{{:~toDate(creado,'DD/MM/YY')}}</label>{{:origen}} {{:comprobante}}
           {{/for}}
           </div>
@@ -380,6 +385,7 @@
     </div>
   </script>
 
+  <!-- ~page ~locales -->
   <script id="locales" type="text/x-jsrender">
     <div class="container">
       <div class="tabs w-tabs" data-duration-in="300" data-duration-out="100">
@@ -515,7 +521,9 @@
     </div> 
   </script>
 
+  <!-- ~component ~listadolocales -->
   <script id="listadolocales" type="text/x-jsrender">
+  {{for data}}
     <div class="td">
       <div class="tr">
         <p>{{:nombre_simple}}</p>
@@ -527,13 +535,13 @@
         <p>{{:mail}}</p>
       </div>
       <div class="tr w-hidden-small w-hidden-tiny">
-        <p>{{:plan}}</p>
+        <p>{{if ~root.extra[key] && ~root.extra[key].plan}}{{:~root.extra[key].plan}}{{/if}}</p>
       </div>
       <div class="tr w-hidden-small w-hidden-tiny">
         <p>{{:telefono}}</p>
       </div>
       <div class="pago tr">
-        <p class="enfecha">{{if pagos}}{{:~toDate(pagos[pagos.length-1].creado,'DD/MM')}}{{else}}&mdash;{{/if}}</p>
+        <p class="enfecha">{{if ~root.extra[key] && ~root.extra[key].pagos}}{{:~toDate(~root.extra[key].pagos[~root.extra[key].pagos.length-1].creado,'DD/MM')}}{{else}}&mdash;{{/if}}</p>
       </div>
       <div class="actions tr">
         <div class="table-action ver" data-ix="open-viewlocal">Ver</div>
@@ -543,8 +551,10 @@
         <div class="eliminar table-action" data-ix="eliminar-show" data-key="{{:key}}">Eliminar</div>
       </div>
     </div>   
+  {{/for}}
   </script>
 
+  <!-- ~page ~estadisticas -->
   <script id="estadisticas" type="text/x-jsrender">
     <div class="head-section"></div>
     <div class="estadisticas">
@@ -603,8 +613,10 @@
     </div>
   </script>
 
+  <!-- ~modal ~local -->
   <script id="modal_viewlocal" type="text/x-jsrender">
   </script>
+
   <!-- end templates -->    
 
   <!-- begin modals -->

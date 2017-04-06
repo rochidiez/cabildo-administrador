@@ -1,7 +1,8 @@
 $(function(){
 
 	var settings = {
-		pagos : {
+		notification_delay : 5000
+		, pagos : {
 			dia_vencimiento : 20
 		}
 		, user : undefined
@@ -18,14 +19,14 @@ $(function(){
 	}
 	, routes = {
 		index : function(){
-	    	helpers.render_tpl('.content','#index',{}, function(){
+	    	helpers.render_tpl('.content','#index',{}, {}, function(){
 	    		$('body').addClass('login-body')
 	    		$('input[name="email"]').focus()
 	    		$('#loading').fadeOut(200)
 	    	})
 		}
 		, estadisticas : function(){
-			helpers.render_tpl('.content','#estadisticas',{}, function(){
+			helpers.render_tpl('.content','#estadisticas',{}, {}, function(){
 				helpers.tpl.resetWebflow()
 				$('#loading').fadeOut(200)
 			})
@@ -35,37 +36,45 @@ $(function(){
 			, key = helpers.getParameterByName('key')
 
 			if(isAdmin()){
-				key = key ? 'locales/' + key : null
+				key = key ? key : null
 			} else {
-				key = 'locales/' + settings.user.displayName
+				key = settings.user.displayName
 			}
 
-			helpers.firebase_once('categorias', function(categorias){ 
-				helpers.render_row(key,'.content', '#local', {categorias: categorias, key : key}, function(res){
-					$('.horarios--container').html($.templates('#horario').render(helpers.tpl.toArray(res.entry['horarios para filtro']))).promise().done(function(){
-						$('.descuento--container').html($.templates('#descuento').render(res.entry.descuentos)).promise().done(function(){
-							if($('.horarios--container').children().length > 6){
-								$('.add-time').addClass('w-hidden')
-							}
-							$('#loading').fadeOut(200)
+			helpers.firebase_once('/categorias', function(categorias){ 
+				helpers.firebase_once('/clientes/' + key, function(cliente){ 
+					helpers.render_row('/locales/'+key,'.content', '#local', {categorias: categorias.val(), cliente: cliente.val(), key : key}, function(res){
+						$('.horarios--container').html($.templates('#horario').render(helpers.tpl.toArray(res.data['horarios para filtro']))).promise().done(function(){
+							$('.descuento--container').html($.templates('#descuento').render(res.data.descuentos)).promise().done(function(){
+								if($('.horarios--container').children().length > 6){
+									$('.add-time').addClass('w-hidden')
+								}
+								$('#loading').fadeOut(200)
+							})
 						})
-					})			
+					})
 				})
 			})
 		}
 		, locales : function(){
 			// modal action
 			// bring all and sort.
-			
-			helpers.render_tpl('.content','#locales',{}, function(){
-				helpers.render_tabs('locales','#listadolocales',{
-					"todos":[]
-					,"Premium":[]
-					,"Básico":[]
-					,"Avenida Cabildo":[]
-				}, function(){
-					helpers.tpl.resetWebflow()
-					$('#loading').fadeOut(200)	
+			helpers.render_tpl('.content','#locales',{},{}, function(){
+				helpers.firebase_once('/clientes', function(clientes){ 
+					helpers.render_tabs('locales','#listadolocales',{
+						tabs: {
+							"todos":[]
+							,"Premium":[]
+							,"Básico":[]
+							,"Avenida Cabildo":[]
+						}
+						,showalltabs: 1
+						, data: clientes.val()
+						, extraKey : 'plan'
+					}, function(){
+						helpers.tpl.resetWebflow()
+						$('#loading').fadeOut(200)	
+					})
 				})
 			})
 		}
@@ -108,7 +117,16 @@ $(function(){
 			}
 		}
 		, tpl : {
-			isAdmin : function(){
+			notify : function(text){
+				$('.notification').append('<p>'+text+'</p>').removeClass('w-hidden').fadeIn('fast', function(){
+					setTimeout(function(){
+						$(this).fadeOut('slow', function(){
+							$(this).addClass('w-hidden')
+						})
+					},settings.notification_delay)
+				})
+			}
+		   , isAdmin : function(){
 				return isAdmin()
 			}
 			, getProxVencimiento : function(format){
@@ -117,7 +135,6 @@ $(function(){
 				, date = then
 
 				if(now < then){
-					console.log("2")
 					date = moment([now.format('YY'), now.format('MM'), settings.pagos.dia_vencimiento])
 				}
 
@@ -205,7 +222,8 @@ $(function(){
 		, render_tabs : function(a,b,c,d){
 			helpers.firebase_once(a, function(snapshot){
 
-				var tabs = c
+				var tabs = c.tabs
+
 				snapshot.forEach(function(childSnapshot) {
 					var childKey = childSnapshot.key
 					, childData = childSnapshot.val()
@@ -214,13 +232,13 @@ $(function(){
 					row.key = childKey
 		    		tabs.todos.push(row)
 
-		    		if(row.plan){
-		    			tabs[row.plan].push(row)
+		    		if(c.data && c.data[childKey] && c.data[childKey][c.extraKey]){
+		    			tabs[c.data[childKey][c.extraKey]].push(row)
 		    		}				
 				})
 
-		    	for(var slug in c){
-		    		helpers.render_tpl('div[data-w-tab="' + slug + '"] .' + a,b,tabs[slug])
+		    	for(var slug in c.tabs){
+	    			helpers.render_tpl('div[data-w-tab="' + slug + '"] .' + a,b,tabs[slug],c.data)
 		    	}
 
 		    	setTimeout(function(){
@@ -229,23 +247,17 @@ $(function(){
 			})
 		}
 		, render_row : function(a,b,c,d,e){
-			if(!a) return helpers.render_extra_tpl(b,c,{},d,e)
+			if(!a) return helpers.render_tpl(b,c,{},d,e)
 			helpers.firebase_once(a, function(snapshot){
-				if($(d).length){
-					helpers.render_extra_tpl(b,c,snapshot.val(),d,e)
-				}else{
-					helpers.render_tpl(b,c,snapshot.val(),e)				
-				}
+				helpers.render_tpl(b,c,snapshot.val(),d,e)
 			})
 		}
-		, render_tpl : function(a,b,c,d) { // use to pass single object
-	   		$(a).html($.templates(b).render(c, helpers.tpl)).promise().done(function(result){
-	   			if(typeof d == 'function') d.call(this,result)
-	   		})
-		}
-		, render_extra_tpl : function(a,b,c,d,e) { // use to parse multiple objects
-	   		$(a).html($.templates(b).render({entry:c,extra:d}, helpers.tpl)).promise().done(function(){
-	   			if(typeof e == 'function') e.call(this,{entry:c,extra:d})
+		, render_tpl : function(a,b,c,d,e) { // use d to parse multiple objects
+			console.log(c)
+			console.log(d)
+			console.log("---")
+	   		$(a).html($.templates(b).render({data:c,extra:d}, helpers.tpl)).promise().done(function(){
+	   			if(typeof e == 'function') e.call(this,{data:c,extra:d})
 	   		})
 		}
 	}
@@ -303,12 +315,13 @@ $(function(){
 
 	$(document).on('click','.save',function(){
 
-		console.log("save")
 		// uploads
 
-		var key = $('input[name="key"]').val()?$('input[name=key]').val():'locales/'+$('input[name=nombre_simple]').val()
+		var key = $('input[name="key"]').val()?$('input[name=key]').val():$('input[name=nombre_simple]').val()
 		, horarios = "Lunes a Viernes " + $('input[name=de-lunes-a-viernes]').val() + " \nSábados " + $('input[name=sabado]').val()  + " \nFeriados " + $('input[name=feriados]').val()
 		, horarios_filtro = {}
+		, postData = {}
+		, clientData = {}
 		, descuentos = []
 
 
@@ -335,7 +348,7 @@ $(function(){
 		})
 
 		$('#loading').fadeIn(200, function(){
-			var updates = {
+			postData = {
 				nombre_simple: $('input[name=nombre_simple]').val()||""
 				, direccion : $('input[name=direccion]').val()||""
 				, descripcion : $('textarea[name=descripcion]').val()||""
@@ -356,13 +369,16 @@ $(function(){
 				, 'imagen fondo' : $('.imagen_fondo').attr('src')||""
 			}
 
-			if($('input[name=plan]').val()){
-				updates.plan = $('input[name=plan]').val()
+			if($('select[name=plan]').val()){
+				// todo: aditional updates in locales
+				clientData.plan = $('select[name=plan]').val()
+				//planData.creado = new Date().toString()
 			}
 
-			firebase.database().ref(key).update(updates)
-			.then(function(a){
-				$('#loading').fadeOut()
+			firebase.database().ref('/locales/'+key).update(postData).then(function(a){
+				firebase.database().ref('/clientes/'+key).update(clientData).then(function(a){
+					$('#loading').fadeOut()
+				})
 			})
 		})
 
@@ -419,11 +435,11 @@ $(function(){
 
 			$('.proximo-pago-input').slideToggle()
 
-			firebase.database().ref(key + '/pagos').once('value').then(function(snapshot) {
+			firebase.database().ref('/clientes/' + key + '/pagos').once('value').then(function(snapshot) {
 			 	var nextKey = snapshot.numChildren()
 			 	, updates = {}
 				updates['/pagos/' + nextKey] = pagoData;
-				firebase.database().ref(key).update(updates).then(function(){
+				firebase.database().ref('/clientes/' + key).update(updates).then(function(){
 					$('#loading').fadeOut()
 				})
 			})
