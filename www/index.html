@@ -108,6 +108,7 @@
 
   <!-- ~component ~descuento -->
   <script id="descuento" type="text/x-jsrender">
+  {{for values}}
     <div class="descuento-cont descuentos">
       <select class="_1 select w-select porcentaje">
         <option value="">Seleccionar</option>
@@ -134,15 +135,14 @@
       </select>
       <select class="_1 select w-select entidad">
         <option value="">Seleccionar</option>
-        <option value="Club La Nación"{{if #data && #data.indexOf('La Nación')>-1}} selected{{/if}}>Club La Nación</option>
-        <option value="Clarín 365"{{if #data && #data.indexOf('365')>-1}} selected{{/if}}>Clarín 365</option>
-        <option value="Tarjeta Naranja"{{if #data && #data.indexOf('Naranja')>-1}} selected{{/if}}>Tarjeta Naranja</option>
-        <option value="Club Personal"{{if #data && #data.indexOf('Personal')>-1}} selected{{/if}}>Club Personal</option>
-        <option value="Tarjeta Shopping"{{if #data && #data.indexOf('Shopping')>-1}} selected{{/if}}>Club Personal</option>
+        {{for ~root.entidades}}
+        <option value="{{>#data}}"{{if #parent.parent.data.indexOf(#data)>-1}} selected{{/if}}>{{>#data}}</option>
+        {{/for}}
       </select>
       <a class="add-descuento w-inline-block" href="#"><img src="images/add-circle.svg">
       </a>
     </div> 
+  {{/for}}
   </script>
   
   <!-- ~component ~horario -->
@@ -160,6 +160,13 @@
       </select>
       <select class="select select-field w-select abre">
         <option value="">Horario</option>
+        <option value="0"{{if #data&&abre=='0'}} selected{{/if}}>0</option>
+        <option value="1"{{if #data&&abre=='1'}} selected{{/if}}>1</option>
+        <option value="2"{{if #data&&abre=='2'}} selected{{/if}}>2</option>
+        <option value="3"{{if #data&&abre=='3'}} selected{{/if}}>3</option>
+        <option value="4"{{if #data&&abre=='4'}} selected{{/if}}>4</option>
+        <option value="5"{{if #data&&abre=='5'}} selected{{/if}}>5</option>
+        <option value="6"{{if #data&&abre=='6'}} selected{{/if}}>6</option>
         <option value="7"{{if #data&&abre=='7'}} selected{{/if}}>7</option>
         <option value="8"{{if #data&&abre=='8'}} selected{{/if}}>8</option>
         <option value="9"{{if #data&&abre=='9'}} selected{{/if}}>9</option>
@@ -177,10 +184,16 @@
         <option value="21"{{if #data&&abre=='21'}} selected{{/if}}>21</option>
         <option value="22"{{if #data&&abre=='22'}} selected{{/if}}>22</option>
         <option value="23"{{if #data&&abre=='23'}} selected{{/if}}>23</option>
-        <option value="24"{{if #data&&abre=='24'}} selected{{/if}}>24</option>
       </select>
       <select class="select select-field w-select cierra">
         <option value="">Horario</option>
+        <option value="0"{{if #data&&cierra=='0'}} selected{{/if}}>0</option>
+        <option value="1"{{if #data&&cierra=='1'}} selected{{/if}}>1</option>
+        <option value="2"{{if #data&&cierra=='2'}} selected{{/if}}>2</option>
+        <option value="3"{{if #data&&cierra=='3'}} selected{{/if}}>3</option>
+        <option value="4"{{if #data&&cierra=='4'}} selected{{/if}}>4</option>
+        <option value="5"{{if #data&&cierra=='5'}} selected{{/if}}>5</option>
+        <option value="6"{{if #data&&cierra=='6'}} selected{{/if}}>6</option>
         <option value="7"{{if #data&&cierra=='7'}} selected{{/if}}>7</option>
         <option value="8"{{if #data&&cierra=='8'}} selected{{/if}}>8</option>
         <option value="9"{{if #data&&cierra=='9'}} selected{{/if}}>9</option>
@@ -198,7 +211,6 @@
         <option value="21"{{if #data&&cierra=='21'}} selected{{/if}}>21</option>
         <option value="22"{{if #data&&cierra=='22'}} selected{{/if}}>22</option>
         <option value="23"{{if #data&&cierra=='23'}} selected{{/if}}>23</option>
-        <option value="24"{{if #data&&cierra=='24'}} selected{{/if}}>24</option>
       </select>
     </div>
   </script>
@@ -374,8 +386,9 @@
                 <option value="85%">85%</option>
                 <option value="90%">90%</option>
                 <option value="95%">95%</option>
+                <option value="2x1">2x1</option>
               </select>
-              <input class="_1 input w-input" data-name="Descuento" id="Descuento-3" maxlength="256" name="Descuento" placeholder="otro descuento" type="text">
+              <input class="_1 input w-input" maxlength="256" name="descuento" placeholder="otro descuento" type="text">
               <a class="add-descuento w-inline-block" href="#"><img src="images/add-circle.svg">
               </a>
             </div>

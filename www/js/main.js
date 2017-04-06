@@ -42,14 +42,24 @@ $(function(){
 			}
 
 			helpers.firebase_once('/categorias', function(categorias){ 
-				helpers.firebase_once('/clientes/' + key, function(cliente){ 
-					helpers.render_row('/locales/'+key,'.content', '#local', {categorias: categorias.val(), cliente: cliente.val(), key : key}, function(res){
-						$('.horarios--container').html($.templates('#horario').render(helpers.tpl.toArray(res.data['horarios para filtro']))).promise().done(function(){
-							$('.descuento--container').html($.templates('#descuento').render(res.data.descuentos)).promise().done(function(){
-								if($('.horarios--container').children().length > 6){
-									$('.add-time').addClass('w-hidden')
+				helpers.firebase_once('/descuentos', function(descuentos){ 
+					helpers.firebase_once('/clientes/' + key, function(cliente){ 
+						helpers.render_row('/locales/'+key,'.content', '#local', {categorias: categorias.val(), descuentos: descuentos.val(), cliente: cliente.val(), key : key}, function(res){
+							$('.horarios--container').html($.templates('#horario').render(helpers.tpl.toArray(res.data['horarios para filtro']))).promise().done(function(){
+								var items = descuentos.val()
+								, entidades = []
+
+								for(var i in items){
+									var ent = i.substring(i.indexOf("con ") + 4)
+									if(!entidades[ent]) entidades.push(ent)
 								}
-								$('#loading').fadeOut(200)
+								console.log(entidades)
+								$('.descuento--container').html($.templates('#descuento').render({values:res.data.descuentos,entidades:entidades})).promise().done(function(){
+									if($('.horarios--container').children().length > 6){
+										$('.add-time').addClass('w-hidden')
+									}
+									$('#loading').fadeOut(200)
+								})
 							})
 						})
 					})
@@ -451,7 +461,12 @@ $(function(){
 
 	$(document).on('click','.add-descuento',function(e) {
 		if($('.descuento--container').children().length < 99){
-			$('.descuento--container').append($.templates('#descuento').render())
+			var $tr    = $(this).closest('.descuento-cont')
+			var $clone = $tr.clone()
+			$clone.find('select').val('');
+			$tr.after($clone)
+
+			//$('.descuento--container').append($.templates('#descuento').render())
 		}
 		e.preventDefault()
 	})
@@ -459,7 +474,11 @@ $(function(){
 	// descuentos
 	$(document).on('click','.add-time',function(e) {
 		if($('.horarios--container').children().length < 7){
-			$('.horarios--container').append($.templates('#horario').render())
+			var $tr    = $(this).prev().find('.horarios_filtro').last()
+			var $clone = $tr.clone()
+			$clone.find('select').val('');
+			$tr.after($clone)
+
 		}
 		e.preventDefault()
 	})
