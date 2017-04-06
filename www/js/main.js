@@ -53,7 +53,6 @@ $(function(){
 									var ent = i.substring(i.indexOf("con ") + 4)
 									if(!entidades[ent]) entidades.push(ent)
 								}
-								console.log(entidades)
 								$('.descuento--container').html($.templates('#descuento').render({values:res.data.descuentos,entidades:entidades})).promise().done(function(){
 									if($('.horarios--container').children().length > 6){
 										$('.add-time').addClass('w-hidden')
@@ -67,8 +66,6 @@ $(function(){
 			})
 		}
 		, locales : function(){
-			// modal action
-			// bring all and sort.
 			helpers.render_tpl('.content','#locales',{},{}, function(){
 				helpers.firebase_once('/clientes', function(clientes){ 
 					helpers.render_tabs('locales','#listadolocales',{
@@ -263,9 +260,6 @@ $(function(){
 			})
 		}
 		, render_tpl : function(a,b,c,d,e) { // use d to parse multiple objects
-			console.log(c)
-			console.log(d)
-			console.log("---")
 	   		$(a).html($.templates(b).render({data:c,extra:d}, helpers.tpl)).promise().done(function(){
 	   			if(typeof e == 'function') e.call(this,{data:c,extra:d})
 	   		})
@@ -312,6 +306,7 @@ $(function(){
 	})
 
 	// ~locales
+
 	$(document).on('click','.edit.table-action',function(){
 		location.hash = 'local?key=' + $(this).data('key')
 	})
@@ -321,17 +316,13 @@ $(function(){
 	})	
 
 	// ~local
-	// pagos
 
 	$(document).on('click','.save',function(){
-
-		// uploads
 
 		var key = $('input[name="key"]').val()?$('input[name=key]').val():$('input[name=nombre_simple]').val()
 		, horarios = "Lunes a Viernes " + $('input[name=de-lunes-a-viernes]').val() + " \nSábados " + $('input[name=sabado]').val()  + " \nFeriados " + $('input[name=feriados]').val()
 		, horarios_filtro = {}
 		, postData = {}
-		, clientData = {}
 		, descuentos = []
 
 
@@ -379,22 +370,33 @@ $(function(){
 				, 'imagen fondo' : $('.imagen_fondo').attr('src')||""
 			}
 
-			if($('select[name=plan]').val()){
-				// todo: aditional updates in locales
-				clientData.plan = $('select[name=plan]').val()
-				//planData.creado = new Date().toString()
-			}
+			var promise = new Promise(function(resolve, reject) {
+				var data = postData
+				, clientData = {}
 
-			firebase.database().ref('/locales/'+key).update(postData).then(function(a){
-				firebase.database().ref('/clientes/'+key).update(clientData).then(function(a){
+				if($('select[name=plan]').val() != $('input[name=plan1]').val()){
+					var plan = $('select[name=plan]').val()
+					clientData.plan = plan
+
+					firebase.database().ref('/planes/' + plan).once('value').then(function(snapshot){
+						data.visibilidad = snapshot.val().visibilidad
+						firebase.database().ref('/clientes/'+key).update(clientData).then(function(a){
+							resolve(data)
+						})
+					})
+				} else {
+					resolve(data)	
+				}				
+			})
+
+			promise.then(function(postData){
+				firebase.database().ref('/locales/'+key).update(postData).then(function(a){
 					$('#loading').fadeOut()
 				})
 			})
 		})
 
-
 		// uploads
-
 
 		$('.photo').each(function(){
 			if($(this).get(0).files.length){
@@ -465,13 +467,12 @@ $(function(){
 			var $clone = $tr.clone()
 			$clone.find('select').val('');
 			$tr.after($clone)
-
-			//$('.descuento--container').append($.templates('#descuento').render())
 		}
 		e.preventDefault()
 	})
 
 	// descuentos
+
 	$(document).on('click','.add-time',function(e) {
 		if($('.horarios--container').children().length < 7){
 			var $tr    = $(this).prev().find('.horarios_filtro').last()
@@ -484,6 +485,7 @@ $(function(){
 	})
 
 	// fotos
+
 	$(document).on('click','.link-block',function(e) {
 		var position =  $(this).parent().index()
 		$('.photo:eq(' + position + ')').click()
@@ -506,53 +508,6 @@ $(function(){
 	        reader.readAsDataURL(this.files[0])
 	    }			
 	})
-
-	$(document).on('submit','.publish__uploadimages--form',function(e) {
-	    var file = new FormData(this)
-	    , upload_in_progress = 1 
-
-	    $('.publish__uploadimages--info').text("Iniciando carga de fotos...");
-
-	    // Upload file and metadata to the object 'images/mountains.jpg'
-		var uploadTask = storageRef.child('images/' + file.name).put(file);
-
-		// Listen for state changes, errors, and completion of the upload.
-		uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
-			function(snapshot) {
-				// Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-				var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-				console.log('Upload is ' + progress + '% done');
-				switch (snapshot.state) {
-					case firebase.storage.TaskState.PAUSED: // or 'paused'
-						console.log('Upload is paused');
-						break;
-					case firebase.storage.TaskState.RUNNING: // or 'running'
-						console.log('Upload is running');
-					break;
-				}
-			}, function(error) {
-				switch (error.code) {
-					case 'storage/unauthorized':
-						// User doesn't have permission to access the object
-						break;
-
-					case 'storage/canceled':
-						// User canceled the upload
-						break;
-
-					case 'storage/unknown':
-						// Unknown error occurred, inspect error.serverResponse
-						break;
-				}
-			}, function() {
-				// Upload completed successfully, now we can get the download URL
-				console.log("proceed to save " + uploadTask.snapshot)
-				console.log("proceed to save " + uploadTask.snapshot.downloadURL)
-				var downloadURL = uploadTask.snapshot.downloadURL;
-			});
-
-	    e.preventDefault()
-	})	
 
 	firebase.auth().onAuthStateChanged(function(user) {
 		if (user) {

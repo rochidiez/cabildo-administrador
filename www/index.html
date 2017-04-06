@@ -121,15 +121,15 @@
         <option value="35%"{{if #data && #data.indexOf('35%')>-1}} selected{{/if}}>35%</option>
         <option value="40%"{{if #data && #data.indexOf('40%')>-1}} selected{{/if}}>40%</option>
         <option value="45%"{{if #data && #data.indexOf('45%')>-1}} selected{{/if}}>45%</option>
-        <option value="55%"{{if #data && #data.indexOf('50%')>-1}} selected{{/if}}>50%</option>
-        <option value="60%"{{if #data && #data.indexOf('55%')>-1}} selected{{/if}}>55%</option>
-        <option value="65%"{{if #data && #data.indexOf('60%')>-1}} selected{{/if}}>60%</option>
-        <option value="70%"{{if #data && #data.indexOf('65%')>-1}} selected{{/if}}>65%</option>
-        <option value="75%"{{if #data && #data.indexOf('70%')>-1}} selected{{/if}}>70%</option>
-        <option value="80%"{{if #data && #data.indexOf('75%')>-1}} selected{{/if}}>75%</option>
-        <option value="85%"{{if #data && #data.indexOf('80%')>-1}} selected{{/if}}>80%</option>
-        <option value="90%"{{if #data && #data.indexOf('85%')>-1}} selected{{/if}}>85%</option>
-        <option value="95%"{{if #data && #data.indexOf('90%')>-1}} selected{{/if}}>90%</option>
+        <option value="50%"{{if #data && #data.indexOf('50%')>-1}} selected{{/if}}>50%</option>
+        <option value="55%"{{if #data && #data.indexOf('55%')>-1}} selected{{/if}}>55%</option>
+        <option value="60%"{{if #data && #data.indexOf('60%')>-1}} selected{{/if}}>60%</option>
+        <option value="65%"{{if #data && #data.indexOf('65%')>-1}} selected{{/if}}>66%</option>
+        <option value="70%"{{if #data && #data.indexOf('70%')>-1}} selected{{/if}}>70%</option>
+        <option value="75%"{{if #data && #data.indexOf('75%')>-1}} selected{{/if}}>75%</option>
+        <option value="80%"{{if #data && #data.indexOf('80%')>-1}} selected{{/if}}>80%</option>
+        <option value="85%"{{if #data && #data.indexOf('85%')>-1}} selected{{/if}}>85%</option>
+        <option value="90%"{{if #data && #data.indexOf('90%')>-1}} selected{{/if}}>90%</option>
         <option value="95%"{{if #data && #data.indexOf('95%')>-1}} selected{{/if}}>95%</option>
         <option value="2x1"{{if #data && #data.indexOf('2x1')>-1}} selected{{/if}}>2x1</option>
       </select>
@@ -221,7 +221,7 @@
       <input type="hidden" name="key" value="{{:extra.key}}" />
 
     {{if extra.key}}
-      <h3 class="heading"> {{:~prop('nombre_simple',entry)}}</h3>
+      <h3 class="heading"> {{:~prop('nombre_simple',data)}}</h3>
     {{else}}
       <h3 class="heading">Cargá un nuevo local</h3>
     {{/if}}
@@ -235,14 +235,14 @@
 
       <div class="publish__uploadimages--preview section-photos">
         <div class="profile-picture">
-          <a class="link-block w-inline-block" href="#"><img class="foto-perfil imagen_logo" src="{{if ~prop('imagen logo',entry)}}{{:entry['imagen logo']}}{{else}}images/profile-medidas.png{{/if}}">
+          <a class="link-block w-inline-block" href="#"><img class="foto-perfil imagen_logo" src="{{if ~prop('imagen logo',data)}}{{:data['imagen logo']}}{{else}}images/profile-medidas.png{{/if}}">
           </a>
           <div class="button-container"><a class="picture-button w-button" data-name="imagen_logo" href="#">Subi una foto de perfil</a>
             <p class="picture-span">Subí una imagen en jpg o png de 500px x 500px aprox.</p>
           </div>
         </div>
         <div class="portada">
-          <a class="link-block w-inline-block" href="#"><img class="foto-perfil imagen_fondo" src="{{if ~prop('imagen fondo',entry)}}{{:entry['imagen fondo']}}{{else}}images/portada-medidas.png{{/if}}">
+          <a class="link-block w-inline-block" href="#"><img class="foto-perfil imagen_fondo" src="{{if ~prop('imagen fondo',data)}}{{:data['imagen fondo']}}{{else}}images/portada-medidas.png{{/if}}">
           </a>
           <div class="button-container"><a class="picture-button w-button" data-name="imagen_fondo" href="#">Subi una foto de portada</a>
             <p class="picture-span">Subí una imagen en jpg o png de 800px x 458px aprox.</p>
@@ -254,11 +254,11 @@
           <div class="title-section">Información básica</div>
           <div class="w-form">
             <label for="nombre">Nombre del negocio</label>
-            <input class="input w-input" maxlength="256" name="nombre_simple" placeholder="Avenida Cabildo" required="required" type="text" value="{{:~prop('nombre_simple',entry)}}">
+            <input class="input w-input" maxlength="256" name="nombre_simple" placeholder="Avenida Cabildo" required="required" type="text" value="{{:~prop('nombre_simple',data)}}">
             <label for="direcci-n">Dirección</label>
-            <input class="input w-input" maxlength="256" name="direccion" placeholder="Av. Cabildo 1394" required="required" type="text" value="{{:~prop('direccion',entry)}}">
+            <input class="input w-input" maxlength="256" name="direccion" placeholder="Av. Cabildo 1394" required="required" type="text" value="{{:~prop('direccion',data)}}">
             <label for="descripci-n">Descripción sobre tu negocio</label>
-            <textarea class="input w-input" maxlength="5000" name="descripcion" placeholder="Toda la AVENIDA en una sola aplicación.">{{:~prop('descripcion',entry)}}</textarea>
+            <textarea class="input w-input" maxlength="5000" name="descripcion" placeholder="Toda la AVENIDA en una sola aplicación.">{{:~prop('descripcion',data)}}</textarea>
             <label for="categoria">Categoría</label>
             <select class="select w-select" name="categoria" required="required">
               <option value="">Seleccionar</option>
@@ -267,20 +267,21 @@
               {{/for}}
             </select>
             <label for="web">Sitio Web</label>
-            <input class="input w-input" maxlength="256" name="web" placeholder="avenicacabildo.com.ar" required="required" type="text" value="{{:~prop('web',entry)}}">
+            <input class="input w-input" maxlength="256" name="web" placeholder="avenicacabildo.com.ar" required="required" type="text" value="{{:~prop('web',data)}}">
           </div>
         </div>
         <div class="conteiner-info">
           <div class="title-section">Tu suscripción</div>
           <div class="w-form">
               <label for="nombre-2">Nombre</label>
-              <input class="input w-input" data-name="nombre" name="nombre_suscriptor" placeholder="María Fernanda" type="text"  value="{{:~prop('nombre_suscriptor',entry)}}">
+              <input class="input w-input" data-name="nombre" name="nombre_suscriptor" placeholder="María Fernanda" type="text"  value="{{:~prop('nombre_suscriptor',data)}}">
               <label for="email-18">Email</label>
-              <input class="input w-input" maxlength="256" name="mail_suscriptor" placeholder="maria@avenidacabildo.com.ar" required="required" type="email" value="{{:~prop('mail_suscriptor',entry)}}">
+              <input class="input w-input" maxlength="256" name="mail_suscriptor" placeholder="maria@avenidacabildo.com.ar" required="required" type="email" value="{{:~prop('mail_suscriptor',data)}}">
           </div>
         {{if ~isAdmin()}}
           <div class="w-form">
             <label for="nombre-2">Plan</label>          
+            <input type="hidden" name="plan1" value="{{:extra.cliente.plan}}" />
             <select class="select w-select" name="plan">
               <option value="">Elegí un plan</option>
               <option value="Básico"{{if extra.cliente.plan == 'Básico'}} selected{{/if}}>Básico</option>
@@ -318,11 +319,11 @@
           <div class="title-section">Horarios</div>
           <div class="w-form">
               <label for="de-lunes-a-viernes">Lunes a viernes</label>
-              <input class="input w-input" maxlength="256" name="de-lunes-a-viernes" placeholder="Ej: de 9 a 22hs" required="required" type="text" value="{{:~getHorario('Lunes a viernes',entry)}}">
+              <input class="input w-input" maxlength="256" name="de-lunes-a-viernes" placeholder="Ej: de 9 a 22hs" required="required" type="text" value="{{:~getHorario('Lunes a viernes',data)}}">
               <label for="sabado">Sábados</label>
-              <input class="input w-input" maxlength="256" name="sabado" placeholder="Ej: de 9 a 12" type="text" value="{{:~getHorario('Sábados',entry)}}">
+              <input class="input w-input" maxlength="256" name="sabado" placeholder="Ej: de 9 a 12" type="text" value="{{:~getHorario('Sábados',data)}}">
               <label for="domingo">Domingos</label>
-              <input class="input w-input" maxlength="256" name="feriados" placeholder="ej: cerrado" type="text" value="{{:~getHorario('Feriados',entry)}}">
+              <input class="input w-input" maxlength="256" name="feriados" placeholder="ej: cerrado" type="text" value="{{:~getHorario('Feriados',data)}}">
           </div>
         </div>
         <div class="conteiner-info">
@@ -346,20 +347,20 @@
           <div class="title-section">¿Cómo te contactan tus clientes?</div>
           <div class="w-form">
               <label for="telefono">Teléfono</label>
-              <input class="input w-input" maxlength="256" name="telefono" placeholder="4544-4674" type="text" value="{{:~prop('telefono',entry)}}">
+              <input class="input w-input" maxlength="256" name="telefono" placeholder="4544-4674" type="text" value="{{:~prop('telefono',data)}}">
               <label for="email-clientes">Email</label>
-              <input class="input w-input" maxlength="256" name="mail" placeholder="hola@avenidacabildo.com.ar" type="email" value="{{:~prop('mail',entry)}}">
+              <input class="input w-input" maxlength="256" name="mail" placeholder="hola@avenidacabildo.com.ar" type="email" value="{{:~prop('mail',data)}}">
               <label for="facebook">Facebook</label>
-              <input class="input w-input" maxlength="256" name="facebook" placeholder="www.facebook.com/AvenidaCabildoApp" type="text" value="{{:~prop('facebook',entry)}}">
+              <input class="input w-input" maxlength="256" name="facebook" placeholder="www.facebook.com/AvenidaCabildoApp" type="text" value="{{:~prop('facebook',data)}}">
               <label for="instagram">Instagram</label>
-              <input class="input w-input" maxlength="256" name="instagram" placeholder="instagram.com/avenidacabildo" type="text" value="{{:~prop('instagram',entry)}}">
+              <input class="input w-input" maxlength="256" name="instagram" placeholder="instagram.com/avenidacabildo" type="text" value="{{:~prop('instagram',data)}}">
           </div>
         </div>
         <div class="conteiner-info">
           <div class="title-section">Descuentos</div>
           <div class="w-form">
             <label for="descuento-av">Para quienes usen Avenida Cabildo</label>
-            <input class="input w-input" maxlength="256" name="descuento_av" placeholder="20%" type="text" value="{{:~prop('descuento_av',entry)}}">
+            <input class="input w-input" maxlength="256" name="descuento_av" placeholder="20%" type="text" value="{{:~prop('descuento_av',data)}}">
             <label for="email-13">Descuento con tarjetas</label>
 
             <div class="descuento--container">
@@ -394,7 +395,7 @@
             </div>
           </div>
         </div>
-      </div><a class="save submit-button w-button" href="#">{{if extra.key}}Actualizar {{:~prop('nombre_simple',entry)}}{{else}}Cargar nuevo local{{/if}}</a>
+      </div><a class="save submit-button w-button" href="#">{{if extra.key}}Actualizar {{:~prop('nombre_simple',data)}}{{else}}Cargar nuevo local{{/if}}</a>
     </div>
   </script>
 
