@@ -98,7 +98,7 @@ $(function(){
 		}
 		, views : {
 			render : function(){
-
+				
 				$('#loading').fadeIn(200, function(){
 
 					$('body').removeClass()
