@@ -318,7 +318,7 @@ $(function(){
 
 	$(document).on('click','.ver.table-action',function(){
 		helpers.firebase_once('/locales/' + $(this).data('key'), function(local){ 
-			$('.modal.viewlocal .modal-contenido').html($.templates('#modal_viewlocal').render(local.val()))
+			$('.modal.viewlocal .modal-contenido').html($.templates('#modal_viewlocal').render(local.val(), helpers.tpl))
 		})
 	})
 
@@ -374,7 +374,6 @@ $(function(){
 			postData = {
 				nombre_simple: $('input[name=nombre_simple]').val()||""
 				, direccion : $('input[name=direccion]').val()||""
-				, descripcion : $('textarea[name=descripcion]').val()||""
 				, categoria : $('select[name=categoria]').val()||""
 				, web : $('input[name=web]').val()||""
 				, nombre_suscriptor : $('input[name=nombre_suscriptor]').val()||""
@@ -386,6 +385,7 @@ $(function(){
 				, instagram : $('input[name=instagram]').val()||""
 				, descuento_av : $('input[name=descuento_av]').val()||""
 				, descuentos : descuentos
+				, 'detalle texto' : $('textarea[name=detalle_texto]').val()||""
 				, 'horarios' : horarios
 				, 'horarios para filtro' : horarios_filtro
 				, 'imagen logo' : $('.imagen_logo').attr('src')||""
