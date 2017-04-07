@@ -126,14 +126,9 @@ $(function(){
 			}
 		}
 		, tpl : {
-			notify : function(text){
-				$('.notification').append('<p>'+text+'</p>').removeClass('w-hidden').fadeIn('fast', function(){
-					setTimeout(function(){
-						$(this).fadeOut('slow', function(){
-							$(this).addClass('w-hidden')
-						})
-					},settings.notification_delay)
-				})
+			notification : function(text){
+				$('.mensaje.modal .modal--pcenter').text(text)
+				$('*[data-ix=open-mensaje]').click()
 			}
 		   , isAdmin : function(){
 				return isAdmin()
@@ -157,7 +152,9 @@ $(function(){
 				Webflow.require("tabs").ready()
 				Webflow.require('ix').init([
 				  {"slug":"close-viewlocal","name":"close-viewlocal","value":{"style":{},"triggers":[{"type":"click","selector":".viewlocal","stepsA":[{"display":"none","opacity":0,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
+				  {"slug":"close-mensaje","name":"close-mensaje","value":{"style":{},"triggers":[{"type":"click","selector":".mensaje","stepsA":[{"display":"none","opacity":0,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
 				  {"slug":"open-viewlocal","name":"open-viewlocal","value":{"style":{},"triggers":[{"type":"click","selector":".viewlocal","stepsA":[{"display":"block"},{"opacity":1,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
+				  {"slug":"open-mensaje","name":"open-mensaje","value":{"style":{},"triggers":[{"type":"click","selector":".mensaje","stepsA":[{"display":"block"},{"opacity":1,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
 				  {"slug":"close-delete","name":"close-delete","value":{"style":{},"triggers":[{"type":"click","selector":".eliminarlocal","stepsA":[{"opacity":0.02,"transition":"opacity 200 ease 0"},{"display":"none"}],"stepsB":[]}]}},
 				  {"slug":"eliminar-show","name":"eliminar-show","value":{"style":{},"triggers":[{"type":"click","selector":".eliminarlocal","stepsA":[{"display":"block"},{"opacity":1,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}}
 				])
@@ -314,8 +311,6 @@ $(function(){
 	})
 
 	// ~locales
-
-
 	$(document).on('click','.ver.table-action',function(){
 		$('.modal.viewlocal .modal-contenido').html('')
 		helpers.firebase_once('/locales/' + $(this).data('key'), function(local){ 
@@ -332,7 +327,15 @@ $(function(){
 	})	
 
 	$('.modal.eliminarlocal .modalbutton.yes').click(function(){
-		location.hash = 'local?key=' + encodeURIComponent($(this).data('key'))
+		var key = $('body').data('key')
+		$('#loading').fadeIn(200, function(){
+			firebase.database().ref('/locales').child(key).remove().then(function(){
+				$('*[data-ix=close-delete]').click()
+				$('#loading').fadeOut(200,function(){
+					helpers.tpl.notification("Local eliminado: " +key)
+				})
+			})
+		})
 	})
 
 	$('.edit.table-action').click(function(){
@@ -439,6 +442,7 @@ $(function(){
 					updateDescuentos.then(function(descData){
 						firebase.database().ref('/descuentos/').update(descData).then(function(snap){
 							$('#loading').fadeOut()
+							helpers.tpl.notification("Local actualizado: " +key)
 						})
 					})
 				})

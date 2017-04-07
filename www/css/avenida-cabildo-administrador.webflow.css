@@ -396,6 +396,11 @@ label {
   opacity: 0;
 }
 
+.mensaje.modal {
+  display: none;
+  opacity: 0;
+}
+
 .eliminarlocal.modal {
   display: none;
   opacity: 0;

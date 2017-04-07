@@ -38,8 +38,9 @@
   </script>  
 </head>
 <body>
+
   <div id="loading"><div class="overlay"></div><div class="bg"></div></div>
-  <div class="notification w-hidden"></div>
+  <div class="w-hidden" data-ix="open-mensaje"></div>
   <div class="header"></div>
   <div class="content"></div>
   <div class="footer--container"></div>
@@ -654,6 +655,12 @@
   <div class="eliminarlocal modal" id="viewlocal">
     <div class="modal-contenedor"><img class="close" data-ix="close-delete" src="images/icono-close.svg">
       <p class="modal--pcenter">¿Estás seguro que deseas eliminar este local?</p><a class="modalbutton w-button" data-ix="close-delete" href="#">No</a><a class="modalbutton w-button yes" href="#">Si</a>
+    </div>
+  </div>
+
+  <div class="mensaje modal" id="mensaje">
+    <div class="modal-contenedor"><img class="close" data-ix="close-mensaje" src="images/icono-close.svg">
+      <p class="modal--pcenter"></p><a class="modalbutton w-button" data-ix="close-mensaje" href="#">Entendido</a>
     </div>
   </div>
 
