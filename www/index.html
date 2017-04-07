@@ -249,7 +249,7 @@
             <label for="direcci-n">Dirección</label>
             <input class="input w-input" maxlength="256" name="direccion" placeholder="Av. Cabildo 1394" required="required" type="text" value="{{:~prop('direccion',data)}}">
             <label for="descripci-n">Descripción sobre tu negocio</label>
-            <textarea class="input w-input" maxlength="5000" name="descripcion" placeholder="Toda la AVENIDA en una sola aplicación.">{{:~prop('descripcion',data)}}</textarea>
+            <textarea class="input w-input" maxlength="5000" name="detalle_texto" placeholder="Toda la AVENIDA en una sola aplicación.">{{:~prop('detalle_texto',data)}}</textarea>
             <label for="categoria">Categoría</label>
             <select class="select w-select" name="categoria" required="required">
               <option value="">Seleccionar</option>
@@ -549,7 +549,7 @@
         <p class="enfecha">{{if ~root.extra[key] && ~root.extra[key].pagos}}{{:~toDate(~root.extra[key].pagos[~root.extra[key].pagos.length-1].creado,'DD/MM')}}{{else}}&mdash;{{/if}}</p>
       </div>
       <div class="actions tr">
-        <div class="table-action ver" data-ix="open-viewlocal">Ver</div>
+        <div class="table-action ver" data-ix="open-viewlocal" data-key="{{:key}}">Ver</div>
         <a class="w-inline-block" href="#">
           <div class="edit table-action" data-key="{{:key}}">Editar</div>
         </a>
@@ -620,6 +620,25 @@
 
   <!-- ~modal ~local -->
   <script id="modal_viewlocal" type="text/x-jsrender">
+    <div class="informacion-local">
+      <div><img class="foto-local" src="images/5877e0a09ac381814417974d_webclip.png">
+      </div>
+      <div class="infolocal-txt">
+        <p><strong>En promoción</strong>: No</p>
+        <p><strong>Nombre</strong>: {{:nombre_simple}}</p>
+        <p><strong>Quién administra</strong>: {{:nombre_suscriptor}}</p>
+        <p><strong>Email</strong>: {{:mail_suscriptor}}</p>
+        <p><strong>Teléfono</strong>: {{:telefono}}</p>
+        <p><strong>Dirección</strong>: {{:direccion}}</p>
+        <p><strong>Horarios&nbsp;</strong>: {{:horarios.replace('\n',', ').replace('\\n',', ')}}</p>
+        <p><strong>Categoría</strong>: {{:categoria}}</p>
+        <p><strong>Descuentos</strong>:</p> {{if descuentos}}{{:descuentos.join(', ')}}{{/if}}
+        <p><strong>Descripción</strong>: {{:detalle_texto}}</p>
+        <p><strong>Facebook&nbsp;</strong>: {{if facebook}}<a href="{{:facebook}}" target="_blank">{{:facebook}}</a>{{/if}}</p>
+        <p><strong>Instagram&nbsp;</strong>: {{if instagram}}<a href="{{:instagram}}" target="_blank">{{:instagram}}</a>{{/if}}</p>
+        <p><strong>Web&nbsp;</strong>: {{if web}}<a href="{{:web}}" target="_blank">{{:web}}</a>{{/if}}</p>
+      </div>
+    </div>
   </script>
 
   <!-- end templates -->    
@@ -628,25 +647,7 @@
 
   <div class="modal viewlocal" id="viewlocal">
     <div class="modal-contenedor"><img class="close" data-ix="close-viewlocal" src="images/icono-close.svg">
-      <div class="informacion-local">
-        <div><img class="foto-local" src="images/5877e0a09ac381814417974d_webclip.png">
-        </div>
-        <div class="infolocal-txt">
-          <p><strong>En promoción</strong>: No</p>
-          <p><strong>Nombre</strong>: Bensimon</p>
-          <p><strong>Quién administra</strong>: Rosa Dominguez</p>
-          <p><strong>Email</strong>: rosa@bensimon.com</p>
-          <p><strong>Teléfono</strong>: 156 789 0273</p>
-          <p><strong>Dirección</strong>: Av. Cabildo 1204</p>
-          <p><strong>Horarios&nbsp;</strong>: Lunes a Domingos 24hs</p>
-          <p><strong>Categoría</strong>: Medicina y salud</p>
-          <p><strong>Descuentos</strong>: 10% Clarín, 20% La Nación, 10% Avenida Cabildo</p>
-          <p><strong>Descripción</strong>: Farmacity 2x1 llevas dos y pagas 1</p>
-          <p><strong>Facebook&nbsp;</strong>: https://www.facebook.com/Farmacity/</p>
-          <p><strong>Instagram&nbsp;</strong>: https://www.facebook.com/Farmacity/</p>
-          <p><strong>Web&nbsp;</strong>: bensimo.com.ar</p>
-        </div>
-      </div>
+      <div class="modal-contenido"></div>
     </div>
   </div>
 

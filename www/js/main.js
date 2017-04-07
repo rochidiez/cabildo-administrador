@@ -182,8 +182,15 @@ $(function(){
 
 				return $.trim(str)
 			}
-			, toHorarios : function(){
+			, toHorarios : function(horarios){
+				var parts = []
 
+				if(entry.horarios.indexOf("\\n")>-1)
+					parts = entry.horarios.split("\\n")
+				else if(entry.horarios.indexOf("\n")>-1)
+					parts = entry.horarios.split("\n")
+
+				return parts
 			}
 			, toArray : function(object){
 				if(!object) return false
@@ -307,6 +314,13 @@ $(function(){
 	})
 
 	// ~locales
+
+
+	$(document).on('click','.ver.table-action',function(){
+		helpers.firebase_once('/locales/' + $(this).data('key'), function(local){ 
+			$('.modal.viewlocal .modal-contenido').html($.templates('#modal_viewlocal').render(local.val()))
+		})
+	})
 
 	$(document).on('click','.edit.table-action',function(){
 		location.hash = 'local?key=' + encodeURIComponent($(this).data('key'))

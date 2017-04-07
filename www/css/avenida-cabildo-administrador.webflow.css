@@ -719,6 +719,11 @@ label {
   justify-content: space-around;
 }
 
+ul.no-bullets {
+  text-align: left;
+  list-style: none;
+}
+
 @media (max-width: 991px) {
   .tr {
     width: 16.6%;
