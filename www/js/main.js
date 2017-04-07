@@ -45,15 +45,17 @@ $(function(){
 				helpers.firebase_once('/descuentos', function(descuentos){ 
 					helpers.firebase_once('/clientes/' + key, function(cliente){ 
 						helpers.render_row('/locales/'+key,'.content', '#local', {categorias: categorias.val(), descuentos: descuentos.val(), cliente: cliente.val(), key : key}, function(res){
-							$('.horarios--container').html($.templates('#horario').render(helpers.tpl.toArray(res.data['horarios para filtro']))).promise().done(function(){
+							var horarios_filtro = res.data && res.data['horarios para filtro'] ? res.data['horarios para filtro'] : null
+							$('.horarios--container').html($.templates('#horario').render(helpers.tpl.toArray(horarios_filtro))).promise().done(function(){
 								var items = descuentos.val()
 								, entidades = []
+								, values = res.data && res.data.descuentos ? res.data.descuentos : null
 
 								for(var i in items){
 									var ent = i.substring(i.indexOf("con ") + 4)
 									if(!entidades[ent]) entidades.push(ent)
 								}
-								$('.descuento--container').html($.templates('#descuento').render({values:res.data.descuentos,entidades:entidades})).promise().done(function(){
+								$('.descuento--container').html($.templates('#descuento').render({values:values,entidades:entidades})).promise().done(function(){
 									if($('.horarios--container').children().length > 6){
 										$('.add-time').addClass('w-hidden')
 									}
@@ -532,3 +534,7 @@ $(function(){
    		helpers.views.render()
     }).trigger('hashchange')
 })
+
+moment.createFromInputFallback = function(config) {
+  config._d = new Date(config._i);
+}

@@ -1,3 +1,31 @@
+#loading	{ 
+	position: absolute;
+	z-index: 100;
+	width: 100%; 
+	height: 100%; 
+	background-color:  magenta;
+	/*animation: animatedBackground 40s linear infinite;*/
+	animation: animatedBackground 2s easeIn;
+}
+
+@keyframes animatedBackground {
+	from { background-position: 0 0; }
+	to { background-position: 100% 0; }
+}
+
+@-webkit-keyframes object_one {
+	75% { -webkit-transform: scale(0); }
+}
+
+@keyframes object_one {
+  75% { 
+    transform: scale(0);
+    -webkit-transform: scale(0);
+  }
+}
+
+
+/*
 #loading{
 	opacity: 0.75;
 	background-color: #ffffff;
@@ -88,3 +116,4 @@
     -webkit-transform: scale(0);
   }
 }
+*/

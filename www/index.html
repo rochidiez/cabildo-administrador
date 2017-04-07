@@ -38,7 +38,9 @@
   </script>  
 </head>
 <body>
-  <div id="loading">
+  <div id="loading"></div>
+
+  <!--div id="loading">
     <div id="loading-center">
       <div id="loading-center-absolute">
         <div class="object" id="object_one"></div>
@@ -46,7 +48,7 @@
         <div class="object" id="object_three"></div>
       </div>
     </div>
-  </div>
+  </div-->
 
   <div class="notification w-hidden"></div>
   <div class="header"></div>
@@ -136,7 +138,7 @@
       <select class="_1 select w-select entidad">
         <option value="">Seleccionar</option>
         {{for ~root.entidades}}
-        <option value="{{>#data}}"{{if #parent.parent.data.indexOf(#data)>-1}} selected{{/if}}>{{>#data}}</option>
+        <option value="{{>#data}}"{{if #parent.parent.data && #parent.parent.data.indexOf(#data)>-1}} selected{{/if}}>{{>#data}}</option>
         {{/for}}
       </select>
       <a class="add-descuento w-inline-block" href="#"><img src="images/add-circle.svg">
@@ -263,7 +265,7 @@
             <select class="select w-select" name="categoria" required="required">
               <option value="">Seleccionar</option>
               {{for ~toArray(extra.categorias)}}
-              <option value="{{:key}}"{{if ~root.data.categoria==key}} selected{{/if}}>{{:key}}</option>
+              <option value="{{:key}}"{{if ~root.data && ~root.data.categoria==key}} selected{{/if}}>{{:key}}</option>
               {{/for}}
             </select>
             <label for="web">Sitio Web</label>
@@ -281,12 +283,12 @@
         {{if ~isAdmin()}}
           <div class="w-form">
             <label for="nombre-2">Plan</label>          
-            <input type="hidden" name="plan1" value="{{:extra.cliente.plan}}" />
+            <input type="hidden" name="plan1" value={{if extra.cliente}}{{:extra.cliente.plan}}{{else}}&mdash;{{/if}}" />
             <select class="select w-select" name="plan">
               <option value="">Elegí un plan</option>
-              <option value="Básico"{{if extra.cliente.plan == 'Básico'}} selected{{/if}}>Básico</option>
-              <option value="Premium"{{if extra.cliente.plan == 'Premium'}} selected{{/if}}>Premium</option>
-              <option value="Avenida Cabildo"{{if extra.cliente.plan == 'Avenida Cabildo'}} selected{{/if}}>Avenida Cabildo</option>
+              <option value="Básico"{{if extra.cliente && extra.cliente.plan == 'Básico'}} selected{{/if}}>Básico</option>
+              <option value="Premium"{{if extra.cliente && extra.cliente.plan == 'Premium'}} selected{{/if}}>Premium</option>
+              <option value="Avenida Cabildo"{{if extra.cliente && extra.cliente.plan == 'Avenida Cabildo'}} selected{{/if}}>Avenida Cabildo</option>
             </select>          
           </div>
         {{else}}
@@ -295,7 +297,7 @@
         {{/if}}
           <div class="proximo-pago">El próximo vencimiento es el {{:~getProxVencimiento()}}</div>
           <a class="pago-btn open w-button" href="#">Realizar pago</a>
-        {{if extra.cliente.pagos}}
+        {{if extra.cliente && extra.cliente.pagos}}
           <a class="pago-btn w-button" href="#" onclick="$('.historico-pagos').slideToggle()">Ver pagos</a>
           <div class="historico-pagos w-hidden">
           {{for extra.cliente.pagos}}
