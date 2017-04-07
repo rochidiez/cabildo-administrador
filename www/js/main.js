@@ -317,6 +317,7 @@ $(function(){
 
 
 	$(document).on('click','.ver.table-action',function(){
+		$('.modal.viewlocal .modal-contenido').html('')
 		helpers.firebase_once('/locales/' + $(this).data('key'), function(local){ 
 			$('.modal.viewlocal .modal-contenido').html($.templates('#modal_viewlocal').render(local.val(), helpers.tpl))
 		})
