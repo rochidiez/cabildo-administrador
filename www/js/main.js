@@ -98,7 +98,7 @@ $(function(){
 		}
 		, views : {
 			render : function(){
-				
+
 				$('#loading').fadeIn(200, function(){
 
 					$('body').removeClass()
@@ -237,7 +237,6 @@ $(function(){
 					var childKey = childSnapshot.key
 					, childData = childSnapshot.val()
 					, row = childData
-
 					row.key = childKey
 		    		tabs.todos.push(row)
 
@@ -310,11 +309,11 @@ $(function(){
 	// ~locales
 
 	$(document).on('click','.edit.table-action',function(){
-		location.hash = 'local?key=' + $(this).data('key')
+		location.hash = 'local?key=' + encodeURIComponent($(this).data('key'))
 	})
 
 	$(document).on('click','.eliminar.table-action',function(){
-		$('body').attr('data-key',$(this).data('key'))
+		$('body').attr('data-key',encodeURIComponent($(this).data('key')))
 	})	
 
 	// ~local
