@@ -344,7 +344,7 @@ label {
 }
 
 .modal {
-  position: absolute;
+  position: fixed;
   left: 0px;
   top: 0px;
   right: 0px;
@@ -374,8 +374,9 @@ label {
 }
 
 .foto-local {
-  width: 100px;
-  height: 100px;
+  width: 100%;
+  /*width: 100px;
+  height: 100px;*/
   background-color: #0869b4;
 }
 
