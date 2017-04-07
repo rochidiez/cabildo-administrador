@@ -330,6 +330,14 @@ $(function(){
 		$('body').attr('data-key',encodeURIComponent($(this).data('key')))
 	})	
 
+	$('.modal.eliminarlocal .modalbutton.yes').click(function(){
+		location.hash = 'local?key=' + encodeURIComponent($(this).data('key'))
+	})
+
+	$('.edit.table-action').click(function(){
+		location.hash = 'local?key=' + encodeURIComponent($(this).data('key'))
+	})
+
 	// ~local
 
 	$(document).on('click','.save',function(){
@@ -339,7 +347,6 @@ $(function(){
 		, horarios_filtro = {}
 		, postData = {}
 		, descuentos = []
-
 
 		$('.horarios_filtro').each(function() {
 			var dia = $(this).find('.dia').val()
@@ -385,7 +392,8 @@ $(function(){
 				, 'imagen fondo' : $('.imagen_fondo').attr('src')||""
 			}
 
-			var promise = new Promise(function(resolve, reject) {
+
+			var updateCliente = new Promise(function(resolve, reject) {
 				var data = postData
 				, clientData = {}
 
@@ -403,10 +411,35 @@ $(function(){
 					resolve(data)	
 				}				
 			})
+			, updateDescuentos = new Promise(function(resolve, reject) {
+				firebase.database().ref('/descuentos').once('value').then(function(snap){
+					var data = snap.val()
+					descuentos.forEach(function(descuento){
+						if(!data[descuento]) {
+							data[descuento] = {
+								'imagen' : {
+									"1x" : "http://www.imprimitucupon.com/images/layout/cabecera/logo.png"
+									, "2x" : "http://www.imprimitucupon.com/images/layout/cabecera/logo.png"
+									, "3x" : "http://www.imprimitucupon.com/images/layout/cabecera/logo.png"
+								}
+								, 'locales adheridos' : []
+							}
+						}
+						if($.inArray(key,data[descuento]['locales adheridos'])==-1){
+							data[descuento]['locales adheridos'][data[descuento]['locales adheridos'].length] = key;
+						}
+					})
+					resolve(data)
+				})
+			})
 
-			promise.then(function(postData){
-				firebase.database().ref('/locales/'+key).update(postData).then(function(a){
-					$('#loading').fadeOut()
+			updateCliente.then(function(postData){
+				firebase.database().ref('/locales/'+key).update(postData).then(function(snap){
+					updateDescuentos.then(function(descData){
+						firebase.database().ref('/descuentos/').update(descData).then(function(snap){
+							$('#loading').fadeOut()
+						})
+					})
 				})
 			})
 		})
@@ -429,7 +462,7 @@ $(function(){
 					var i = snapshot.metadata.customMetadata.name.replace('_',' ')
 					, value = snapshot.downloadURL
 
-					firebase.database().ref(key + '/' + i).set(value)
+					firebase.database().ref('/locales/' + key + '/' + i).set(value)
 					$('#upload').fadeOut()
 				})
 			}

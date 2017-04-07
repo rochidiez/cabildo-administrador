@@ -357,8 +357,8 @@
             <div class="descuento--container">
             </div>
 
-            <div class="descuento-cont">
-              <select class="_1 select w-select" name="field-6">
+            <div class="descuento-cont descuentos">
+              <select class="_1 select w-select porcentaje">
                 <option value="">Seleccionar</option>
                 <option value="5%">5%</option>
                 <option value="10%">10%</option>
@@ -380,7 +380,7 @@
                 <option value="95%">95%</option>
                 <option value="2x1">2x1</option>
               </select>
-              <input class="_1 input w-input" maxlength="256" name="descuento" placeholder="otro descuento" type="text">
+              <input class="_1 input w-input entidad" maxlength="256" type="text">
               <a class="add-descuento w-inline-block" href="#"><img src="images/add-circle.svg">
               </a>
             </div>
@@ -621,10 +621,10 @@
   <!-- ~modal ~local -->
   <script id="modal_viewlocal" type="text/x-jsrender">
     <div class="informacion-local">
-      <div><img class="foto-local" src="images/5877e0a09ac381814417974d_webclip.png">
+      <div><img class="foto-local" src="{{if #data['imagen logo']}}{{>#data['imagen logo']}}{{else}}images/5877e0a09ac381814417974d_webclip.png{{/if}}">
       </div>
       <div class="infolocal-txt">
-        <p><strong>En promoción</strong>: No</p>
+        <p><strong>En promoción</strong>: {{if #data['en promocion']}}Sí{{else}}No{{/if}}</p>
         <p><strong>Nombre</strong>: {{:nombre_simple}}</p>
         <p><strong>Quién administra</strong>: {{:nombre_suscriptor}}</p>
         <p><strong>Email</strong>: {{:mail_suscriptor}}</p>
@@ -653,7 +653,7 @@
 
   <div class="eliminarlocal modal" id="viewlocal">
     <div class="modal-contenedor"><img class="close" data-ix="close-delete" src="images/icono-close.svg">
-      <p class="modal--pcenter">¿Estás seguro que deseas eliminar este local?</p><a class="modalbutton w-button" href="#">No</a><a class="modalbutton w-button yes" href="#">Si</a>
+      <p class="modal--pcenter">¿Estás seguro que deseas eliminar este local?</p><a class="modalbutton w-button" data-ix="close-delete" href="#">No</a><a class="modalbutton w-button yes" href="#">Si</a>
     </div>
   </div>
 
