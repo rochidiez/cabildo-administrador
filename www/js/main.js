@@ -1,276 +1,276 @@
-$(function(){
-
-	var settings = {
-		notification_delay : 5000
-		, pagos : {
-			dia_vencimiento : 20
-		}
-		, user : undefined
-		, admin : { 
-			paths : ['/admin.html']
-			, uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2'
-		}
+var notification = function(text){
+	$('.mensaje.modal .modal--pcenter').text(text)
+	$('.mensaje.modal').css({opacity:1}).fadeIn(100)
+}
+, settings = {
+	notification_delay : 5000
+	, pagos : {
+		dia_vencimiento : 20
 	}
-	, isAdmin = function(){
-		return settings.user.uid==settings.admin.uid
+	, user : undefined
+	, admin : { 
+		paths : ['/admin.html']
+		, uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2'
 	}
-	, isGuest = function(){
-		return !settings.user
+}
+, isAdmin = function(){
+	return settings.user.uid==settings.admin.uid
+}
+, isGuest = function(){
+	return !settings.user
+}
+, routes = {
+	index : function(next){
+  	helpers.render_tpl('.content','#index',{}, {}, function(){
+  		$('body').addClass('login-body')
+  		$('input[name="email"]').focus()
+  		next()
+  	})
 	}
-	, routes = {
-		index : function(){
-	    	helpers.render_tpl('.content','#index',{}, {}, function(){
-	    		$('body').addClass('login-body')
-	    		$('input[name="email"]').focus()
-	    		$('#loading').fadeOut(200)
-	    	})
-		}
-		, estadisticas : function(){
-			helpers.render_tpl('.content','#estadisticas',{}, {}, function(){
-				helpers.tpl.resetWebflow()
-				$('#loading').fadeOut(200)
-			})
-		}
-		, local : function(){
-			var position = 0
-			, key = helpers.getParameterByName('key')
+	, estadisticas : function(next){
+		helpers.render_tpl('.content','#estadisticas',{}, {}, next)
+	}
+	, local : function(next){
+		var position = 0
+		, key = helpers.getParameterByName('key')
 
-			if(isAdmin()){
-				key = key ? key : null
-			} else {
-				key = settings.user.displayName
-			}
+		if(isAdmin()){
+			key = key ? key : null
+		} else {
+			key = settings.user.displayName
+		}
 
-			helpers.firebase_once('/categorias', function(categorias){ 
-				helpers.firebase_once('/descuentos', function(descuentos){ 
-					helpers.firebase_once('/clientes/' + key, function(cliente){ 
+		helpers.firebase_once('/categorias', function(categorias){ 
+			helpers.firebase_once('/descuentos', function(descuentos){ 
+				helpers.firebase_once('/clientes/' + key, function(cliente){ 
+					helpers.firebase_once('/tarjetas', function(tarjetas){ 
 						helpers.render_row('/locales/'+key,'.content', '#local', {categorias: categorias.val(), descuentos: descuentos.val(), cliente: cliente.val(), key : key}, function(res){
 							var horarios_filtro = res.data && res.data['horarios para filtro'] ? res.data['horarios para filtro'] : null
 							$('.horarios--container').html($.templates('#horario').render(helpers.tpl.toArray(horarios_filtro))).promise().done(function(){
-								var items = descuentos.val()
+								var tarjs = tarjetas.val()
 								, entidades = []
 								, values = res.data && res.data.descuentos ? res.data.descuentos : null
 
-								for(var i in items){
-									var ent = i.substring(i.indexOf("con ") + 4)
-									if(!entidades[ent]) entidades.push(ent)
+								for(var i in tarjs){
+									entidades.push(i)
 								}
+
 								$('.descuento--container').html($.templates('#descuento').render({values:values,entidades:entidades})).promise().done(function(){
 									if($('.horarios--container').children().length > 6){
 										$('.add-time').addClass('w-hidden')
 									}
-									$('#loading').fadeOut(200)
+									next()
 								})
 							})
 						})
 					})
 				})
 			})
-		}
-		, locales : function(){
-			helpers.render_tpl('.content','#locales',{},{}, function(){
-				helpers.firebase_once('/clientes', function(clientes){ 
-					helpers.render_tabs('locales','#listadolocales',{
-						tabs: {
-							"todos":[]
-							,"Premium":[]
-							,"Básico":[]
-							,"Avenida Cabildo":[]
-						}
-						,showalltabs: 1
-						, data: clientes.val()
-						, extraKey : 'plan'
-					}, function(){
-						helpers.tpl.resetWebflow()
-						$('#loading').fadeOut(200)	
-					})
+		})
+	}
+	, locales : function(next){
+		helpers.render_tpl('.content','#locales',{},{}, function(){
+			helpers.firebase_once('/clientes', function(clientes){ 
+				helpers.render_tabs('locales','#listadolocales',{
+					tabs: {
+						"todos":[]
+						,"Premium":[]
+						,"Básico":[]
+						,"Avenida Cabildo":[]
+					}
+					,showalltabs: 1
+					, data: clientes.val()
+					, extraKey : 'plan'
+				}, function(){
+						next()
 				})
 			})
-		}
+		})
 	}
-	, helpers = {
-		updateHeader : function(){
-			var route = location.hash.replace('#','')||''
+}
+, helpers = {
+	updateHeader : function(){
+		var route = location.hash.replace('#','')||''
+		, route = route.indexOf('?') > -1 ? route.substring(0, route.indexOf('?')) : route
+
+		$('.nav-item').removeClass('w--current')
+		$('a[data-section="#' + route + '"]').addClass('w--current')
+	}
+	, resetWebflow : function(){
+		if(typeof Webflow == undefined) return false
+		Webflow.require("tabs").ready()
+		Webflow.require('ix').init([
+		  {"slug":"close-viewlocal","name":"close-viewlocal","value":{"style":{},"triggers":[{"type":"click","selector":".viewlocal","stepsA":[{"display":"none","opacity":0,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
+		  {"slug":"close-mensaje","name":"close-mensaje","value":{"style":{},"triggers":[{"type":"click","selector":".mensaje","stepsA":[{"display":"none","opacity":0,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
+		  {"slug":"open-viewlocal","name":"open-viewlocal","value":{"style":{},"triggers":[{"type":"click","selector":".viewlocal","stepsA":[{"display":"block"},{"opacity":1,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
+		  {"slug":"open-mensaje","name":"open-mensaje","value":{"style":{},"triggers":[{"type":"click","selector":".mensaje","stepsA":[{"display":"block"},{"opacity":1,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
+		  {"slug":"close-delete","name":"close-delete","value":{"style":{},"triggers":[{"type":"click","selector":".eliminarlocal","stepsA":[{"opacity":0.02,"transition":"opacity 200 ease 0"},{"display":"none"}],"stepsB":[]}]}},
+		  {"slug":"eliminar-show","name":"eliminar-show","value":{"style":{},"triggers":[{"type":"click","selector":".eliminarlocal","stepsA":[{"display":"block"},{"opacity":1,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}}
+		])
+	}
+	, render : function(){
+
+		$('#loading').fadeIn(200, function(){
+
+			$('body').removeClass()
+			/*
+			var user = firebase.auth().currentUser;
+
+			$('.footer--container').html($.templates('#footer').render({user:user}))
+
+			if(user){
+				$('.session-status').html(user.email + ' <a href="#" class="salir">Cerrar sesión</a>')
+			}*/
+
+
+			var route = location.hash.replace('#','')||'index'
 			, route = route.indexOf('?') > -1 ? route.substring(0, route.indexOf('?')) : route
 
-			$('.nav-item').removeClass('w--current')
-			$('a[data-section="#' + route + '"]').addClass('w--current')
-		}
-		, views : {
-			render : function(){
-
-				$('#loading').fadeIn(200, function(){
-
-					$('body').removeClass()
-					
-					var user = firebase.auth().currentUser;
-
-					$('.footer--container').html($.templates('#footer').render({user:user}))
-
-					if(user){
-						$('.session-status').html(user.email + ' <a href="#" class="salir">Cerrar sesión</a>')
-					}
-
-					var route = location.hash.replace('#','')||'index'
-					, route = route.indexOf('?') > -1 ? route.substring(0, route.indexOf('?')) : route
-
-	    			if(route){
-				    	if(typeof routes[route] == 'function'){
-				    		routes[route].call(this)
+			if(route){
+		    	if(typeof routes[route] == 'function'){
+		    		routes[route].call(this, function(){
+		    			$('#loading').fadeOut(200,function(){
 				    		helpers.updateHeader()
-				    	} else {
-				    		$('.container').html("No existe la página")
-				    	}
-				    }
-				})
-			}
-		}
-		, tpl : {
-			notification : function(text){
-				$('.mensaje.modal .modal--pcenter').text(text)
-				$('*[data-ix=open-mensaje]').click()
-			}
-		   , isAdmin : function(){
-				return isAdmin()
-			}
-			, getProxVencimiento : function(format){
-				var now = moment()
-				, then = moment([now.format('YY'), now.format('MM')-1, settings.pagos.dia_vencimiento])
-				, date = then
-
-				if(now < then){
-					date = moment([now.format('YY'), now.format('MM'), settings.pagos.dia_vencimiento])
-				}
-
-				return moment(date).format(format||'DD/MM')
-			}
-			, toDate : function(date,format){
-				return moment(date).format(format||'DD/MM/YY')
-			}
-			, resetWebflow : function(){
-				if(typeof Webflow == undefined) return false
-				Webflow.require("tabs").ready()
-				Webflow.require('ix').init([
-				  {"slug":"close-viewlocal","name":"close-viewlocal","value":{"style":{},"triggers":[{"type":"click","selector":".viewlocal","stepsA":[{"display":"none","opacity":0,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
-				  {"slug":"close-mensaje","name":"close-mensaje","value":{"style":{},"triggers":[{"type":"click","selector":".mensaje","stepsA":[{"display":"none","opacity":0,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
-				  {"slug":"open-viewlocal","name":"open-viewlocal","value":{"style":{},"triggers":[{"type":"click","selector":".viewlocal","stepsA":[{"display":"block"},{"opacity":1,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
-				  {"slug":"open-mensaje","name":"open-mensaje","value":{"style":{},"triggers":[{"type":"click","selector":".mensaje","stepsA":[{"display":"block"},{"opacity":1,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
-				  {"slug":"close-delete","name":"close-delete","value":{"style":{},"triggers":[{"type":"click","selector":".eliminarlocal","stepsA":[{"opacity":0.02,"transition":"opacity 200 ease 0"},{"display":"none"}],"stepsB":[]}]}},
-				  {"slug":"eliminar-show","name":"eliminar-show","value":{"style":{},"triggers":[{"type":"click","selector":".eliminarlocal","stepsA":[{"display":"block"},{"opacity":1,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}}
-				])
-			}
-			, getHorario : function(index,entry){
-				if(!entry || !entry.horarios) return ""
-
-				var parts = []
-				, str = ""
-
-				if(entry.horarios.indexOf("\\n")>-1)
-					parts = entry.horarios.split("\\n")
-				else if(entry.horarios.indexOf("\n")>-1)
-					parts = entry.horarios.split("\n")
-				
-				parts.forEach(function(ln){
-					ln = ln.toLowerCase()
-					if(ln.indexOf(index.toLowerCase())>-1){
-						str = ln.replace(index.toLowerCase(),"")
-					}
-				})
-
-				return $.trim(str)
-			}
-			, toHorarios : function(horarios){
-				var parts = []
-
-				if(entry.horarios.indexOf("\\n")>-1)
-					parts = entry.horarios.split("\\n")
-				else if(entry.horarios.indexOf("\n")>-1)
-					parts = entry.horarios.split("\n")
-
-				return parts
-			}
-			, toArray : function(object){
-				if(!object) return false
-				var items = []
-				if(!$(object).length) return items;
-				for(var i in object){
-					var row = object[i]
-					row.key = i
-					items.push(row)
-				}
-				return items
-			}
-			, prop : function(a,b,c){
-				var d = b
-				if(typeof b=='string') d = c
-				if(d && d[a]) return d[a]
-				return typeof b=='string' ? b : ""
-			}
-		}
-		, setParameterByName : function(name,value,url){
-	        if(!url) url = window.location.hash.split('#').join('')
-	        if(value == null) value = ''
-	        var pattern = new RegExp('\\b('+name+'=).*?(&|$)')
-	        if(url.search(pattern)>=0){
-	            return url.replace(pattern,'$1' + value + '$2')
-	        }
-	        return url + '&' + name + '=' + value 
-	    }
-	    , getParameterByName : function(name, url) {
-		    if (!url) {
-		      url = window.location.href;
-		    }
-		    name = name.replace(/[\[\]]/g, "\\$&");
-		    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-		        results = regex.exec(url);
-		    if (!results) return null;
-		    if (!results[2]) return '';
-		    return decodeURIComponent(results[2].replace(/\+/g, " "));
-	    }  	
-		, firebase_once : function(a, b){    
-			firebase.database().ref(a).once('value').then(function(snapshot) {
-				if(typeof b == 'function') b.call(this,snapshot)
-			})
-		}
-		, render_tabs : function(a,b,c,d){
-			helpers.firebase_once(a, function(snapshot){
-
-				var tabs = c.tabs
-
-				snapshot.forEach(function(childSnapshot) {
-					var childKey = childSnapshot.key
-					, childData = childSnapshot.val()
-					, row = childData
-					row.key = childKey
-		    		tabs.todos.push(row)
-
-		    		if(c.data && c.data[childKey] && c.data[childKey][c.extraKey]){
-		    			tabs[c.data[childKey][c.extraKey]].push(row)
-		    		}				
-				})
-
-		    	for(var slug in c.tabs){
-	    			helpers.render_tpl('div[data-w-tab="' + slug + '"] .' + a,b,tabs[slug],c.data)
+				    		helpers.resetWebflow()
+		    			})
+		    		})
+		    	} else {
+		    		$('.container').html("No existe la página")
 		    	}
+		    }
+		})
+	}
+	, tpl : {
+	    isAdmin : function(){
+			return isAdmin()
+		}
+		, getProxVencimiento : function(format){
+			var now = moment()
+			, then = moment([now.format('YY'), now.format('MM')-1, settings.pagos.dia_vencimiento])
+			, date = then
 
-		    	setTimeout(function(){
-		    		if(typeof d == 'function') d.call(this)
-		    	},200)	    	
-			})
+			if(now < then){
+				date = moment([now.format('YY'), now.format('MM'), settings.pagos.dia_vencimiento])
+			}
+
+			return moment(date).format(format||'DD/MM')
 		}
-		, render_row : function(a,b,c,d,e){
-			if(!a) return helpers.render_tpl(b,c,{},d,e)
-			helpers.firebase_once(a, function(snapshot){
-				helpers.render_tpl(b,c,snapshot.val(),d,e)
-			})
+		, toDate : function(date,format){
+			return moment(date).format(format||'DD/MM/YY')
 		}
-		, render_tpl : function(a,b,c,d,e) { // use d to parse multiple objects
-	   		$(a).html($.templates(b).render({data:c,extra:d}, helpers.tpl)).promise().done(function(){
-	   			if(typeof e == 'function') e.call(this,{data:c,extra:d})
-	   		})
+		, getHorario : function(index,entry){
+			if(!entry || !entry.horarios) return ""
+
+			var parts = []
+			, str = ""
+
+			if(entry.horarios.indexOf("\\n")>-1)
+				parts = entry.horarios.split("\\n")
+			else if(entry.horarios.indexOf("\n")>-1)
+				parts = entry.horarios.split("\n")
+			
+			parts.forEach(function(ln){
+				ln = ln.toLowerCase()
+				if(ln.indexOf(index.toLowerCase())>-1){
+					str = ln.replace(index.toLowerCase(),"")
+				}
+			})
+
+			return $.trim(str)
+		}
+		, toHorarios : function(horarios){
+			var parts = []
+
+			if(entry.horarios.indexOf("\\n")>-1)
+				parts = entry.horarios.split("\\n")
+			else if(entry.horarios.indexOf("\n")>-1)
+				parts = entry.horarios.split("\n")
+
+			return parts
+		}
+		, toArray : function(object){
+			if(!object) return false
+			var items = []
+			if(!$(object).length) return items;
+			for(var i in object){
+				var row = object[i]
+				row.key = i
+				items.push(row)
+			}
+			return items
+		}
+		, prop : function(a,b,c){
+			var d = b
+			if(typeof b=='string') d = c
+			if(d && d[a]) return d[a]
+			return typeof b=='string' ? b : ""
 		}
 	}
+	, setParameterByName : function(name,value,url){
+        if(!url) url = window.location.hash.split('#').join('')
+        if(value == null) value = ''
+        var pattern = new RegExp('\\b('+name+'=).*?(&|$)')
+        if(url.search(pattern)>=0){
+            return url.replace(pattern,'$1' + value + '$2')
+        }
+        return url + '&' + name + '=' + value 
+    }
+    , getParameterByName : function(name, url) {
+	    if (!url) {
+	      url = window.location.href;
+	    }
+	    name = name.replace(/[\[\]]/g, "\\$&");
+	    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+	        results = regex.exec(url);
+	    if (!results) return null;
+	    if (!results[2]) return '';
+	    return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }  	
+	, firebase_once : function(a, b){    
+		firebase.database().ref(a).once('value').then(function(snapshot) {
+			if(typeof b == 'function') b.call(this,snapshot)
+		})
+	}
+	, render_tabs : function(a,b,c,d){
+		helpers.firebase_once(a, function(snapshot){
 
+			var tabs = c.tabs
+
+			snapshot.forEach(function(childSnapshot) {
+				var childKey = childSnapshot.key
+				, childData = childSnapshot.val()
+				, row = childData
+				row.key = childKey
+	    		tabs.todos.push(row)
+
+	    		if(c.data && c.data[childKey] && c.data[childKey][c.extraKey]){
+	    			tabs[c.data[childKey][c.extraKey]].push(row)
+	    		}				
+			})
+
+	    	for(var slug in c.tabs){
+    			helpers.render_tpl('div[data-w-tab="' + slug + '"] .' + a,b,tabs[slug],c.data)
+	    	}
+
+	    	setTimeout(function(){
+	    		if(typeof d == 'function') d.call(this)
+	    	},200)	    	
+		})
+	}
+	, render_row : function(a,b,c,d,e){
+		if(!a) return helpers.render_tpl(b,c,{},d,e)
+		helpers.firebase_once(a, function(snapshot){
+			helpers.render_tpl(b,c,snapshot.val(),d,e)
+		})
+	}
+	, render_tpl : function(a,b,c,d,e) { // use d to parse multiple objects
+   		$(a).html($.templates(b).render({data:c,extra:d}, helpers.tpl)).promise().done(function(){
+   			if(typeof e == 'function') e.call(this,{data:c,extra:d})
+   		})
+	}
+}
+
+$(function(){
 	$(document).on('click','.nav-item',function(e){
 		e.preventDefault()
 		var section = $(this).data('section')
@@ -288,6 +288,7 @@ $(function(){
 		  	alert(err.message)
 		})
 	})
+
 
 	$(document).on('click','.login',function(){
 		var email = $.trim($('#email').val())
@@ -332,7 +333,7 @@ $(function(){
 			firebase.database().ref('/locales').child(key).remove().then(function(){
 				$('*[data-ix=close-delete]').click()
 				$('#loading').fadeOut(200,function(){
-					helpers.tpl.notification("Local eliminado: " +key)
+					notification("Local eliminado: " +key)
 				})
 			})
 		})
@@ -343,135 +344,161 @@ $(function(){
 	})
 
 	// ~local
-
 	$(document).on('click','.save',function(){
 
 		var key = $('input[name="key"]').val()?$('input[name=key]').val():$('input[name=nombre_simple]').val()
-		, horarios = "Lunes a Viernes " + $('input[name=de-lunes-a-viernes]').val() + " \nSábados " + $('input[name=sabado]').val()  + " \nFeriados " + $('input[name=feriados]').val()
-		, horarios_filtro = {}
-		, postData = {}
 		, descuentos = []
+		, ubicacion = ""
+		, plan = $('select[name=plan]').val()
 
-		$('.horarios_filtro').each(function() {
-			var dia = $(this).find('.dia').val()
-			, abre = $(this).find('.abre').val()
-			, cierra = $(this).find('.cierra').val()
+		if(plan==""){
+			return notification("Por favor elija un plan")
+		}
 
-			if(dia!="" && abre!="" && cierra!=""){
-				horarios_filtro[dia] = {
-					abre: abre
-					, cierra : cierra
-				}
-			}
-		})
-
-		$('.descuentos').each(function() {
-			var porcentaje = $(this).find('.porcentaje').val()
-			, entidad = $(this).find('.entidad').val()
-
-			if(porcentaje!="" && entidad!=""){
-				descuentos.push(porcentaje + ' con ' + entidad)
-			}
-		})
-
-		$('#loading').fadeIn(200, function(){
-			postData = {
-				nombre_simple: $('input[name=nombre_simple]').val()||""
-				, direccion : $('input[name=direccion]').val()||""
-				, categoria : $('select[name=categoria]').val()||""
-				, web : $('input[name=web]').val()||""
-				, nombre_suscriptor : $('input[name=nombre_suscriptor]').val()||""
-				, mail_suscriptor : $('input[name=mail_suscriptor]').val()||""
-				, telefono : $('input[name=telefono]').val()||""
-				, mail_suscriptor : $('input[name=mail_suscriptor]').val()||""
-				, mail : $('input[name=mail]').val()||""
-				, facebook : $('input[name=facebook]').val()||""
-				, instagram : $('input[name=instagram]').val()||""
-				, descuento_av : $('input[name=descuento_av]').val()||""
-				, descuentos : descuentos
-				, 'detalle texto' : $('textarea[name=detalle_texto]').val()||""
-				, 'horarios' : horarios
-				, 'horarios para filtro' : horarios_filtro
-				, 'imagen logo' : $('.imagen_logo').attr('src')||""
-				, 'imagen fondo' : $('.imagen_fondo').attr('src')||""
-			}
-
-
-			var updateCliente = new Promise(function(resolve, reject) {
-				var data = postData
-				, clientData = {}
-
-				if($('select[name=plan]').val() != $('input[name=plan1]').val()){
-					var plan = $('select[name=plan]').val()
-					clientData.plan = plan
-
-					firebase.database().ref('/planes/' + plan).once('value').then(function(snapshot){
-						data.visibilidad = snapshot.val().visibilidad
-						firebase.database().ref('/clientes/'+key).update(clientData).then(function(a){
-							resolve(data)
-						})
-					})
-				} else {
-					resolve(data)	
-				}				
+		var geocode = new Promise(function(resolve, reject) {
+			$.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + $('input[name=direccion]').val() + ' CABA, Argentina', function(res){ 
+			    resolve(res)
+			}).fail(function() {
+			    resolve(null)
 			})
-			, updateDescuentos = new Promise(function(resolve, reject) {
-				firebase.database().ref('/descuentos').once('value').then(function(snap){
-					var data = snap.val()
+		})
+		, updateCliente = new Promise(function(resolve, reject) {
+			var clientData = {}
+			, plan = $('select[name=plan]').val()
+
+			clientData.plan = plan
+			clientData.nombre_suscriptor = $('input[name=nombre_suscriptor]').val()||""
+			clientData.mail_suscriptor = $('input[name=mail_suscriptor]').val()||""
+
+			firebase.database().ref('/planes/' + plan).once('value').then(function(snap_plan){
+				var horarios = "Lunes a Viernes " + $('input[name=de-lunes-a-viernes]').val() + " \nSábados " + $('input[name=sabado]').val()  + " \nFeriados " + $('input[name=feriados]').val()
+				, horarios_filtro = {}
+				, plan = snap_plan.val()
+
+				$('.horarios_filtro').each(function() {
+					var dia = $(this).find('.dia').val()
+					, abre = $(this).find('.abre').val()
+					, cierra = $(this).find('.cierra').val()
+
+					if(dia!="" && abre!="" && cierra!=""){
+						horarios_filtro[dia] = {
+							abre: abre
+							, cierra : cierra
+						}
+					}
+				})
+
+				$('.descuentos').each(function() {
+					var porcentaje = $(this).find('.porcentaje').val()
+					, entidad = $(this).find('.entidad').val()
+
+					if(porcentaje!="" && entidad!=""){
+						descuentos.push(porcentaje + ' con ' + entidad)
+					}
+				})
+
+				var data = {
+					categoria : $('select[name=categoria]').val()||""
+					, descuentos : descuentos
+					, 'detalle texto' : $('textarea[name=detalle_texto]').val()||""
+					, direccion : $('input[name=direccion]').val()||""
+					, efectivo : $('input[name=descuento_av]').val()||""
+					, facebook : $('input[name=facebook]').val()||""
+					, horarios : horarios
+					, 'horarios para filtro' : horarios_filtro
+					, 'imagen logo' : $('.imagen_logo').attr('src')||""
+					, 'imagen fondo' : $('.imagen_fondo').attr('src')||""
+					, instagram : $('input[name=instagram]').val()||""
+					, mail : $('input[name=mail]').val()||""
+					, nombre_simple: $('input[name=nombre_simple]').val()||""
+					, telefono : $('input[name=telefono]').val()||""
+					, ubicacion : ubicacion
+					, web : $('input[name=web]').val()||""
+					, visibilidad : plan.visibilidad||3
+				}
+				firebase.database().ref('/clientes/'+key).update(clientData).then(function(a){
+					resolve(data)
+				})
+			})
+		})
+		, updateDescuentos = new Promise(function(resolve, reject) {
+			firebase.database().ref('/descuentos').once('value').then(function(snap_descuentos){
+				firebase.database().ref('/tarjetas').once('value').then(function(snap_tarjetas){
+					var data = snap_descuentos.val()
+					, tarjetas = snap_tarjetas.val()
+
+					console.log(tarjetas)
+
 					descuentos.forEach(function(descuento){
+						console.log(descuento)
 						if(!data[descuento]) {
-							data[descuento] = {
-								'imagen' : {
-									"1x" : "http://www.imprimitucupon.com/images/layout/cabecera/logo.png"
-									, "2x" : "http://www.imprimitucupon.com/images/layout/cabecera/logo.png"
-									, "3x" : "http://www.imprimitucupon.com/images/layout/cabecera/logo.png"
+
+							// grab images
+							var tkey = descuento.substr(descuento.indexOf("con ") + 4)
+							, skey = ""
+
+							for(var i in tarjetas){
+								if(skey == "" && i.indexOf(tkey) > -1){
+									skey = i
 								}
+							}
+
+							data[descuento] = {
+								'imagen' : tarjetas[skey] ? tarjetas[skey].imagen : {}
 								, 'locales adheridos' : []
 							}
 						}
 						if($.inArray(key,data[descuento]['locales adheridos'])==-1){
 							data[descuento]['locales adheridos'][data[descuento]['locales adheridos'].length] = key;
 						}
-					})
+					}) 
 					resolve(data)
-				})
+				})				
 			})
+		})		
+	
+		geocode.then(function(geojson){
 
-			updateCliente.then(function(postData){
-				firebase.database().ref('/locales/'+key).update(postData).then(function(snap){
-					updateDescuentos.then(function(descData){
-						firebase.database().ref('/descuentos/').update(descData).then(function(snap){
-							$('#loading').fadeOut()
-							helpers.tpl.notification("Local actualizado: " +key)
+			if(geojson.status=="OK"){
+				ubicacion = geojson.results[0].geometry.location.lat + ", " + geojson.results[0].geometry.location.lng
+			}
+
+			$('#loading').fadeIn(200, function(){
+				$('.photo').each(function(){
+					if($(this).get(0).files.length){
+						var name = $(this).attr('name')
+						, file = $(this).get(0).files[0]
+						, metadata = {
+							customMetadata : {
+								'name' : name
+								, 'key' : key
+							}
+						}
+
+						$('#upload').fadeIn()
+						firebase.storage().ref().child('images/' + file.name).put(file,metadata).then(function(snapshot){
+							var i = snapshot.metadata.customMetadata.name.replace('_',' ')
+							, value = snapshot.downloadURL
+
+							firebase.database().ref('/locales/' + key + '/' + i).set(value)
+							$('#upload').fadeOut()
+						})
+					}
+				})
+
+				updateCliente.then(function(postData){
+					firebase.database().ref('/locales/'+key).update(postData).then(function(snap){
+						updateDescuentos.then(function(descData){
+							firebase.database().ref('/descuentos/').update(descData).then(function(snap){
+								$('#loading').fadeOut()
+								console.log("sale ---> " + key)
+								notification("Local actualizado: " +key)
+							})
 						})
 					})
 				})
 			})
 		})
-
-		// uploads
-
-		$('.photo').each(function(){
-			if($(this).get(0).files.length){
-				var name = $(this).attr('name')
-				, file = $(this).get(0).files[0]
-				, metadata = {
-					customMetadata : {
-						'name' : name
-						, 'key' : key
-					}
-				}
-
-				$('#upload').fadeIn()
-				firebase.storage().ref().child('images/' + file.name).put(file,metadata).then(function(snapshot){
-					var i = snapshot.metadata.customMetadata.name.replace('_',' ')
-					, value = snapshot.downloadURL
-
-					firebase.database().ref('/locales/' + key + '/' + i).set(value)
-					$('#upload').fadeOut()
-				})
-			}
-		})		
 	})
 
 	$(document).on('click','.pago-btn.open',function(e) {
@@ -582,7 +609,7 @@ $(function(){
     $(window).on('hashchange', function(){
     	if(isGuest() && location.hash != '') 
     		return location.hash = ''
-   		helpers.views.render()
+   		helpers.render()
     }).trigger('hashchange')
 })
 
