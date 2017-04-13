@@ -31,7 +31,7 @@
 	background-size: 50%;
 	background-position: center;
 	background-repeat: no-repeat;
-	animation: animatedBackground 10s ease-out;
+	animation: animatedBackground 20s ease-out;
 	z-index: 101;
 }
 

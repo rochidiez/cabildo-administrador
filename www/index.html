@@ -26,7 +26,20 @@
   <link href="images/5877e0a09ac381814417974d_webclip.png" rel="apple-touch-icon">
   <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
   <script>
-    // Initialize Firebase
+
+
+    // Cabildo
+    var config = {
+      apiKey: "AIzaSyDxNOXJR9IQkPRO5fHmapWKcqozvl5ETkU",
+      authDomain: "avenida-cabildo.firebaseapp.com",
+      databaseURL: "https://avenida-cabildo.firebaseio.com",
+      projectId: "avenida-cabildo",
+      storageBucket: "avenida-cabildo.appspot.com",
+      messagingSenderId: "854269150359"
+    };  
+
+  /*
+    // Infinix
     var config = {
       apiKey: "AIzaSyACm6k1hFLVQc9zJgP6omf1HjzSfkUqtYI",
       authDomain: "infinix-console.firebaseapp.com",
@@ -34,6 +47,7 @@
       storageBucket: "infinix-console.appspot.com",
       messagingSenderId: "378423189863"
     };
+        */
     firebase.initializeApp(config);
   </script>
 </head>
@@ -54,9 +68,9 @@
         <div class="w-form">
           <form data-name="login" id="wf-form-login" name="wf-form-login">
             <label for="email">Email</label>
-            <input class="input w-input" data-name="email" id="email" maxlength="256" name="email" value="Ej: Alejandro@avenidacabildo.com.ar" type="email">
+            <input class="input w-input" data-name="email" id="email" maxlength="256" name="email" placeholder="Ej: Alejandro@avenidacabildo.com.ar" type="email">
             <label for="password">Contraseña</label>
-            <input class="input w-input" data-name="Contraseña" id="password" maxlength="256" name="Contrase-a" value="Tu contraseña" type="password"><a class="login--link" href="recuperarpass.html">¿No te acordás tu contraseña?</a>
+            <input class="input w-input" data-name="Contraseña" id="password" maxlength="256" name="Contrase-a" placeholder="Tu contraseña" type="password"><a class="login--link" href="recuperarpass.html">¿No te acordás tu contraseña?</a>
           </form>
 
           <div class="error-message w-form-fail">
@@ -245,11 +259,11 @@
           <div class="title-section">Información básica</div>
           <div class="w-form">
             <label for="nombre">Nombre del negocio</label>
-            <input class="input w-input" maxlength="256" name="nombre_simple" value="Avenida Cabildo" required="required" type="text" value="{{:~prop('nombre_simple',data)}}">
+            <input class="input w-input" maxlength="256" name="nombre_simple" placeholder="Avenida Cabildo" required="required" type="text" value="{{:~prop('nombre_simple',data)}}">
             <label for="direcci-n">Dirección</label>
-            <input class="input w-input" maxlength="256" name="direccion" value="Av. Cabildo 1394" required="required" type="text" value="{{:~prop('direccion',data)}}">
+            <input class="input w-input" maxlength="256" name="direccion" placeholder="Av. Cabildo 1394" required="required" type="text" value="{{:~prop('direccion',data)}}">
             <label for="descripci-n">Descripción sobre tu negocio</label>
-            <textarea class="input w-input" maxlength="5000" name="detalle_texto" value="Toda la AVENIDA en una sola aplicación.">{{:~prop('detalle texto',data)}}</textarea>
+            <textarea class="input w-input" maxlength="5000" name="detalle_texto" placeholder="Toda la AVENIDA en una sola aplicación.">{{:~prop('detalle texto',data)}}</textarea>
             <label for="categoria">Categoría</label>
             <select class="select w-select" name="categoria" required="required">
               <option value="">Seleccionar</option>
@@ -258,16 +272,16 @@
               {{/for}}
             </select>
             <label for="web">Sitio Web</label>
-            <input class="input w-input" maxlength="256" name="web" value="avenicacabildo.com.ar" required="required" type="text" value="{{:~prop('web',data)}}">
+            <input class="input w-input" maxlength="256" name="web" placeholder="avenicacabildo.com.ar" required="required" type="text" value="{{:~prop('web',data)}}">
           </div>
         </div>
         <div class="conteiner-info">
           <div class="title-section">Tu suscripción</div>
           <div class="w-form">
               <label for="nombre-2">Nombre</label>
-              <input class="input w-input" data-name="nombre" name="nombre_suscriptor" value="María Fernanda" type="text"  value="{{:~prop('nombre_suscriptor',data)}}">
+              <input class="input w-input" data-name="nombre" name="nombre_suscriptor" placeholder="María Fernanda" type="text"  value="{{:~prop('nombre_suscriptor',extra.cliente)}}">
               <label for="email-18">Email</label>
-              <input class="input w-input" maxlength="256" name="mail_suscriptor" value="maria@avenidacabildo.com.ar" required="required" type="email" value="{{:~prop('mail_suscriptor',data)}}">
+              <input class="input w-input" maxlength="256" name="mail_suscriptor" placeholder="maria@avenidacabildo.com.ar" required="required" type="email" value="{{:~prop('mail_suscriptor',extra.cliente)}}">
           </div>
         {{if ~isAdmin()}}
           <div class="w-form">
@@ -295,11 +309,11 @@
         {{/if}}
           <div class="proximo-pago-input w-hidden">
             <label for="email-18">Medio</label>
-              <input class="input w-input" maxlength="256" name="medio" value="Transferencia electrónica" type="text">
+              <input class="input w-input" maxlength="256" name="medio" placeholder="Transferencia electrónica" type="text">
             <label for="email-18">Origen</label>
-              <input class="input w-input" maxlength="256" name="origen" value="Banco Santander" type="text">
+              <input class="input w-input" maxlength="256" name="origen" placeholder="Banco Santander" type="text">
             <label for="email-18">Comprobante</label>
-              <input class="input w-input" maxlength="256" name="comprobante" value="22928363" type="text">
+              <input class="input w-input" maxlength="256" name="comprobante" placeholder="22928363" type="text">
               <a class="pago-btn do w-button" href="#">Realizar pago</a>
           </div>
         </div>
@@ -309,11 +323,11 @@
           <div class="title-section">Horarios</div>
           <div class="w-form">
               <label for="de-lunes-a-viernes">Lunes a viernes</label>
-              <input class="input w-input" maxlength="256" name="de-lunes-a-viernes" value="Ej: de 9 a 22hs" required="required" type="text" value="{{:~getHorario('Lunes a viernes',data)}}">
+              <input class="input w-input" maxlength="256" name="de-lunes-a-viernes" placeholder="Ej: de 9 a 22hs" required="required" type="text" value="{{:~getHorario('Lunes a viernes',data)}}">
               <label for="sabado">Sábados</label>
-              <input class="input w-input" maxlength="256" name="sabado" value="Ej: de 9 a 12" type="text" value="{{:~getHorario('Sábados',data)}}">
+              <input class="input w-input" maxlength="256" name="sabado" placeholder="Ej: de 9 a 12" type="text" value="{{:~getHorario('Sábados',data)}}">
               <label for="domingo">Domingos</label>
-              <input class="input w-input" maxlength="256" name="feriados" value="ej: cerrado" type="text" value="{{:~getHorario('Feriados',data)}}">
+              <input class="input w-input" maxlength="256" name="feriados" placeholder="ej: cerrado" type="text" value="{{:~getHorario('Feriados',data)}}">
           </div>
         </div>
         <div class="conteiner-info">
@@ -337,20 +351,20 @@
           <div class="title-section">¿Cómo te contactan tus clientes?</div>
           <div class="w-form">
               <label for="telefono">Teléfono</label>
-              <input class="input w-input" maxlength="256" name="telefono" value="4544-4674" type="text" value="{{:~prop('telefono',data)}}">
+              <input class="input w-input" maxlength="256" name="telefono" placeholder="4544-4674" type="text" value="{{:~prop('telefono',data)}}">
               <label for="email-clientes">Email</label>
-              <input class="input w-input" maxlength="256" name="mail" value="hola@avenidacabildo.com.ar" type="email" value="{{:~prop('mail',data)}}">
+              <input class="input w-input" maxlength="256" name="mail" placeholder="hola@avenidacabildo.com.ar" type="email" value="{{:~prop('mail',data)}}">
               <label for="facebook">Facebook</label>
-              <input class="input w-input" maxlength="256" name="facebook" value="www.facebook.com/AvenidaCabildoApp" type="text" value="{{:~prop('facebook',data)}}">
+              <input class="input w-input" maxlength="256" name="facebook" placeholder="www.facebook.com/AvenidaCabildoApp" type="text" value="{{:~prop('facebook',data)}}">
               <label for="instagram">Instagram</label>
-              <input class="input w-input" maxlength="256" name="instagram" value="instagram.com/avenidacabildo" type="text" value="{{:~prop('instagram',data)}}">
+              <input class="input w-input" maxlength="256" name="instagram" placeholder="instagram.com/avenidacabildo" type="text" value="{{:~prop('instagram',data)}}">
           </div>
         </div>
         <div class="conteiner-info">
           <div class="title-section">Descuentos</div>
           <div class="w-form">
             <label for="descuento-av">Para quienes usen Avenida Cabildo</label>
-            <input class="input w-input" maxlength="256" name="descuento_av" value="20%" type="text" value="{{:~prop('descuento_av',data)}}">
+            <input class="input w-input" maxlength="256" name="descuento_av" placeholder="20%" type="text" value="{{:~prop('efectivo',data)}}">
             <label for="email-13">Descuento con tarjetas</label>
 
             <div class="descuento--container">
@@ -528,7 +542,7 @@
   <!-- ~component ~listadolocales -->
   <script id="listadolocales" type="text/x-jsrender">
   {{for data}}
-    <div class="td">
+    <div class="td" data-id="{{:key}}">
       <div class="tr">
         <p>{{:nombre_simple}}</p>
       </div>
@@ -658,7 +672,7 @@
 
   <div class="mensaje modal" id="mensaje">
     <div class="modal-contenedor"><img class="close" data-ix="close-mensaje" src="images/icono-close.svg">
-      <p class="modal--pcenter"></p><a class="modalbutton w-button" data-ix="close-mensaje" href="#">Entendido</a>
+      <p class="modal--pcenter"></p><a class="modalbutton w-button" data-ix="close-mensaje" href="#">OK</a>
     </div>
   </div>
 

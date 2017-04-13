@@ -10,7 +10,8 @@ var notification = function(text){
 	, user : undefined
 	, admin : { 
 		paths : ['/admin.html']
-		, uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2'
+		//, uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2'
+		, uid : '4KZEtrqeMgc4Hm6P7NWwbCeTLke2'
 	}
 }
 , isAdmin = function(){
@@ -113,15 +114,13 @@ var notification = function(text){
 		$('#loading').fadeIn(200, function(){
 
 			$('body').removeClass()
+
 			/*
 			var user = firebase.auth().currentUser;
-
 			$('.footer--container').html($.templates('#footer').render({user:user}))
-
 			if(user){
 				$('.session-status').html(user.email + ' <a href="#" class="salir">Cerrar sesión</a>')
 			}*/
-
 
 			var route = location.hash.replace('#','')||'index'
 			, route = route.indexOf('?') > -1 ? route.substring(0, route.indexOf('?')) : route
@@ -196,6 +195,15 @@ var notification = function(text){
 				var row = object[i]
 				row.key = i
 				items.push(row)
+			}
+			return items
+		}
+		, keysArray : function(object){
+			if(!object) return false
+			var items = []
+			if(!$(object).length) return items;
+			for(var i in object){
+				items.push(i)
 			}
 			return items
 		}
@@ -328,12 +336,40 @@ $(function(){
 	})	
 
 	$('.modal.eliminarlocal .modalbutton.yes').click(function(){
-		var key = $('body').data('key')
-		$('#loading').fadeIn(200, function(){
+		var key = decodeURI($('body').data('key'))
+		, promise = new Promise(function(resolve, reject) {
+			console.log(key)
+			firebase.database().ref('/descuentos').once('value').then(function(descuentos){
+				descuentos.forEach(function(descuento){
+					var locales = []
+					, childKey = descuento.key
+					, childData = descuento.val()
+
+					console.log(childData)
+					if(childData['locales adheridos'].length){
+						for(var i in childData['locales adheridos']){
+							var value = childData['locales adheridos'][i]
+							if(key != value){
+								locales.push(value)
+							}
+						}
+						firebase.database().ref('/descuentos/' + childKey + '/locales adheridos').set(locales)
+					}
+				})
+			})
+			resolve(null)
+		})
+
+		$('#loading').fadeIn(200,function(){
 			firebase.database().ref('/locales').child(key).remove().then(function(){
-				$('*[data-ix=close-delete]').click()
-				$('#loading').fadeOut(200,function(){
-					notification("Local eliminado: " +key)
+				firebase.database().ref('/clientes').child(key).remove().then(function(){
+					promise.then(function(){
+						$('*[data-ix=close-delete]').click()
+						$('#loading').fadeOut(200,function(){
+							$('*[data-id="' + key + '"]').remove()
+							notification("Local eliminado: " +key)
+						})
+					})
 				})
 			})
 		})
@@ -356,11 +392,16 @@ $(function(){
 		}
 
 		var geocode = new Promise(function(resolve, reject) {
-			$.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + $('input[name=direccion]').val() + ' CABA, Argentina', function(res){ 
-			    resolve(res)
-			}).fail(function() {
-			    resolve(null)
-			})
+			var direccion = $('input[name=direccion]').val()
+			if($.trim(direccion)!=''){
+				$.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + direccion + ' CABA, Argentina', function(res){ 
+				    resolve(res)
+				}).fail(function() {
+				    resolve(null)
+				})
+			} else {
+				resolve(null)
+			}
 		})
 		, updateCliente = new Promise(function(resolve, reject) {
 			var clientData = {}
@@ -382,8 +423,8 @@ $(function(){
 
 					if(dia!="" && abre!="" && cierra!=""){
 						horarios_filtro[dia] = {
-							abre: abre
-							, cierra : cierra
+							abre: parseInt(abre)
+							, cierra : parseInt(cierra)
 						}
 					}
 				})
@@ -403,6 +444,7 @@ $(function(){
 					, 'detalle texto' : $('textarea[name=detalle_texto]').val()||""
 					, direccion : $('input[name=direccion]').val()||""
 					, efectivo : $('input[name=descuento_av]').val()||""
+					, 'en promocion' : 0
 					, facebook : $('input[name=facebook]').val()||""
 					, horarios : horarios
 					, 'horarios para filtro' : horarios_filtro
@@ -427,12 +469,8 @@ $(function(){
 					var data = snap_descuentos.val()
 					, tarjetas = snap_tarjetas.val()
 
-					console.log(tarjetas)
-
 					descuentos.forEach(function(descuento){
-						console.log(descuento)
 						if(!data[descuento]) {
-
 							// grab images
 							var tkey = descuento.substr(descuento.indexOf("con ") + 4)
 							, skey = ""
@@ -451,19 +489,20 @@ $(function(){
 						if($.inArray(key,data[descuento]['locales adheridos'])==-1){
 							data[descuento]['locales adheridos'][data[descuento]['locales adheridos'].length] = key;
 						}
-					}) 
+					})
+
 					resolve(data)
 				})				
 			})
 		})		
-	
-		geocode.then(function(geojson){
+		
+		$('#loading').fadeIn(200, function(){
+			geocode.then(function(geojson){
 
-			if(geojson.status=="OK"){
-				ubicacion = geojson.results[0].geometry.location.lat + ", " + geojson.results[0].geometry.location.lng
-			}
+				if(geojson.status=="OK"){
+					ubicacion = geojson.results[0].geometry.location.lat + ", " + geojson.results[0].geometry.location.lng
+				}
 
-			$('#loading').fadeIn(200, function(){
 				$('.photo').each(function(){
 					if($(this).get(0).files.length){
 						var name = $(this).attr('name')
@@ -475,13 +514,11 @@ $(function(){
 							}
 						}
 
-						$('#upload').fadeIn()
 						firebase.storage().ref().child('images/' + file.name).put(file,metadata).then(function(snapshot){
 							var i = snapshot.metadata.customMetadata.name.replace('_',' ')
 							, value = snapshot.downloadURL
 
 							firebase.database().ref('/locales/' + key + '/' + i).set(value)
-							$('#upload').fadeOut()
 						})
 					}
 				})
@@ -490,9 +527,8 @@ $(function(){
 					firebase.database().ref('/locales/'+key).update(postData).then(function(snap){
 						updateDescuentos.then(function(descData){
 							firebase.database().ref('/descuentos/').update(descData).then(function(snap){
-								$('#loading').fadeOut()
-								console.log("sale ---> " + key)
 								notification("Local actualizado: " +key)
+								$('#loading').fadeOut()
 							})
 						})
 					})
@@ -517,23 +553,21 @@ $(function(){
 			return false
 		}
 
-		$('#loading').fadeIn(200, function(){
-			var pagoData = {
-				origen: $('input[name=origen]').val()
-				, medio: $('input[name=medio]').val()
-				, comprobante: $('input[name=comprobante]').val()
-				, creado: new Date().toString()
-			}
+		var pagoData = {
+			origen: $('input[name=origen]').val()
+			, medio: $('input[name=medio]').val()
+			, comprobante: $('input[name=comprobante]').val()
+			, creado: new Date().toString()
+		}
 
-			$('.proximo-pago-input').slideToggle()
+		$('.proximo-pago-input').slideToggle()
 
-			firebase.database().ref('/clientes/' + key + '/pagos').once('value').then(function(snapshot) {
-			 	var nextKey = snapshot.numChildren()
-			 	, updates = {}
-				updates['/pagos/' + nextKey] = pagoData;
-				firebase.database().ref('/clientes/' + key).update(updates).then(function(){
-					$('#loading').fadeOut()
-				})
+		firebase.database().ref('/clientes/' + key + '/pagos').once('value').then(function(snapshot) {
+		 	var nextKey = snapshot.numChildren()
+		 	, updates = {}
+			updates['/pagos/' + nextKey] = pagoData;
+			firebase.database().ref('/clientes/' + key).update(updates).then(function(){
+				$('#loading').fadeOut()
 			})
 		})
 		e.preventDefault()
@@ -616,3 +650,28 @@ $(function(){
 moment.createFromInputFallback = function(config) {
   config._d = new Date(config._i);
 }
+/*
+firebase.auth().createUserWithEmailAndPassword('admin@cabildo.com', 'cab1ld0$.').then(function(user) {
+    // [END createwithemail]
+    // callSomeFunction(); Optional
+    // var user = firebase.auth().currentUser;
+    user.updateProfile({
+        displayName: 'Administrador',
+        photoURL: ''
+    }).then(function() {
+        // Update successful.
+    }, function(error) {
+        // An error happened.
+    });        
+}, function(error) {
+    // Handle Errors here.
+    var errorCode = error.code;
+    var errorMessage = error.message;
+    // [START_EXCLUDE]
+    if (errorCode == 'auth/weak-password') {
+        alert('The password is too weak.');
+    } else {
+        console.error(error);
+    }
+    // [END_EXCLUDE]
+});	*/
