@@ -385,23 +385,19 @@ $(function(){
 		var key = $('input[name="key"]').val()?$('input[name=key]').val():$('input[name=nombre_simple]').val()
 		, descuentos = []
 		, ubicacion = ""
-		, plan = $('select[name=plan]').val()
+		, plan = $.trim($('select[name=plan]').val())||""
+		, direccion = $.trim($('input[name=direccion]').val())||""
 
-		if(plan==""){
-			return notification("Por favor elija un plan")
-		}
+		if(plan=="") return notification("Por favor elija un plan")
+		if(direccion=="") return notification("Por favor ingrese una dirección")
 
 		var geocode = new Promise(function(resolve, reject) {
-			var direccion = $('input[name=direccion]').val()
-			if($.trim(direccion)!=''){
-				$.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + direccion + ' CABA, Argentina', function(res){ 
-				    resolve(res)
-				}).fail(function() {
-				    resolve(null)
-				})
-			} else {
-				resolve(null)
-			}
+			console.log('https://maps.googleapis.com/maps/api/geocode/json?address=' + direccion + ' CABA, Argentina')
+			$.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + direccion + ' CABA, Argentina', function(res){ 
+			    resolve(res)
+			}).fail(function() {
+			    resolve(null)
+			})
 		})
 		, updateCliente = new Promise(function(resolve, reject) {
 			var clientData = {}
@@ -444,7 +440,7 @@ $(function(){
 					, 'detalle texto' : $('textarea[name=detalle_texto]').val()||""
 					, direccion : $('input[name=direccion]').val()||""
 					, efectivo : $('input[name=descuento_av]').val()||""
-					, 'en promocion' : 0
+					, 'en promocion' : plan.promocion||0
 					, facebook : $('input[name=facebook]').val()||""
 					, horarios : horarios
 					, 'horarios para filtro' : horarios_filtro
@@ -494,13 +490,42 @@ $(function(){
 					resolve(data)
 				})				
 			})
-		})		
-		
+		})	
+		, updateCategorias = new Promise(function(resolve, reject) {
+			firebase.database().ref('/categorias').once('value').then(function(categorias){
+				var cat = $('select[name=categoria]').val()
+
+				categorias.forEach(function(categoria){
+					var locales = []
+					, childKey = categoria.key
+					, childData = categoria.val()
+
+
+					for(var i in childData.locales){
+						if(key != childData.locales[i]){ // add 
+							locales.push(childData.locales[i])
+						} 
+					}
+
+					if(cat == categoria.key || 'todos' == categoria.key){
+						locales.push(key)
+					}
+
+					firebase.database().ref('/categorias/'+childKey+'/locales').set(locales)
+				})
+
+				resolve(null)
+			})				
+		})			
+
 		$('#loading').fadeIn(200, function(){
+
 			geocode.then(function(geojson){
 
 				if(geojson.status=="OK"){
 					ubicacion = geojson.results[0].geometry.location.lat + ", " + geojson.results[0].geometry.location.lng
+				} else {
+					ubicacion = "-34.561491, -58.456147" // por ahora para que no pinche
 				}
 
 				$('.photo').each(function(){
@@ -524,11 +549,14 @@ $(function(){
 				})
 
 				updateCliente.then(function(postData){
+					postData.ubicacion = ubicacion
 					firebase.database().ref('/locales/'+key).update(postData).then(function(snap){
 						updateDescuentos.then(function(descData){
-							firebase.database().ref('/descuentos/').update(descData).then(function(snap){
-								notification("Local actualizado: " +key)
-								$('#loading').fadeOut()
+							updateCategorias.then(function(data){
+								firebase.database().ref('/descuentos/').update(descData).then(function(snap){
+									notification("Local actualizado: " +key)
+									location.hash = 'locales'
+								})
 							})
 						})
 					})
