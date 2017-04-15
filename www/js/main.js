@@ -337,16 +337,14 @@ $(function(){
 
 	$('.modal.eliminarlocal .modalbutton.yes').click(function(){
 		var key = decodeURI($('body').data('key'))
-		, promise = new Promise(function(resolve, reject) {
-			console.log(key)
+		, descuentos = new Promise(function(resolve, reject) {
 			firebase.database().ref('/descuentos').once('value').then(function(descuentos){
 				descuentos.forEach(function(descuento){
 					var locales = []
 					, childKey = descuento.key
 					, childData = descuento.val()
 
-					console.log(childData)
-					if(childData['locales adheridos'].length){
+					if(childData['locales adheridos'] && childData['locales adheridos'].length){
 						for(var i in childData['locales adheridos']){
 							var value = childData['locales adheridos'][i]
 							if(key != value){
@@ -359,11 +357,48 @@ $(function(){
 			})
 			resolve(null)
 		})
+		, categorias = new Promise(function(resolve, reject) {
+			firebase.database().ref('/categorias').once('value').then(function(categorias){
+				categorias.forEach(function(categoria){
+					var locales = []
+					, childKey = categoria.key
+					, childData = categoria.val()
+
+					for(var i in childData.locales){
+						if(key != childData.locales[i]){ // add 
+							locales.push(childData.locales[i])
+						} 
+					}
+
+					firebase.database().ref('/categorias/'+childKey+'/locales').set(locales)
+				})
+			})
+			resolve(null)
+		})
+		, promociones = new Promise(function(resolve, reject) {
+			firebase.database().ref('/promociones').once('value').then(function(promociones){
+				var promos = []
+				, ctr = 0
+				promociones.forEach(function(promocion){
+					ctr++
+					if(key != promocion){ // add 
+						promos.push(promocion)
+					} 
+
+					if(ctr === promociones.length){
+						firebase.database().ref('/promociones').set(promos)		
+					}
+				})				
+			})
+			resolve(null)
+		})
 
 		$('#loading').fadeIn(200,function(){
 			firebase.database().ref('/locales').child(key).remove().then(function(){
 				firebase.database().ref('/clientes').child(key).remove().then(function(){
-					promise.then(function(){
+					categorias.then()
+					promociones.then()
+					descuentos.then(function(){
 						$('*[data-ix=close-delete]').click()
 						$('#loading').fadeOut(200,function(){
 							$('*[data-id="' + key + '"]').remove()
@@ -392,7 +427,6 @@ $(function(){
 		if(direccion=="") return notification("Por favor ingrese una dirección")
 
 		var geocode = new Promise(function(resolve, reject) {
-			console.log('https://maps.googleapis.com/maps/api/geocode/json?address=' + direccion + ' CABA, Argentina')
 			$.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + direccion + ' CABA, Argentina', function(res){ 
 			    resolve(res)
 			}).fail(function() {
@@ -507,7 +541,7 @@ $(function(){
 						} 
 					}
 
-					if(cat == categoria.key || 'todos' == categoria.key){
+					if(cat == categoria.key || 'Todos' == categoria.key){
 						locales.push(key)
 					}
 
@@ -556,6 +590,8 @@ $(function(){
 								firebase.database().ref('/descuentos/').update(descData).then(function(snap){
 									notification("Local actualizado: " +key)
 									location.hash = 'locales'
+									$('*[data-key="*"]').removeClass('updated')
+									$('*[data-key="'+key+'"]').addClass('updated')									
 								})
 							})
 						})

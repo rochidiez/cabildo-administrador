@@ -236,6 +236,10 @@ label {
   font-weight: 600;
 }
 
+.td.updated {
+  background-color: #eef;
+}
+
 .tr {
   display: -webkit-box;
   display: -webkit-flex;
@@ -271,6 +275,7 @@ label {
   min-width: 10%;
   white-space: nowrap;
 }
+
 
 .p-intable {
   line-height: 49px;
