@@ -10,8 +10,8 @@ var notification = function(text){
 	, user : undefined
 	, admin : { 
 		paths : ['/admin.html']
-		//, uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2'
-		, uid : '4KZEtrqeMgc4Hm6P7NWwbCeTLke2'
+		//, uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2' // infinix
+		, uid : '4KZEtrqeMgc4Hm6P7NWwbCeTLke2' // cabildo
 	}
 }
 , isAdmin = function(){
@@ -332,79 +332,88 @@ $(function(){
 	})
 
 	$(document).on('click','.eliminar.table-action',function(){
-		$('body').attr('data-key',encodeURIComponent($(this).data('key')))
+		$('body').attr('id',encodeURIComponent($(this).data('key')))
 	})	
 
+	// ~remove
 	$('.modal.eliminarlocal .modalbutton.yes').click(function(){
-		var key = decodeURI($('body').data('key'))
-		, descuentos = new Promise(function(resolve, reject) {
-			firebase.database().ref('/descuentos').once('value').then(function(descuentos){
-				descuentos.forEach(function(descuento){
-					var locales = []
-					, childKey = descuento.key
-					, childData = descuento.val()
+		var key = decodeURI($('body').attr('id'))
+		, promise = new Promise(function(resolve, reject) { // local and cliente
+			return firebase.database().ref('/locales').child(key).remove().then(function(){
+				return firebase.database().ref('/clientes').child(key).remove().then(function(){
+					resolve(null)
+				})
+			})
+		})
+		$('#loading').fadeIn(200, function(){
+			promise.then(function(){ // descuentos
+				var ctr = 0		
+				return firebase.database().ref('/descuentos').once('value').then(function(descuentos){
+					descuentos.forEach(function(descuento){
+						ctr++
+						var locales = []
+						, childKey = descuento.key
+						, childData = descuento.val()
 
-					if(childData['locales adheridos'] && childData['locales adheridos'].length){
-						for(var i in childData['locales adheridos']){
-							var value = childData['locales adheridos'][i]
-							if(key != value){
-								locales.push(value)
+						if(childData['locales adheridos'] && childData['locales adheridos'].length){
+							for(var i in childData['locales adheridos']){
+								var value = childData['locales adheridos'][i]
+								if(key != value){
+									locales.push(value)
+								}
 							}
+							firebase.database().ref('/descuentos/' + childKey + '/locales adheridos').set(locales)
 						}
-						firebase.database().ref('/descuentos/' + childKey + '/locales adheridos').set(locales)
-					}
-				})
-			})
-			resolve(null)
-		})
-		, categorias = new Promise(function(resolve, reject) {
-			firebase.database().ref('/categorias').once('value').then(function(categorias){
-				categorias.forEach(function(categoria){
-					var locales = []
-					, childKey = categoria.key
-					, childData = categoria.val()
 
-					for(var i in childData.locales){
-						if(key != childData.locales[i]){ // add 
-							locales.push(childData.locales[i])
-						} 
-					}
-
-					firebase.database().ref('/categorias/'+childKey+'/locales').set(locales)
-				})
-			})
-			resolve(null)
-		})
-		, promociones = new Promise(function(resolve, reject) {
-			firebase.database().ref('/promociones').once('value').then(function(promociones){
-				var promos = []
-				, ctr = 0
-				promociones.forEach(function(promocion){
-					ctr++
-					if(key != promocion){ // add 
-						promos.push(promocion)
-					} 
-
-					if(ctr === promociones.length){
-						firebase.database().ref('/promociones').set(promos)		
-					}
-				})				
-			})
-			resolve(null)
-		})
-
-		$('#loading').fadeIn(200,function(){
-			firebase.database().ref('/locales').child(key).remove().then(function(){
-				firebase.database().ref('/clientes').child(key).remove().then(function(){
-					categorias.then()
-					promociones.then()
-					descuentos.then(function(){
-						$('*[data-ix=close-delete]').click()
-						$('#loading').fadeOut(200,function(){
-							$('*[data-id="' + key + '"]').remove()
-							notification("Local eliminado: " +key)
-						})
+						if(ctr === descuentos.val().length){
+							return true
+						}					
 					})
+				})
+			}).then(function(){ // categorias
+				var ctr = 0	
+				return firebase.database().ref('/categorias').once('value').then(function(categorias){
+					categorias.forEach(function(categoria){
+						ctr++
+						var locales = []
+						, childKey = categoria.key
+						, childData = categoria.val()
+
+						for(var i in childData.locales){
+							if(key != childData.locales[i]){ // add 
+								locales.push(childData.locales[i])
+							} 
+						}
+
+						firebase.database().ref('/categorias/'+childKey+'/locales').set(locales)
+						if(ctr === categorias.val().length){
+							return true
+						}					
+					})
+				})
+			}).then(function(){ // promociones
+				return firebase.database().ref('/promociones').once('value').then(function(promociones){
+					var promos = []
+					, ctr = 0
+					promociones.forEach(function(promo){
+						var promo = promo.val()
+						ctr++
+						if(key != promo){ // add 
+							promos.push(promo)
+						} 
+
+						if(ctr === promociones.val().length){
+							return firebase.database().ref('/promociones').set(promos).then(function(){
+								return true
+							})
+						}
+					})				
+				})			
+			}).then(function(){ // exit
+				$('*[data-ix=close-delete]').click()
+				$('#loading').fadeOut(200,function(){
+					$('*[data-id="' + key + '"]').remove()
+					notification("Local eliminado: " +key)
 				})
 			})
 		})
@@ -420,31 +429,61 @@ $(function(){
 		var key = $('input[name="key"]').val()?$('input[name=key]').val():$('input[name=nombre_simple]').val()
 		, descuentos = []
 		, ubicacion = ""
+		, planData = {}
 		, plan = $.trim($('select[name=plan]').val())||""
 		, direccion = $.trim($('input[name=direccion]').val())||""
+		, promise = new Promise(function(resolve, reject) {
+			firebase.database().ref('/planes/' + plan).once('value').then(function(snap_plan){
+				resolve(snap_plan.val())
+			})
+		})
 
 		if(plan=="") return notification("Por favor elija un plan")
 		if(direccion=="") return notification("Por favor ingrese una dirección")
 
-		var geocode = new Promise(function(resolve, reject) {
-			$.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + direccion + ' CABA, Argentina', function(res){ 
-			    resolve(res)
-			}).fail(function() {
-			    resolve(null)
-			})
-		})
-		, updateCliente = new Promise(function(resolve, reject) {
-			var clientData = {}
-			, plan = $('select[name=plan]').val()
+		$('#loading').fadeIn(200, function(){
+			return promise.then(function(data){ //geojson
+				planData = data
+				return $.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + direccion + ' CABA, Argentina', function(geocode){
+					if(geocode.status=="OK"){
+						ubicacion = geocode.results[0].geometry.location.lat + ", " + geocode.results[0].geometry.location.lng
+					} else {
+						ubicacion = "-34.561491, -58.456147" // por ahora para que no pinche
+					}					
+				    return planData
+				}).fail(function() {
+				    return planData
+				})
+			}).then(function(chain){ // photos
+				$('.photo').each(function(){
+					if($(this).get(0).files.length){
+						var name = $(this).attr('name')
+						, file = $(this).get(0).files[0]
+						, metadata = {
+							customMetadata : {
+								'name' : name
+								, 'key' : key
+							}
+						}
 
-			clientData.plan = plan
-			clientData.nombre_suscriptor = $('input[name=nombre_suscriptor]').val()||""
-			clientData.mail_suscriptor = $('input[name=mail_suscriptor]').val()||""
+						firebase.storage().ref().child('images/' + file.name).put(file,metadata).then(function(snapshot){
+							var i = snapshot.metadata.customMetadata.name.replace('_',' ')
+							, value = snapshot.downloadURL
 
-			firebase.database().ref('/planes/' + plan).once('value').then(function(snap_plan){
+							firebase.database().ref('/locales/' + key + '/' + i).set(value)
+						})
+					}
+				})
+
+				return planData				
+			}).then(function(planData){ // clientes
+				var clientData = {}
+				clientData.plan = plan
+				clientData.nombre_suscriptor = $('input[name=nombre_suscriptor]').val()||""
+				clientData.mail_suscriptor = $('input[name=mail_suscriptor]').val()||""
+
 				var horarios = "Lunes a Viernes " + $('input[name=de-lunes-a-viernes]').val() + " \nSábados " + $('input[name=sabado]').val()  + " \nFeriados " + $('input[name=feriados]').val()
 				, horarios_filtro = {}
-				, plan = snap_plan.val()
 
 				$('.horarios_filtro').each(function() {
 					var dia = $(this).find('.dia').val()
@@ -468,13 +507,13 @@ $(function(){
 					}
 				})
 
-				var data = {
+				var postData = {
 					categoria : $('select[name=categoria]').val()||""
 					, descuentos : descuentos
 					, 'detalle texto' : $('textarea[name=detalle_texto]').val()||""
 					, direccion : $('input[name=direccion]').val()||""
 					, efectivo : $('input[name=descuento_av]').val()||""
-					, 'en promocion' : plan.promocion||0
+					, 'en promocion' : planData.promocion||0
 					, facebook : $('input[name=facebook]').val()||""
 					, horarios : horarios
 					, 'horarios para filtro' : horarios_filtro
@@ -488,115 +527,101 @@ $(function(){
 					, web : $('input[name=web]').val()||""
 					, visibilidad : plan.visibilidad||3
 				}
-				firebase.database().ref('/clientes/'+key).update(clientData).then(function(a){
-					resolve(data)
+
+				return firebase.database().ref('/locales/'+key).update(postData).then(function(){
+					return firebase.database().ref('/clientes/'+key).update(clientData).then(function(){
+						return postData
+					})
 				})
-			})
-		})
-		, updateDescuentos = new Promise(function(resolve, reject) {
-			firebase.database().ref('/descuentos').once('value').then(function(snap_descuentos){
-				firebase.database().ref('/tarjetas').once('value').then(function(snap_tarjetas){
-					var data = snap_descuentos.val()
-					, tarjetas = snap_tarjetas.val()
 
-					descuentos.forEach(function(descuento){
-						if(!data[descuento]) {
-							// grab images
-							var tkey = descuento.substr(descuento.indexOf("con ") + 4)
-							, skey = ""
+			}).then(function(chain4){ // descuentos
+				return firebase.database().ref('/descuentos').once('value').then(function(snap_descuentos){
+					return firebase.database().ref('/tarjetas').once('value').then(function(snap_tarjetas){
+						var data = snap_descuentos.val()
+						, tarjetas = snap_tarjetas.val()
+						, ctr = 0
 
-							for(var i in tarjetas){
-								if(skey == "" && i.indexOf(tkey) > -1){
-									skey = i
+						descuentos.forEach(function(descuento){
+							ctr++
+							if(!data[descuento]) {
+								// grab images
+								var tkey = descuento.substr(descuento.indexOf("con ") + 4)
+								, skey = ""
+
+								for(var i in tarjetas){
+									if(skey == "" && i.indexOf(tkey) > -1){
+										skey = i
+									}
+								}
+
+								data[descuento] = {
+									'imagen' : tarjetas[skey] ? tarjetas[skey].imagen : {}
+									, 'locales adheridos' : []
 								}
 							}
 
-							data[descuento] = {
-								'imagen' : tarjetas[skey] ? tarjetas[skey].imagen : {}
-								, 'locales adheridos' : []
+							if($.inArray(key,data[descuento]['locales adheridos'])==-1){
+								data[descuento]['locales adheridos'][data[descuento]['locales adheridos'].length] = key;
 							}
-						}
-						if($.inArray(key,data[descuento]['locales adheridos'])==-1){
-							data[descuento]['locales adheridos'][data[descuento]['locales adheridos'].length] = key;
-						}
-					})
 
-					resolve(data)
-				})				
-			})
-		})	
-		, updateCategorias = new Promise(function(resolve, reject) {
-			firebase.database().ref('/categorias').once('value').then(function(categorias){
-				var cat = $('select[name=categoria]').val()
-
-				categorias.forEach(function(categoria){
-					var locales = []
-					, childKey = categoria.key
-					, childData = categoria.val()
-
-
-					for(var i in childData.locales){
-						if(key != childData.locales[i]){ // add 
-							locales.push(childData.locales[i])
-						} 
-					}
-
-					if(cat == categoria.key || 'Todos' == categoria.key){
-						locales.push(key)
-					}
-
-					firebase.database().ref('/categorias/'+childKey+'/locales').set(locales)
-				})
-
-				resolve(null)
-			})				
-		})			
-
-		$('#loading').fadeIn(200, function(){
-
-			geocode.then(function(geojson){
-
-				if(geojson.status=="OK"){
-					ubicacion = geojson.results[0].geometry.location.lat + ", " + geojson.results[0].geometry.location.lng
-				} else {
-					ubicacion = "-34.561491, -58.456147" // por ahora para que no pinche
-				}
-
-				$('.photo').each(function(){
-					if($(this).get(0).files.length){
-						var name = $(this).attr('name')
-						, file = $(this).get(0).files[0]
-						, metadata = {
-							customMetadata : {
-								'name' : name
-								, 'key' : key
-							}
-						}
-
-						firebase.storage().ref().child('images/' + file.name).put(file,metadata).then(function(snapshot){
-							var i = snapshot.metadata.customMetadata.name.replace('_',' ')
-							, value = snapshot.downloadURL
-
-							firebase.database().ref('/locales/' + key + '/' + i).set(value)
-						})
-					}
-				})
-
-				updateCliente.then(function(postData){
-					postData.ubicacion = ubicacion
-					firebase.database().ref('/locales/'+key).update(postData).then(function(snap){
-						updateDescuentos.then(function(descData){
-							updateCategorias.then(function(data){
-								firebase.database().ref('/descuentos/').update(descData).then(function(snap){
-									notification("Local actualizado: " +key)
-									location.hash = 'locales'
-									$('*[data-key="*"]').removeClass('updated')
-									$('*[data-key="'+key+'"]').addClass('updated')									
+							if(ctr === descuentos.length){
+								return firebase.database().ref('/descuentos/').update(data).then(function(){
+									return data
 								})
-							})
+							}
 						})
+					})				
+				})				
+			}).then(function(chain5){ // categorias
+				return firebase.database().ref('/categorias').once('value').then(function(categorias){
+					var cat = $('select[name=categoria]').val()
+
+					categorias.forEach(function(categoria){
+						var locales = []
+						, childKey = categoria.key
+						, childData = categoria.val()
+
+						for(var i in childData.locales){
+							if(key != childData.locales[i]){ // add 
+								locales.push(childData.locales[i])
+							} 
+						}
+
+						if(cat == categoria.key || 'Todos' == categoria.key){
+							locales.push(key)
+						}
+
+						firebase.database().ref('/categorias/'+childKey+'/locales').set(locales)
+					})
+
+					return true
+				})	
+	
+			}).then(function(chain6){ // promociones
+				return firebase.database().ref('/promociones').once('value').then(function(snapshot){
+					var promociones = snapshot.val()
+					, promos = []
+					, ctr = 0 
+
+					promociones.forEach(function(promo){
+						ctr++
+						if(key != promo ){
+							promos.push(promo)
+						}
+
+						if(ctr === promociones.length){
+							if(planData.promocion == "1"){
+								promos.push(key)
+							}
+							return firebase.database().ref('/promociones').set(promos)		
+						}
 					})
 				})
+			}).then (function(){ // salida
+				notification("Local actualizado: " +key)
+				location.hash = 'locales'
+				$('*[data-key="*"]').removeClass('updated')
+				$('*[data-key="'+key+'"]').addClass('updated')					
 			})
 		})
 	})
