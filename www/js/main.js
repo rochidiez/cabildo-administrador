@@ -31,7 +31,7 @@ var notification = function(text){
 	, estadisticas : function(resolve){
 		$('.content').html($.templates('#estadisticas').render()).promise().done(resolve)
 	}
-	, local : function(next){
+	, local : function(resolve){
 		var position = 0
 		, key = helpers.getParameterByName('key')
 		, data = []
@@ -68,19 +68,26 @@ var notification = function(text){
 				return local.val()
 			})
 		}).then(function(local){
-			local.key = key
+			if(local) local.key = key
 			return $('.content').html($.templates('#local').render({data:local,key:key,categorias:data.categorias.val(),cliente:data.cliente.val()},helpers.tpl)).promise().done(function(){
-	            var horarios_filtro = local['horarios para filtro']||null
+	            var horarios_filtro = local ? local['horarios para filtro'] : null
 	            $('.horarios--container').html($.templates('#horario').render(helpers.tpl.toArray(horarios_filtro))).promise().done(function(){
 	                var entidades = []
-	                , descuentos = []
+	                , descuentos = [""]
 
 	                data.tarjetas.forEach(function(tarjeta){
 	                	entidades.push(tarjeta.key)
 	                })
 
 	                data.descuentos.forEach(function(descuento){
-	                	descuentos.push(descuento.key)
+	                	var row = descuento.val()
+	                	if(row['locales adheridos']){
+		                	for(var i in row['locales adheridos']){
+		                		if(key==row['locales adheridos'][i]){
+		                			descuentos.push(descuento.key)	
+		                		}
+		                	}
+		                }
 	                })
 
 	                $('.descuento--container').html($.templates('#descuento').render({values:descuentos,entidades:entidades})).promise().done(function(){
@@ -88,12 +95,13 @@ var notification = function(text){
 	                        $('.add-time').addClass('w-hidden')
 	                    }
 	                })
-                })				
-				next()
+                })
+
+				resolve()
 			})
 		})
 	}
-	, locales : function(next){
+	, locales : function(resolve){
 
 		var data = []
 		, promise = new Promise(function(resolve, reject) { // clientes
@@ -129,11 +137,11 @@ var notification = function(text){
 
             $('.content').html($.templates('#locales').render()).promise().done(function(){
             	for(var i in tabs){
-	            	$('.w-tab-pane[data-w-tab="' + i + '"] .locales').html($.templates('#listadolocales').render(tabs[i]))
+	            	$('.w-tab-pane[data-w-tab="' + i + '"] .locales').html($.templates('#listadolocales').render(tabs[i], helpers.tpl))
 	            }
             })
 
-	        next()
+	        resolve()
 		})
 	}
 }
@@ -343,6 +351,7 @@ $(function(){
 				})
 			})
 		})
+
 		$('#loading').fadeIn(200, function(){
 			promise.then(function(){ // descuentos
 				var ctr = 0		
@@ -350,17 +359,17 @@ $(function(){
 					descuentos.forEach(function(descuento){
 						ctr++
 						var locales = []
-						, childKey = descuento.key
-						, childData = descuento.val()
+						, key = descuento.key
+						, data = descuento.val()
 
-						if(childData['locales adheridos'] && childData['locales adheridos'].length){
-							for(var i in childData['locales adheridos']){
-								var value = childData['locales adheridos'][i]
+						if(data['locales adheridos'] && data['locales adheridos'].length){
+							for(var i in data['locales adheridos']){
+								var value = data['locales adheridos'][i]
 								if(key != value){
 									locales.push(value)
 								}
 							}
-							firebase.database().ref('/descuentos/' + childKey + '/locales adheridos').set(locales)
+							firebase.database().ref('/descuentos/' + key + '/locales adheridos').set(locales)
 						}
 
 						if(ctr === descuentos.val().length){
@@ -374,16 +383,16 @@ $(function(){
 					categorias.forEach(function(categoria){
 						ctr++
 						var locales = []
-						, childKey = categoria.key
-						, childData = categoria.val()
+						, key = categoria.key
+						, data = categoria.val()
 
-						for(var i in childData.locales){
-							if(key != childData.locales[i]){ // add 
-								locales.push(childData.locales[i])
+						for(var i in data.locales){
+							if(key != data.locales[i]){ // add 
+								locales.push(data.locales[i])
 							} 
 						}
 
-						firebase.database().ref('/categorias/'+childKey+'/locales').set(locales)
+						firebase.database().ref('/categorias/'+key+'/locales').set(locales)
 						if(ctr === categorias.val().length){
 							return true
 						}					
@@ -648,7 +657,8 @@ $(function(){
 		}
 
 		$('.proximo-pago-input').slideToggle()
-
+		$('.pago-btn').removeClass('w-hidden').show()
+		$('#loading').fadeIn()
 		firebase.database().ref('/clientes/' + key + '/pagos').once('value').then(function(snapshot) {
 		 	var nextKey = snapshot.numChildren()
 		 	, updates = {}
