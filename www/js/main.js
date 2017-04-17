@@ -10,8 +10,8 @@ var notification = function(text){
 	, user : undefined
 	, admin : { 
 		paths : ['/admin.html']
-		, uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2' // infinix
-		//, uid : '4KZEtrqeMgc4Hm6P7NWwbCeTLke2' // cabildo
+		//, uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2' // infinix
+		, uid : '4KZEtrqeMgc4Hm6P7NWwbCeTLke2' // cabildo
 	}
 }
 , isAdmin = function(){
