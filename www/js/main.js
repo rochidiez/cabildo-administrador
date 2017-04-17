@@ -10,8 +10,8 @@ var notification = function(text){
 	, user : undefined
 	, admin : { 
 		paths : ['/admin.html']
-		//, uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2' // infinix
-		, uid : '4KZEtrqeMgc4Hm6P7NWwbCeTLke2' // cabildo
+		, uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2' // infinix
+		//, uid : '4KZEtrqeMgc4Hm6P7NWwbCeTLke2' // cabildo
 	}
 }
 , isAdmin = function(){
@@ -21,19 +21,25 @@ var notification = function(text){
 	return !settings.user
 }
 , routes = {
-	index : function(next){
-  	helpers.render_tpl('.content','#index',{}, {}, function(){
-  		$('body').addClass('login-body')
-  		$('input[name="email"]').focus()
-  		next()
-  	})
+	index : function(resolve){
+		$('.content').html($.templates('#index').render()).promise().done(function(){
+	  		$('body').addClass('login-body')
+	  		$('input[name="email"]').focus()
+			resolve()
+		})
 	}
-	, estadisticas : function(next){
-		helpers.render_tpl('.content','#estadisticas',{}, {}, next)
+	, estadisticas : function(resolve){
+		$('.content').html($.templates('#estadisticas').render()).promise().done(resolve)
 	}
 	, local : function(next){
 		var position = 0
 		, key = helpers.getParameterByName('key')
+		, data = []
+		, promise = new Promise(function(resolve, reject) { // categorias
+			return firebase.database().ref('/categorias').once('value').then(function(categorias) {
+				resolve(categorias)
+			})
+		})
 
 		if(isAdmin()){
 			key = key ? key : null
@@ -41,51 +47,93 @@ var notification = function(text){
 			key = settings.user.displayName
 		}
 
-		helpers.firebase_once('/categorias', function(categorias){ 
-			helpers.firebase_once('/descuentos', function(descuentos){ 
-				helpers.firebase_once('/clientes/' + key, function(cliente){ 
-					helpers.firebase_once('/tarjetas', function(tarjetas){ 
-						helpers.render_row('/locales/'+key,'.content', '#local', {categorias: categorias.val(), descuentos: descuentos.val(), cliente: cliente.val(), key : key}, function(res){
-							var horarios_filtro = res.data && res.data['horarios para filtro'] ? res.data['horarios para filtro'] : null
-							$('.horarios--container').html($.templates('#horario').render(helpers.tpl.toArray(horarios_filtro))).promise().done(function(){
-								var tarjs = tarjetas.val()
-								, entidades = []
-								, values = res.data && res.data.descuentos ? res.data.descuentos : null
+		promise.then(function(categorias){
+			data.categorias = categorias
+			return firebase.database().ref('/descuentos').once('value').then(function(descuentos) {
+				return descuentos
+			})			
+		}).then(function(descuentos){
+			data.descuentos = descuentos
+			return firebase.database().ref('/tarjetas').once('value').then(function(tarjetas) {
+				return tarjetas
+			})
+		}).then(function(tarjetas){
+			data.tarjetas = tarjetas
+			return firebase.database().ref('/clientes/' + key).once('value').then(function(cliente) {
+				return cliente
+			})
+		}).then(function(cliente){
+			data.cliente = cliente
+			return firebase.database().ref('/locales/'+key).once('value').then(function(local) {
+				return local.val()
+			})
+		}).then(function(local){
+			local.key = key
+			return $('.content').html($.templates('#local').render({data:local,key:key,categorias:data.categorias.val(),cliente:data.cliente.val()},helpers.tpl)).promise().done(function(){
+	            var horarios_filtro = local['horarios para filtro']||null
+	            $('.horarios--container').html($.templates('#horario').render(helpers.tpl.toArray(horarios_filtro))).promise().done(function(){
+	                var entidades = []
+	                , descuentos = []
 
-								for(var i in tarjs){
-									entidades.push(i)
-								}
+	                data.tarjetas.forEach(function(tarjeta){
+	                	entidades.push(tarjeta.key)
+	                })
 
-								$('.descuento--container').html($.templates('#descuento').render({values:values,entidades:entidades})).promise().done(function(){
-									if($('.horarios--container').children().length > 6){
-										$('.add-time').addClass('w-hidden')
-									}
-									next()
-								})
-							})
-						})
-					})
-				})
+	                data.descuentos.forEach(function(descuento){
+	                	descuentos.push(descuento.key)
+	                })
+
+	                $('.descuento--container').html($.templates('#descuento').render({values:descuentos,entidades:entidades})).promise().done(function(){
+	                    if($('.horarios--container').children().length > 6){
+	                        $('.add-time').addClass('w-hidden')
+	                    }
+	                })
+                })				
+				next()
 			})
 		})
 	}
 	, locales : function(next){
-		helpers.render_tpl('.content','#locales',{},{}, function(){
-			helpers.firebase_once('/clientes', function(clientes){ 
-				helpers.render_tabs('locales','#listadolocales',{
-					tabs: {
-						"todos":[]
-						,"Premium":[]
-						,"Básico":[]
-						,"Avenida Cabildo":[]
-					}
-					,showalltabs: 1
-					, data: clientes.val()
-					, extraKey : 'plan'
-				}, function(){
-						next()
-				})
+
+		var data = []
+		, promise = new Promise(function(resolve, reject) { // clientes
+			return firebase.database().ref('/clientes').once('value').then(function(clientes) {
+				resolve(clientes)
 			})
+		})
+
+		promise.then(function(clientes){
+			data.clientes = clientes.val()
+			return firebase.database().ref('/planes').once('value').then(function(planes) {
+				return planes
+			})
+		}).then(function(planes){
+			data.planes = planes
+			return firebase.database().ref('/locales').once('value').then(function(locales) {
+				return locales
+			})
+		}).then(function(locales){
+            var tabs = {"todos":[]}
+
+            locales.forEach(function(snapshot) {
+                var key = snapshot.key
+                , local = snapshot.val()
+                local.key = key
+                local.cliente = data.clientes[key]
+                tabs.todos.push(local)
+
+                if(local.plan){
+                    tabs[local.plan].push(local)
+                }               
+            })
+
+            $('.content').html($.templates('#locales').render()).promise().done(function(){
+            	for(var i in tabs){
+	            	$('.w-tab-pane[data-w-tab="' + i + '"] .locales').html($.templates('#listadolocales').render(tabs[i]))
+	            }
+            })
+
+	        next()
 		})
 	}
 }
@@ -110,17 +158,8 @@ var notification = function(text){
 		])
 	}
 	, render : function(){
-
 		$('#loading').fadeIn(200, function(){
-
 			$('body').removeClass()
-
-			/*
-			var user = firebase.auth().currentUser;
-			$('.footer--container').html($.templates('#footer').render({user:user}))
-			if(user){
-				$('.session-status').html(user.email + ' <a href="#" class="salir">Cerrar sesión</a>')
-			}*/
 
 			var route = location.hash.replace('#','')||'index'
 			, route = route.indexOf('?') > -1 ? route.substring(0, route.indexOf('?')) : route
@@ -233,49 +272,7 @@ var notification = function(text){
 	    if (!results) return null;
 	    if (!results[2]) return '';
 	    return decodeURIComponent(results[2].replace(/\+/g, " "));
-    }  	
-	, firebase_once : function(a, b){    
-		firebase.database().ref(a).once('value').then(function(snapshot) {
-			if(typeof b == 'function') b.call(this,snapshot)
-		})
-	}
-	, render_tabs : function(a,b,c,d){
-		helpers.firebase_once(a, function(snapshot){
-
-			var tabs = c.tabs
-
-			snapshot.forEach(function(childSnapshot) {
-				var childKey = childSnapshot.key
-				, childData = childSnapshot.val()
-				, row = childData
-				row.key = childKey
-	    		tabs.todos.push(row)
-
-	    		if(c.data && c.data[childKey] && c.data[childKey][c.extraKey]){
-	    			tabs[c.data[childKey][c.extraKey]].push(row)
-	    		}				
-			})
-
-	    	for(var slug in c.tabs){
-    			helpers.render_tpl('div[data-w-tab="' + slug + '"] .' + a,b,tabs[slug],c.data)
-	    	}
-
-	    	setTimeout(function(){
-	    		if(typeof d == 'function') d.call(this)
-	    	},200)	    	
-		})
-	}
-	, render_row : function(a,b,c,d,e){
-		if(!a) return helpers.render_tpl(b,c,{},d,e)
-		helpers.firebase_once(a, function(snapshot){
-			helpers.render_tpl(b,c,snapshot.val(),d,e)
-		})
-	}
-	, render_tpl : function(a,b,c,d,e) { // use d to parse multiple objects
-   		$(a).html($.templates(b).render({data:c,extra:d}, helpers.tpl)).promise().done(function(){
-   			if(typeof e == 'function') e.call(this,{data:c,extra:d})
-   		})
-	}
+    }
 }
 
 $(function(){
@@ -321,8 +318,9 @@ $(function(){
 
 	// ~locales
 	$(document).on('click','.ver.table-action',function(){
+		var key = $(this).data('key')
 		$('.modal.viewlocal .modal-contenido').html('')
-		helpers.firebase_once('/locales/' + $(this).data('key'), function(local){ 
+		firebase.database().ref('/locales/' + key).once('value').then(function(local) {
 			$('.modal.viewlocal .modal-contenido').html($.templates('#modal_viewlocal').render(local.val(), helpers.tpl))
 		})
 	})

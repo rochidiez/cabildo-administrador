@@ -27,6 +27,7 @@
   <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
   <script>
 
+  /*
     // Cabildo
     var config = {
       apiKey: "AIzaSyDxNOXJR9IQkPRO5fHmapWKcqozvl5ETkU",
@@ -36,8 +37,8 @@
       storageBucket: "avenida-cabildo.appspot.com",
       messagingSenderId: "854269150359"
     };  
+*/
 
-  /*
     // Infinix
     var config = {
       apiKey: "AIzaSyACm6k1hFLVQc9zJgP6omf1HjzSfkUqtYI",
@@ -46,7 +47,7 @@
       storageBucket: "infinix-console.appspot.com",
       messagingSenderId: "378423189863"
     };
-*/
+
     firebase.initializeApp(config);
   </script>
 </head>
@@ -222,9 +223,9 @@
   <!-- ~page ~local -->
   <script id="local" type="text/x-jsrender">
     <div class="container">
-      <input type="hidden" name="key" value="{{:extra.key}}" />
+      <input type="hidden" name="key" value="{{:key}}" />
 
-    {{if extra.key}}
+    {{if key}}
       <h3 class="heading"> {{:~prop('nombre_simple',data)}}</h3>
     {{else}}
       <h3 class="heading">Cargá un nuevo local</h3>
@@ -266,7 +267,7 @@
             <label for="categoria">Categoría</label>
             <select class="select w-select" name="categoria" required="required">
               <option value="">Seleccionar</option>
-              {{for ~toArray(extra.categorias)}}
+              {{for ~toArray(categorias)}}
               <option value="{{:key}}"{{if ~root.data && ~root.data.categoria==key}} selected{{/if}}>{{:key}}</option>
               {{/for}}
             </select>
@@ -278,30 +279,30 @@
           <div class="title-section">Tu suscripción</div>
           <div class="w-form">
               <label for="nombre-2">Nombre</label>
-              <input class="input w-input" data-name="nombre" name="nombre_suscriptor" placeholder="María Fernanda" type="text"  value="{{:~prop('nombre_suscriptor',extra.cliente)}}">
+              <input class="input w-input" data-name="nombre" name="nombre_suscriptor" placeholder="María Fernanda" type="text"  value="{{:~prop('nombre_suscriptor',cliente)}}">
               <label for="email-18">Email</label>
-              <input class="input w-input" maxlength="256" name="mail_suscriptor" placeholder="maria@avenidacabildo.com.ar" required="required" type="email" value="{{:~prop('mail_suscriptor',extra.cliente)}}">
+              <input class="input w-input" maxlength="256" name="mail_suscriptor" placeholder="maria@avenidacabildo.com.ar" required="required" type="email" value="{{:~prop('mail_suscriptor',cliente)}}">
           </div>
         {{if ~isAdmin()}}
           <div class="w-form">
             <label for="nombre-2">Plan</label>          
             <select class="select w-select" name="plan" required>
               <option value="">Elegí un plan</option>
-              <option value="Básico"{{if extra.cliente && extra.cliente.plan == 'Básico'}} selected{{/if}}>Básico</option>
-              <option value="Premium"{{if extra.cliente && extra.cliente.plan == 'Premium'}} selected{{/if}}>Premium</option>
-              <option value="Avenida Cabildo"{{if extra.cliente && extra.cliente.plan == 'Avenida Cabildo'}} selected{{/if}}>Avenida Cabildo</option>
+              <option value="Básico"{{if cliente && cliente.plan == 'Básico'}} selected{{/if}}>Básico</option>
+              <option value="Premium"{{if cliente && cliente.plan == 'Premium'}} selected{{/if}}>Premium</option>
+              <option value="Avenida Cabildo"{{if cliente && cliente.plan == 'Avenida Cabildo'}} selected{{/if}}>Avenida Cabildo</option>
             </select>          
           </div>
         {{else}}
-          <div class="plan">{{:~prop('plan','Plan Básico',extra.cliente)}}</div>
+          <div class="plan">{{:~prop('plan','Plan Básico',cliente)}}</div>
           <div class="plan-span">Para cambiar el plan escribinos a hola@avenidacabildo.com.ar</div>
         {{/if}}
           <div class="proximo-pago">El próximo vencimiento es el {{:~getProxVencimiento()}}</div>
           <a class="pago-btn open w-button" href="#">Realizar pago</a>
-        {{if extra.cliente && extra.cliente.pagos}}
+        {{if cliente && cliente.pagos}}
           <a class="pago-btn w-button" href="#" onclick="$('.historico-pagos').slideToggle()">Ver pagos</a>
           <div class="historico-pagos w-hidden">
-          {{for extra.cliente.pagos}}
+          {{for cliente.pagos}}
             <label for="email-18">{{:~toDate(creado,'DD/MM/YY')}}</label>{{:origen}} {{:comprobante}}
           {{/for}}
           </div>
@@ -398,7 +399,7 @@
             </div>
           </div>
         </div>
-      </div><a class="save submit-button w-button" href="#">{{if extra.key}}Actualizar {{:~prop('nombre_simple',data)}}{{else}}Cargar nuevo local{{/if}}</a>
+      </div><a class="save submit-button w-button" href="#">{{if key}}Actualizar {{:~prop('nombre_simple',data)}}{{else}}Cargar nuevo local{{/if}}</a>
     </div>
   </script>
 
@@ -540,7 +541,6 @@
 
   <!-- ~component ~listadolocales -->
   <script id="listadolocales" type="text/x-jsrender">
-  {{for data}}
     <div class="td" data-id="{{:key}}">
       <div class="tr">
         <p>{{:nombre_simple}}</p>
@@ -552,13 +552,13 @@
         <p>{{:mail}}</p>
       </div>
       <div class="tr w-hidden-small w-hidden-tiny">
-        <p>{{if ~root.extra[key] && ~root.extra[key].plan}}{{:~root.extra[key].plan}}{{/if}}</p>
+        <p>{{if plan}}{{:plan}}{{/if}}</p>
       </div>
       <div class="tr w-hidden-small w-hidden-tiny">
         <p>{{:telefono}}</p>
       </div>
       <div class="pago tr">
-        <p class="enfecha">{{if ~root.extra[key] && ~root.extra[key].pagos}}{{:~toDate(~root.extra[key].pagos[~root.extra[key].pagos.length-1].creado,'DD/MM')}}{{else}}&mdash;{{/if}}</p>
+        <p class="enfecha">{{if cliente && cliente.pagos}}{{:~toDate(cliente.pagos[cliente.pagos.length-1].creado,'DD/MM')}}{{else}}&mdash;{{/if}}</p>
       </div>
       <div class="actions tr">
         <div class="table-action ver" data-ix="open-viewlocal" data-key="{{:key}}">Ver</div>
@@ -568,7 +568,6 @@
         <div class="eliminar table-action" data-ix="eliminar-show" data-key="{{:key}}">Eliminar</div>
       </div>
     </div>   
-  {{/for}}
   </script>
 
   <!-- ~page ~estadisticas -->
