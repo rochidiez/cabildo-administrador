@@ -27,7 +27,7 @@
   <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
   <script>
 
-
+  /*
     // Cabildo
     var config = {
       apiKey: "AIzaSyDxNOXJR9IQkPRO5fHmapWKcqozvl5ETkU",
@@ -37,7 +37,7 @@
       storageBucket: "avenida-cabildo.appspot.com",
       messagingSenderId: "854269150359"
     };  
-  /*
+*/
     // Infinix
     var config = {
       apiKey: "AIzaSyACm6k1hFLVQc9zJgP6omf1HjzSfkUqtYI",
@@ -46,7 +46,7 @@
       storageBucket: "infinix-console.appspot.com",
       messagingSenderId: "378423189863"
     };
-*/
+
     firebase.initializeApp(config);
   </script>
 </head>
@@ -574,8 +574,8 @@
     <div class="head-section"></div>
     <div class="estadisticas">
       <h1 class="title-stats">Tus estadísticas</h1>
-      <div class="w-tabs" data-duration-in="300" data-duration-out="100">
-        <div class="w-tab-menu">
+      <div class="w-tabs2" data-duration-in="300" data-duration-out="100">
+        <!--div class="w-tab-menu">
           <a class="tab w-inline-block w-tab-link" data-w-tab="estemes">
             <div>Este mes</div>
           </a>
@@ -585,21 +585,21 @@
           <a class="tab w-inline-block w-tab-link" data-w-tab="ultimo-trimestre">
             <div>El último trimestre</div>
           </a>
-        </div>
-        <div class="tab-container w-tab-content">
-          <div class="tab-stat w-tab-pane" data-w-tab="estemes">
+        </div-->
+        <div class="tab-container2 w-tab-content2">
+          <div class="tab-stat w-tab-pane2" data-w-tab="estemes">
             <div class="stat-tab-cont">
-              <div class="stat-container">
+              <!--div class="stat-container">
                 <div class="people">380 personas</div>
                 <div class="p-stat">Vieron tu perfil</div>
-              </div>
+              </div-->
               <div class="stat-container">
-                <div class="favs people">200 personas</div>
+                <div class="favs people">{{:personas}} personas</div>
                 <div class="p-stat">Te agregaron a sus favoritos</div>
               </div>
             </div>
           </div>
-          <div class="tab-stat w--tab-active w-tab-pane" data-w-tab="esta-semana">
+          <!--div class="tab-stat w--tab-active w-tab-pane" data-w-tab="esta-semana">
             <div class="stat-tab-cont">
               <div class="stat-container">
                 <div class="people">780 personas</div>
@@ -622,7 +622,7 @@
                 <div class="p-stat">Te agregaron a sus favoritos</div>
               </div>
             </div>
-          </div>
+          </div-->
         </div>
       </div>
     </div>

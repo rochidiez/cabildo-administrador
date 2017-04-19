@@ -10,8 +10,8 @@ var notification = function(text){
 	, user : undefined
 	, admin : { 
 		paths : ['/admin.html']
-		//, uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2' // infinix
-		, uid : '4KZEtrqeMgc4Hm6P7NWwbCeTLke2' // cabildo
+		, uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2' // infinix
+		//, uid : '4KZEtrqeMgc4Hm6P7NWwbCeTLke2' // cabildo
 	}
 }
 , isAdmin = function(){
@@ -29,7 +29,26 @@ var notification = function(text){
 		})
 	}
 	, estadisticas : function(resolve){
-		$('.content').html($.templates('#estadisticas').render()).promise().done(resolve)
+		var data = []
+		, count = 0
+		, promise = new Promise(function(resolve, reject) { // categorias
+			return firebase.database().ref('/usuarios').once('value').then(function(usuarios) {
+				usuarios.forEach(function(locales){
+					var arr = locales.val()
+					for(var i in arr){
+						if(arr[i]==settings.user.displayName){
+							count++
+						}
+					}
+				})				
+				resolve(count)
+			})
+		})
+
+		promise.then(function(count){
+			$('.content').html($.templates('#estadisticas').render({personas:count}))
+		})
+		.then(resolve)		
 	}
 	, local : function(resolve){
 		var position = 0
@@ -186,6 +205,26 @@ var notification = function(text){
 		    }
 		})
 	}
+	, setParameterByName : function(name,value,url){
+        if(!url) url = window.location.hash.split('#').join('')
+        if(value == null) value = ''
+        var pattern = new RegExp('\\b('+name+'=).*?(&|$)')
+        if(url.search(pattern)>=0){
+            return url.replace(pattern,'$1' + value + '$2')
+        }
+        return url + '&' + name + '=' + value 
+    }
+    , getParameterByName : function(name, url) {
+	    if (!url) {
+	      url = window.location.href;
+	    }
+	    name = name.replace(/[\[\]]/g, "\\$&");
+	    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+	        results = regex.exec(url);
+	    if (!results) return null;
+	    if (!results[2]) return '';
+	    return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
 	, tpl : {
 	    isAdmin : function(){
 			return isAdmin()
@@ -260,27 +299,7 @@ var notification = function(text){
 			if(d && d[a]) return d[a]
 			return typeof b=='string' ? b : ""
 		}
-	}
-	, setParameterByName : function(name,value,url){
-        if(!url) url = window.location.hash.split('#').join('')
-        if(value == null) value = ''
-        var pattern = new RegExp('\\b('+name+'=).*?(&|$)')
-        if(url.search(pattern)>=0){
-            return url.replace(pattern,'$1' + value + '$2')
-        }
-        return url + '&' + name + '=' + value 
-    }
-    , getParameterByName : function(name, url) {
-	    if (!url) {
-	      url = window.location.href;
-	    }
-	    name = name.replace(/[\[\]]/g, "\\$&");
-	    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-	        results = regex.exec(url);
-	    if (!results) return null;
-	    if (!results[2]) return '';
-	    return decodeURIComponent(results[2].replace(/\+/g, " "));
-    }
+	}    
 }
 
 $(function(){
