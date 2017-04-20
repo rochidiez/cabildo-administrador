@@ -8,6 +8,8 @@ var notification = function(text){
 		dia_vencimiento : 20
 	}
 	, user : undefined
+	//, endpoint : 'http://cabildo.local'
+	, endpoint : 'https://locales.avenidacabildo.com.ar'
 	, admin : { 
 		paths : ['/admin.html']
 		//, uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2' // infinix
@@ -205,6 +207,14 @@ var notification = function(text){
 		    }
 		})
 	}
+	, randomstr : function(len){
+		var str = ""
+		, possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+
+		for( var i=0; i < len; i++ )
+			str += possible.charAt(Math.floor(Math.random() * possible.length))
+		return str;
+	}	
 	, setParameterByName : function(name,value,url){
         if(!url) url = window.location.hash.split('#').join('')
         if(value == null) value = ''
@@ -504,12 +514,48 @@ $(function(){
 				return planData				
 			}).then(function(planData){ // clientes
 				var clientData = {}
+				, mailData = {}
+
 				clientData.plan = plan
 				clientData.nombre_suscriptor = $('input[name=nombre_suscriptor]').val()||""
 				clientData.mail_suscriptor = $('input[name=mail_suscriptor]').val()||""
 
+				mailData = clientData
+
+				mailData.pass = helpers.randomstr(12)
+				mailData.local = key
+
 				var horarios = "Lunes a Viernes " + $('input[name=de-lunes-a-viernes]').val() + " \nSábados " + $('input[name=sabado]').val()  + " \nFeriados " + $('input[name=feriados]').val()
 				, horarios_filtro = {}
+
+				// suscriptor
+				firebase.auth().createUserWithEmailAndPassword(mailData.mail_suscriptor, mailData.pass).then(function(user) {
+				    // [END createwithemail]
+				    // callSomeFunction(); Optional
+				    // var user = firebase.auth().currentUser;
+				    user.updateProfile({
+				        displayName: key,
+				        photoURL: ''
+				    }).then(function() {
+				    	$.post(settings.endpoint + '/suscriptor.php',mailData,function(){
+				    		notification("La cuenta de cliente ha sido creada y se envió notificación a " + mailData.email_suscriptor)
+				    	})
+				        // Update successful.
+				    }, function(error) {
+				        // An error happened.
+				    })      
+				}, function(error) {
+				    // Handle Errors here.
+				    var errorCode = error.code
+				    var errorMessage = error.message
+				    // [START_EXCLUDE]
+				    if (errorCode == 'auth/weak-password') {
+				        alert('The password is too weak.')
+				    } else {
+				        console.error(error)
+				    }
+				    // [END_EXCLUDE]
+				})
 
 				$('.horarios_filtro').each(function() {
 					var dia = $(this).find('.dia').val()

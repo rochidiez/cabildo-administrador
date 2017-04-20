@@ -1,12 +1,12 @@
 {
     "name": "flydevs/cabildo",
-    "description": "Web App Project",
-    "type": "project",
+    "description": "Cabildo Administración",
+    "type": "administrator",
     "keywords": [
-        "slim",
-        "skeleton"
+        "cabildo",
+        "administrador"
     ],
-    "homepage": "https://not-yet.com",
+    "homepage": "https://avenida-cabildo.com",
     "license": "MIT",
     "authors": [
         {
@@ -17,5 +17,6 @@
         }
     ],
     "require": {
+        "phpmailer/phpmailer": "~5.2"
     }
 }
