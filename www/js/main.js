@@ -10,7 +10,7 @@ var notification = function(text){
 	}
 	, admin : { 
 		uid : '4KZEtrqeMgc4Hm6P7NWwbCeTLke2' // cabildo
-		//, uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2' // infinix
+		//uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2' // infinix
 
 		, endpoint : 'https://avenida-cabildo.herokuapp.com' // heroku
 		//, endpoint : 'https://locales.avenidacabildo.com.ar' // cabildo
@@ -152,7 +152,7 @@ var notification = function(text){
                 tabs.todos.push(local)
 
                 if(local.plan){
-                    tabs[local.plan].push(local)
+                    tabs[local.cliente.plan].push(local)
                 }               
             })
 
@@ -479,9 +479,6 @@ $(function(){
 			})
 		})
 
-		console.log(direccion)
-
-
 		if(plan=="" && isAdmin()) return notification("Por favor elegí un plan para este cliente")
 		if(direccion=="") return notification("Por favor ingresá la dirección de tu local")
 		if(horas=="") return notification("Por favor ingresá el horario de antención de tu local")
@@ -493,16 +490,19 @@ $(function(){
 		$('#loading').fadeIn(200, function(){
 			return promise.then(function(data){ //geojson
 				planData = data
-				return $.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + direccion + ' CABA, Argentina', function(geocode){
-					if(geocode.status=="OK"){
-						ubicacion = geocode.results[0].geometry.location.lat + ", " + geocode.results[0].geometry.location.lng
-					} else {
-						ubicacion = "-34.561491, -58.456147" // por ahora para que no pinche
-					}					
-				    return planData
-				}).fail(function() {
-				    return planData
-				})
+				if(direccion != $('input[name=direccion_ref]').val()){
+					return $.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + direccion + ' CABA, Argentina', function(geocode){
+						if(geocode.status=="OK"){
+							ubicacion = geocode.results[0].geometry.location.lat + ", " + geocode.results[0].geometry.location.lng
+						} else {
+							ubicacion = "-34.561491, -58.456147" // por ahora para que no pinche
+						}					
+					    return planData
+					}).fail(function() {
+					    return planData
+					})
+				}
+				return planData
 			}).then(function(){ // photos
 				$('.photo').each(function(){
 					if($(this).get(0).files.length){
@@ -542,27 +542,28 @@ $(function(){
 				, horarios_filtro = {}
 
 				// suscriptor
-				firebase.auth().createUserWithEmailAndPassword(mailData.mail_suscriptor, mailData.pass).then(function(user) {
-				    user.updateProfile({
-				        displayName: key,
-				        photoURL: ''
-				    }).then(function() {
-				    	$.post(settings.admin.endpoint + '/suscriptor.php',mailData,function(){
-				    		notification("La cuenta de cliente ha sido creada y se envió notificación a " + mailData.email_suscriptor)
-				    	})
-				    }, function(error) {
-				    	notification("Error: " +error)
-				    })      
-				}, function(error) {
-				    var errorCode = error.code
-				    var errorMessage = error.message
-				    if (errorCode == 'auth/weak-password') {
-				        alert('The password is too weak.')
-				        notification("Error: La clave es muy débil")
-				    } else {
-				        notification("Error: " +error)
-				    }
-				})
+				if(clientData.mail_suscriptor != $('input[name=mail_suscriptor_ref]').val()){
+					firebase.auth().createUserWithEmailAndPassword(mailData.mail_suscriptor, mailData.pass).then(function(user) {
+					    user.updateProfile({
+					        displayName: key,
+					        photoURL: ''
+					    }).then(function() {
+					    	$.post(settings.admin.endpoint + '/suscriptor.php',mailData,function(){
+					    		notification("La cuenta de cliente ha sido creada y se envió notificación a " + mailData.email_suscriptor)
+					    	})
+					    }, function(error) {
+					    	notification("Error: " +error)
+					    })      
+					}, function(error) {
+					    var errorCode = error.code
+					    var errorMessage = error.message
+					    if (errorCode == 'auth/weak-password') {
+					        notification("Error: La clave es muy débil")
+					    } else {
+					        notification("Error: " +error)
+					    }
+					})
+				}
 
 				// filtro horarios 
 				$('.horarios_filtro').each(function() {
@@ -598,9 +599,6 @@ $(function(){
 							for(var p in parts){
 								var int = parseInt(parts[p])
 								if(int > 0){
-									console.log("--")
-									console.log(int)
-									console.log("--")
 									out[out.length] = int
 								}
 							}

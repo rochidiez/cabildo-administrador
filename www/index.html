@@ -46,6 +46,7 @@
       messagingSenderId: "378423189863"
     };
 */
+
     firebase.initializeApp(config);
   </script>
 </head>
@@ -259,6 +260,7 @@
             <label for="nombre">Nombre del negocio</label>
             <input class="input w-input" maxlength="256" name="nombre_simple" placeholder="Avenida Cabildo" required="required" type="text" value="{{:~prop('nombre_simple',data)}}">
             <label for="direcci-n">Dirección</label>
+            <input name="direccion_ref" type="hidden" value="{{:~prop('direccion',data)}}">
             <input class="input w-input" maxlength="256" name="direccion" placeholder="Av. Cabildo 1394" required="required" type="text" value="{{:~prop('direccion',data)}}">
             <label for="descripci-n">Descripción sobre tu negocio</label>
             <textarea class="input w-input" maxlength="5000" name="detalle_texto" placeholder="Toda la AVENIDA en una sola aplicación.">{{:~prop('detalle texto',data)}}</textarea>
@@ -277,7 +279,8 @@
           <div class="title-section">Tu suscripción</div>
           <div class="w-form">
               <label for="nombre-2">Nombre</label>
-              <input class="input w-input" data-name="nombre" name="nombre_suscriptor" placeholder="María Fernanda" type="text"  value="{{:~prop('nombre_suscriptor',cliente)}}">
+              <input name="mail_suscriptor_ref" type="hidden" value="{{:~prop('mail_suscriptor',cliente)}}">
+              <input class="input w-input" name="nombre_suscriptor" placeholder="María Fernanda" type="text"  value="{{:~prop('nombre_suscriptor',cliente)}}">
               <label for="email-18">Email</label>
               <input class="input w-input" maxlength="256" name="mail_suscriptor" placeholder="maria@avenidacabildo.com.ar" required="required" type="email" value="{{:~prop('mail_suscriptor',cliente)}}">
           </div>
@@ -550,7 +553,7 @@
         <p>{{:mail}}</p>
       </div>
       <div class="tr w-hidden-small w-hidden-tiny">
-        <p>{{if plan}}{{:plan}}{{/if}}</p>
+        <p>{{if cliente &&cliente.plan}}{{:cliente.plan}}{{/if}}</p>
       </div>
       <div class="tr w-hidden-small w-hidden-tiny">
         <p>{{:telefono}}</p>
