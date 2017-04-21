@@ -467,7 +467,7 @@ $(function(){
 		, planData = {}
 		, plan = $.trim($('select[name=plan]').val())||""
 		, direccion = $.trim($('input[name=direccion]').val())||""
-			, efectivo = $.trim($('input[efectivo]').val())||""
+		, efectivo = $.trim($('input[efectivo]').val())||""
 		, horas = $.trim($('input[name=de-lunes-a-viernes]').val())||""
 		, nombre_simple = $.trim($('input[nombre_simple]').val())||""
 		, web = $.trim($('input[web]').val())||""
@@ -479,9 +479,11 @@ $(function(){
 			})
 		})
 
+		console.log(direccion)
+
+
 		if(plan=="" && isAdmin()) return notification("Por favor elegí un plan para este cliente")
 		if(direccion=="") return notification("Por favor ingresá la dirección de tu local")
-		if(web=="") return notification("Por favor ingresá la dirección de tu local")
 		if(horas=="") return notification("Por favor ingresá el horario de antención de tu local")
 		if(efectivo=="") return notification("Por favor ingresá un descuento exclusivo para tu local")
 		if(web=="") return notification("Por favor ingresá la web de tu local")
