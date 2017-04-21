@@ -152,7 +152,7 @@ var notification = function(text){
                 tabs.todos.push(local)
 
                 if(local.cliente && local.cliente.plan){
-                	tabs[local.cliente.plan] = []
+                	if(!tabs[local.cliente.plan]) tabs[local.cliente.plan] = []
                     tabs[local.cliente.plan].push(local)
                 }               
             })
