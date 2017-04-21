@@ -467,12 +467,12 @@ $(function(){
 		, planData = {}
 		, plan = $.trim($('select[name=plan]').val())||""
 		, direccion = $.trim($('input[name=direccion]').val())||""
-		, efectivo = $.trim($('input[efectivo]').val())||""
+		, efectivo = $.trim($('input[name=efectivo]').val())||""
 		, horas = $.trim($('input[name=de-lunes-a-viernes]').val())||""
-		, nombre_simple = $.trim($('input[nombre_simple]').val())||""
-		, web = $.trim($('input[web]').val())||""
-		, telefono = $.trim($('input[telefono]').val())||""
-		, mail = $.trim($('input[mail]').val())||""
+		, nombre_simple = $.trim($('input[name=nombre_simple]').val())||""
+		, web = $.trim($('input[name=web]').val())||""
+		, telefono = $.trim($('input[name=telefono]').val())||""
+		, mail = $.trim($('input[name=mail]').val())||""
 		, promise = new Promise(function(resolve, reject) {
 			firebase.database().ref('/planes/' + plan).once('value').then(function(snap_plan){
 				resolve(snap_plan.val())
