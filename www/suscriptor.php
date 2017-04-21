@@ -82,10 +82,10 @@ $mail->Password = 'noresp2004';
 $mail->SMTPSecure = 'tls';
 $mail->Port = 587;
 
-//$mail->setFrom('no-reply@avenidacabildo.com.ar', 'Avenida Cabildo');
-//$mail->addAddress('info@avenidacabildo.com.ar', 'Avenida Cabildo');     // Add a recipient
 $mail->setFrom('no-reply@avenidacabildo.com.ar', 'Avenida Cabildo');
-$mail->addAddress('martin@devmeta.net', 'Avenida Cabildo');     // Add a recipient
+$mail->addAddress('info@avenidacabildo.com.ar', 'Avenida Cabildo');     // Add a recipient
+//$mail->setFrom('no-reply@avenidacabildo.com.ar', 'Avenida Cabildo');
+//$mail->addAddress('martin@devmeta.net', 'Avenida Cabildo');     // Add a recipient
 
 $mail->Body    = $mail_admin;
 $mail->AltBody = $mail_admin;

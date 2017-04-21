@@ -390,15 +390,19 @@ $(function(){
 						var locales = []
 						, key = descuento.key
 						, data = descuento.val()
-
+						, ctr =0 
 						if(data['locales adheridos'] && data['locales adheridos'].length){
 							for(var i in data['locales adheridos']){
+								ctr++
 								var value = data['locales adheridos'][i]
 								if(key != value){
 									locales.push(value)
 								}
+
+								if(ctr === promociones.length){
+									return firebase.database().ref('/descuentos/' + key + '/locales adheridos').set(locales)
+								}
 							}
-							firebase.database().ref('/descuentos/' + key + '/locales adheridos').set(locales)
 						}
 					})
 				})
@@ -408,26 +412,34 @@ $(function(){
 						var locales = []
 						, key = categoria.key
 						, data = categoria.val()
+						, ctr = 0
 
 						for(var i in data.locales){
+							ctr++
 							if(key != data.locales[i]){ // add 
 								locales.push(data.locales[i])
 							} 
-						}
 
-						return firebase.database().ref('/categorias/'+key+'/locales').set(locales)
+							if(ctr === promociones.length){
+								return firebase.database().ref('/categorias/'+key+'/locales').set(locales)
+							}
+						}
 					})
 				})
 			}).then(function(){ // promociones
 				return firebase.database().ref('/promociones').once('value').then(function(promociones){
 					var promos = []
+					, ctr = 0
 					promociones.forEach(function(promo){
+						ctr++
 						var promo = promo.val()
 						if(key != promo){ // add 
 							promos.push(promo)
 						} 
 
-						return firebase.database().ref('/promociones').set(promos)
+						if(ctr === promociones.length){
+							return firebase.database().ref('/promociones').set(promos)
+						}
 					})				
 				})			
 			}).then(function(){ // exit
