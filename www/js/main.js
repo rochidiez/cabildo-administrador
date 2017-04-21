@@ -368,13 +368,14 @@ $(function(){
 	})
 
 	$(document).on('click','.eliminar.table-action',function(){
-		$('body').attr('id',encodeURIComponent($(this).data('key')))
+		$('body').attr('id',$(this).data('key'))
 	})	
 
 	// ~remove
 	$('.modal.eliminarlocal .modalbutton.yes').click(function(){
-		var key = decodeURI($('body').attr('id'))
+		var key = $('body').attr('id')
 		, promise = new Promise(function(resolve, reject) { // local and cliente
+			console.log(key)
 			return firebase.database().ref('/locales').child(key).remove().then(function(){
 				return firebase.database().ref('/clientes').child(key).remove().then(function(){
 					resolve(null)
@@ -384,10 +385,8 @@ $(function(){
 
 		$('#loading').fadeIn(200, function(){
 			promise.then(function(){ // descuentos
-				var ctr = 0		
 				return firebase.database().ref('/descuentos').once('value').then(function(descuentos){
 					descuentos.forEach(function(descuento){
-						ctr++
 						var locales = []
 						, key = descuento.key
 						, data = descuento.val()
@@ -401,17 +400,11 @@ $(function(){
 							}
 							firebase.database().ref('/descuentos/' + key + '/locales adheridos').set(locales)
 						}
-
-						if(ctr === descuentos.val().length){
-							return true
-						}					
 					})
 				})
 			}).then(function(){ // categorias
-				var ctr = 0	
 				return firebase.database().ref('/categorias').once('value').then(function(categorias){
 					categorias.forEach(function(categoria){
-						ctr++
 						var locales = []
 						, key = categoria.key
 						, data = categoria.val()
@@ -422,28 +415,19 @@ $(function(){
 							} 
 						}
 
-						firebase.database().ref('/categorias/'+key+'/locales').set(locales)
-						if(ctr === categorias.val().length){
-							return true
-						}					
+						return firebase.database().ref('/categorias/'+key+'/locales').set(locales)
 					})
 				})
 			}).then(function(){ // promociones
 				return firebase.database().ref('/promociones').once('value').then(function(promociones){
 					var promos = []
-					, ctr = 0
 					promociones.forEach(function(promo){
 						var promo = promo.val()
-						ctr++
 						if(key != promo){ // add 
 							promos.push(promo)
 						} 
 
-						if(ctr === promociones.val().length){
-							return firebase.database().ref('/promociones').set(promos).then(function(){
-								return true
-							})
-						}
+						return firebase.database().ref('/promociones').set(promos)
 					})				
 				})			
 			}).then(function(){ // exit
