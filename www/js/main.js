@@ -467,7 +467,12 @@ $(function(){
 		, planData = {}
 		, plan = $.trim($('select[name=plan]').val())||""
 		, direccion = $.trim($('input[name=direccion]').val())||""
-		, hora = $.trim($('input[name=de-lunes-a-viernes]').val())||""
+			, efectivo = $.trim($('input[efectivo]').val())||""
+		, horas = $.trim($('input[name=de-lunes-a-viernes]').val())||""
+		, nombre_simple = $.trim($('input[nombre_simple]').val())||""
+		, web = $.trim($('input[web]').val())||""
+		, telefono = $.trim($('input[telefono]').val())||""
+		, mail = $.trim($('input[mail]').val())||""
 		, promise = new Promise(function(resolve, reject) {
 			firebase.database().ref('/planes/' + plan).once('value').then(function(snap_plan){
 				resolve(snap_plan.val())
@@ -476,7 +481,12 @@ $(function(){
 
 		if(plan=="" && isAdmin()) return notification("Por favor elegí un plan para este cliente")
 		if(direccion=="") return notification("Por favor ingresá la dirección de tu local")
-		if(hora=="") return notification("Por favor ingresá el horario de antención de tu local")
+		if(web=="") return notification("Por favor ingresá la dirección de tu local")
+		if(horas=="") return notification("Por favor ingresá el horario de antención de tu local")
+		if(efectivo=="") return notification("Por favor ingresá un descuento exclusivo para tu local")
+		if(web=="") return notification("Por favor ingresá la web de tu local")
+		if(telefono=="") return notification("Por favor ingresá un teléfono para tu local")
+		if(mail=="") return notification("Por favor ingresá un email para tu local")
 
 		$('#loading').fadeIn(200, function(){
 			return promise.then(function(data){ //geojson
@@ -619,8 +629,8 @@ $(function(){
 					categoria : $('select[name=categoria]').val()||""
 					, 'descuentos' : descuentos
 					, 'detalle texto' : $('textarea[name=detalle_texto]').val()||""
-					, 'direccion' : $('input[name=direccion]').val()||""
-					, 'efectivo' : $('input[name=descuento_av]').val()||""
+					, 'direccion' :direccion
+					, 'efectivo' : efectivo
 					, 'en promocion' : planData.promocion||0
 					, 'facebook' : $('input[name=facebook]').val()||""
 					, 'horarios' : horarios
@@ -628,11 +638,11 @@ $(function(){
 					, 'imagen logo' : $('.imagen_logo').attr('src')||""
 					, 'imagen fondo' : $('.imagen_fondo').attr('src')||""
 					, 'instagram' : $('input[name=instagram]').val()||""
-					, 'mail' : $('input[name=mail]').val()||""
-					, 'nombre_simple': $('input[name=nombre_simple]').val()||""
-					, 'telefono' : $('input[name=telefono]').val()||""
+					, 'mail' : mail
+					, 'nombre_simple': nombre_simple
+					, 'telefono' : telefono
 					, 'ubicacion' : ubicacion
-					, 'web' : $('input[name=web]').val()||""
+					, 'web' : web
 					, 'visibilidad' : plan.visibilidad||3
 				}
 
