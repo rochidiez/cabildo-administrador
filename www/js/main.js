@@ -465,7 +465,7 @@ $(function(){
 
 		var key = $('input[name="key"]').val()?$('input[name=key]').val():$('input[name=nombre_simple]').val()
 		, descuentos = []
-		, ubicacion = ""
+		, ubicacion = undefined
 		, planData = {}
 		, plan = $.trim($('select[name=plan]').val())||""
 		, direccion = $.trim($('input[name=direccion]').val())||""
@@ -492,20 +492,19 @@ $(function(){
 		$('#loading').fadeIn(200, function(){
 			return promise.then(function(data){ //geojson
 				planData = data
+				var ubi = undefined
 				if($('input[name=ubicacion_ref]').val() == "" || direccion != $('input[name=direccion_ref]').val()){
-					return $.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + direccion + ' CABA, Argentina', function(geocode){
+					$.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + direccion + ' CABA, Argentina', function(geocode){
 						if(geocode.status=="OK"){
-							ubicacion = geocode.results[0].geometry.location.lat + ", " + geocode.results[0].geometry.location.lng
-						} else {
-							ubicacion = "-34.561491, -58.456147" // por ahora para que no pinche
-						}					
-					    return planData
+							ubi = geocode.results[0].geometry.location.lat + ", " + geocode.results[0].geometry.location.lng
+						} 				
+					    return ubi
 					}).fail(function() {
-					    return planData
+					    return null
 					})
 				}
-				return planData
-			}).then(function(){ // photos
+			}).then(function(ubi){ // photos
+				ubicacion = ubi
 				$('.photo').each(function(){
 					if($(this).get(0).files.length){
 						var name = $(this).attr('name')
@@ -653,9 +652,9 @@ $(function(){
 					, 'mail' : mail
 					, 'nombre_simple': nombre_simple
 					, 'telefono' : telefono
-					, 'ubicacion' : ubicacion
+					, 'ubicacion' : ubicacion||"-34.561491, -58.456147"
 					, 'web' : web
-					, 'visibilidad' : plan.visibilidad||3
+					, 'visibilidad' : planData.visibilidad||3
 				}
 
 				return firebase.database().ref('/locales/'+key).update(postData).then(function(){
