@@ -260,6 +260,7 @@
             <label for="nombre">Nombre del negocio</label>
             <input class="input w-input" maxlength="256" name="nombre_simple" placeholder="Avenida Cabildo" required="required" type="text" value="{{:~prop('nombre_simple',data)}}">
             <label for="direcci-n">Dirección</label>
+            <input name="ubicacion_ref" type="hidden" value="{{:~prop('ubicacion',data)}}">
             <input name="direccion_ref" type="hidden" value="{{:~prop('direccion',data)}}">
             <input class="input w-input" maxlength="256" name="direccion" placeholder="Av. Cabildo 1394" required="required" type="text" value="{{:~prop('direccion',data)}}">
             <label for="descripci-n">Descripción sobre tu negocio</label>

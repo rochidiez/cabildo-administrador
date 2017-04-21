@@ -151,7 +151,8 @@ var notification = function(text){
                 local.cliente = data.clientes[key]
                 tabs.todos.push(local)
 
-                if(local.plan){
+                if(local.cliente && local.cliente.plan){
+                	tabs[local.cliente.plan] = []
                     tabs[local.cliente.plan].push(local)
                 }               
             })
@@ -325,6 +326,7 @@ $(function(){
 
 	$(document).on('click','.salir',function(){
 		firebase.auth().signOut().then(function() {
+			localStorage.clear()
 			location.hash = '';
 		}).catch(function(error) {
 		  	alert(err.message)
@@ -490,7 +492,7 @@ $(function(){
 		$('#loading').fadeIn(200, function(){
 			return promise.then(function(data){ //geojson
 				planData = data
-				if(direccion != $('input[name=direccion_ref]').val()){
+				if($('input[name=ubicacion_ref]').val() == "" || direccion != $('input[name=direccion_ref]').val()){
 					return $.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + direccion + ' CABA, Argentina', function(geocode){
 						if(geocode.status=="OK"){
 							ubicacion = geocode.results[0].geometry.location.lat + ", " + geocode.results[0].geometry.location.lng
@@ -528,18 +530,17 @@ $(function(){
 			}).then(function(planData){ // clientes
 				var clientData = {}
 				, mailData = {}
+				, horarios = "Lunes a Viernes " + $('input[name=de-lunes-a-viernes]').val() + " \nSábados " + $('input[name=sabado]').val()  + " \nFeriados " + $('input[name=feriados]').val()
+				, horarios_filtro = {}
+				, horarios_ref = {}	
 
 				clientData.plan = plan
 				clientData.nombre_suscriptor = $('input[name=nombre_suscriptor]').val()||""
 				clientData.mail_suscriptor = $('input[name=mail_suscriptor]').val()||""
 
 				mailData = clientData
-
 				mailData.pass = helpers.randomstr(12)
 				mailData.local = key
-
-				var horarios = "Lunes a Viernes " + $('input[name=de-lunes-a-viernes]').val() + " \nSábados " + $('input[name=sabado]').val()  + " \nFeriados " + $('input[name=feriados]').val()
-				, horarios_filtro = {}
 
 				// suscriptor
 				if(clientData.mail_suscriptor != $('input[name=mail_suscriptor_ref]').val()){
@@ -581,15 +582,26 @@ $(function(){
 
 				// desglose horarios del modo simple (opcional)
 				if($.isEmptyObject(horarios_filtro)){
-					var set = {}
-					, arr = {
+					horarios_ref = {
 						"de-lunes-a-viernes" : ["lunes","martes","miercoles","jueves","viernes"]
 						, "sabado" : ["sabado"]
 						, "feriados" : ["domingo"]
 					}
+				} else {
+					if(!horarios_filtro['lunes']) {
+						horarios_ref["de-lunes-a-viernes"] = ["lunes","martes","miercoles","jueves","viernes"]
+					}
+					if(!horarios_filtro['sabado']) {
+						horarios_ref["sabado"] = ["sabado"]
+					}
+					if(!horarios_filtro['domingo']) {
+						horarios_ref["feriados"]  = ["domingo"]
+					}
+				}
 
-					for(var k in arr){
-						var values = arr[k]
+				if(!$.isEmptyObject(horarios_ref)){
+					for(var k in horarios_ref){
+						var values = horarios_ref[k]
 						, abre_cierra = $.trim($('input[name=' + k + ']').val())||""
 
 						if(abre_cierra!=""){
