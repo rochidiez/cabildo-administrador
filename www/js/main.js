@@ -4,16 +4,16 @@ var notification = function(text){
 }
 , settings = {
 	notification_delay : 5000
+	, user : undefined
 	, pagos : {
 		dia_vencimiento : 20
 	}
-	, user : undefined
-	//, endpoint : 'http://cabildo.local'
-	, endpoint : 'https://locales.avenidacabildo.com.ar'
 	, admin : { 
-		paths : ['/admin.html']
+		uid : '4KZEtrqeMgc4Hm6P7NWwbCeTLke2' // cabildo
 		//, uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2' // infinix
-		, uid : '4KZEtrqeMgc4Hm6P7NWwbCeTLke2' // cabildo
+
+		, endpoint : 'https://avenida-cabildo.herokuapp.com' // heroku
+		//, endpoint : 'https://locales.avenidacabildo.com.ar' // cabildo
 	}
 }
 , isAdmin = function(){
@@ -331,7 +331,6 @@ $(function(){
 		})
 	})
 
-
 	$(document).on('click','.login',function(){
 		var email = $.trim($('#email').val())
 		, pass = $.trim($('#password').val())
@@ -468,14 +467,16 @@ $(function(){
 		, planData = {}
 		, plan = $.trim($('select[name=plan]').val())||""
 		, direccion = $.trim($('input[name=direccion]').val())||""
+		, hora = $.trim($('input[name=de-lunes-a-viernes]').val())||""
 		, promise = new Promise(function(resolve, reject) {
 			firebase.database().ref('/planes/' + plan).once('value').then(function(snap_plan){
 				resolve(snap_plan.val())
 			})
 		})
 
-		if(plan=="") return notification("Por favor elija un plan")
-		if(direccion=="") return notification("Por favor ingrese una dirección")
+		if(plan=="" && isAdmin()) return notification("Por favor elegí un plan para este cliente")
+		if(direccion=="") return notification("Por favor ingresá la dirección de tu local")
+		if(hora=="") return notification("Por favor ingresá el horario de antención de tu local")
 
 		$('#loading').fadeIn(200, function(){
 			return promise.then(function(data){ //geojson
@@ -490,7 +491,7 @@ $(function(){
 				}).fail(function() {
 				    return planData
 				})
-			}).then(function(chain){ // photos
+			}).then(function(){ // photos
 				$('.photo').each(function(){
 					if($(this).get(0).files.length){
 						var name = $(this).attr('name')
@@ -530,33 +531,28 @@ $(function(){
 
 				// suscriptor
 				firebase.auth().createUserWithEmailAndPassword(mailData.mail_suscriptor, mailData.pass).then(function(user) {
-				    // [END createwithemail]
-				    // callSomeFunction(); Optional
-				    // var user = firebase.auth().currentUser;
 				    user.updateProfile({
 				        displayName: key,
 				        photoURL: ''
 				    }).then(function() {
-				    	$.post(settings.endpoint + '/suscriptor.php',mailData,function(){
+				    	$.post(settings.admin.endpoint + '/suscriptor.php',mailData,function(){
 				    		notification("La cuenta de cliente ha sido creada y se envió notificación a " + mailData.email_suscriptor)
 				    	})
-				        // Update successful.
 				    }, function(error) {
-				        // An error happened.
+				    	notification("Error: " +error)
 				    })      
 				}, function(error) {
-				    // Handle Errors here.
 				    var errorCode = error.code
 				    var errorMessage = error.message
-				    // [START_EXCLUDE]
 				    if (errorCode == 'auth/weak-password') {
 				        alert('The password is too weak.')
+				        notification("Error: La clave es muy débil")
 				    } else {
-				        console.error(error)
+				        notification("Error: " +error)
 				    }
-				    // [END_EXCLUDE]
 				})
 
+				// filtro horarios 
 				$('.horarios_filtro').each(function() {
 					var dia = $(this).find('.dia').val()
 					, abre = $(this).find('.abre').val()
@@ -564,12 +560,52 @@ $(function(){
 
 					if(dia!="" && abre!="" && cierra!=""){
 						horarios_filtro[dia] = {
-							abre: parseInt(abre)
-							, cierra : parseInt(cierra)
+							'abre': parseInt(abre)
+							, 'cierra' : parseInt(cierra)
 						}
 					}
 				})
 
+				// desglose horarios del modo simple (opcional)
+				if($.isEmptyObject(horarios_filtro)){
+					var set = {}
+					, arr = {
+						"de-lunes-a-viernes" : ["lunes","martes","miercoles","jueves","viernes"]
+						, "sabado" : ["sabado"]
+						, "feriados" : ["domingo"]
+					}
+
+					for(var k in arr){
+						var values = arr[k]
+						, abre_cierra = $.trim($('input[name=' + k + ']').val())||""
+
+						if(abre_cierra!=""){
+							var parts = abre_cierra.split(" ")
+							, out = []
+
+							for(var p in parts){
+								var int = parseInt(parts[p])
+								if(int > 0){
+									console.log("--")
+									console.log(int)
+									console.log("--")
+									out[out.length] = int
+								}
+							}
+
+							if(out.length > 1) {
+								for(var i in values){
+									horarios_filtro[values[i]] = {
+										'abre' : out[0]
+										, 'cierra' : out[1]
+									}
+								}
+							}
+						}
+					}
+				}
+
+				// descuentos
 				$('.descuentos').each(function() {
 					var porcentaje = $(this).find('.porcentaje').val()
 					, entidad = $(this).find('.entidad').val()
@@ -581,23 +617,23 @@ $(function(){
 
 				var postData = {
 					categoria : $('select[name=categoria]').val()||""
-					, descuentos : descuentos
+					, 'descuentos' : descuentos
 					, 'detalle texto' : $('textarea[name=detalle_texto]').val()||""
-					, direccion : $('input[name=direccion]').val()||""
-					, efectivo : $('input[name=descuento_av]').val()||""
+					, 'direccion' : $('input[name=direccion]').val()||""
+					, 'efectivo' : $('input[name=descuento_av]').val()||""
 					, 'en promocion' : planData.promocion||0
-					, facebook : $('input[name=facebook]').val()||""
-					, horarios : horarios
+					, 'facebook' : $('input[name=facebook]').val()||""
+					, 'horarios' : horarios
 					, 'horarios para filtro' : horarios_filtro
 					, 'imagen logo' : $('.imagen_logo').attr('src')||""
 					, 'imagen fondo' : $('.imagen_fondo').attr('src')||""
-					, instagram : $('input[name=instagram]').val()||""
-					, mail : $('input[name=mail]').val()||""
-					, nombre_simple: $('input[name=nombre_simple]').val()||""
-					, telefono : $('input[name=telefono]').val()||""
-					, ubicacion : ubicacion
-					, web : $('input[name=web]').val()||""
-					, visibilidad : plan.visibilidad||3
+					, 'instagram' : $('input[name=instagram]').val()||""
+					, 'mail' : $('input[name=mail]').val()||""
+					, 'nombre_simple': $('input[name=nombre_simple]').val()||""
+					, 'telefono' : $('input[name=telefono]').val()||""
+					, 'ubicacion' : ubicacion
+					, 'web' : $('input[name=web]').val()||""
+					, 'visibilidad' : plan.visibilidad||3
 				}
 
 				return firebase.database().ref('/locales/'+key).update(postData).then(function(){
@@ -606,7 +642,7 @@ $(function(){
 					})
 				})
 
-			}).then(function(chain4){ // descuentos
+			}).then(function(){ // descuentos
 				return firebase.database().ref('/descuentos').once('value').then(function(snap_descuentos){
 					return firebase.database().ref('/tarjetas').once('value').then(function(snap_tarjetas){
 						var data = snap_descuentos.val()
@@ -644,7 +680,7 @@ $(function(){
 						})
 					})				
 				})				
-			}).then(function(chain5){ // categorias
+			}).then(function(){ // categorias
 				return firebase.database().ref('/categorias').once('value').then(function(categorias){
 					var cat = $('select[name=categoria]').val()
 
@@ -669,7 +705,7 @@ $(function(){
 					return true
 				})	
 	
-			}).then(function(chain6){ // promociones
+			}).then(function(){ // promociones
 				return firebase.database().ref('/promociones').once('value').then(function(snapshot){
 					var promociones = snapshot.val()
 					, promos = []
@@ -690,10 +726,12 @@ $(function(){
 					})
 				})
 			}).then (function(){ // salida
-				notification("Local actualizado: " +key)
-				location.hash = 'locales'
-				$('*[data-key="*"]').removeClass('updated')
-				$('*[data-key="'+key+'"]').addClass('updated')					
+				setTimeout(function(){
+					notification("Local actualizado: " +key)
+					location.hash = 'locales'
+					$('*[data-key="*"]').removeClass('updated')
+					$('*[data-key="'+key+'"]').addClass('updated')					
+				},100)
 			})
 		})
 	})
@@ -812,28 +850,3 @@ $(function(){
 moment.createFromInputFallback = function(config) {
   config._d = new Date(config._i);
 }
-/*
-firebase.auth().createUserWithEmailAndPassword('admin@cabildo.com', 'cab1ld0$.').then(function(user) {
-    // [END createwithemail]
-    // callSomeFunction(); Optional
-    // var user = firebase.auth().currentUser;
-    user.updateProfile({
-        displayName: 'Administrador',
-        photoURL: ''
-    }).then(function() {
-        // Update successful.
-    }, function(error) {
-        // An error happened.
-    });        
-}, function(error) {
-    // Handle Errors here.
-    var errorCode = error.code;
-    var errorMessage = error.message;
-    // [START_EXCLUDE]
-    if (errorCode == 'auth/weak-password') {
-        alert('The password is too weak.');
-    } else {
-        console.error(error);
-    }
-    // [END_EXCLUDE]
-});	*/
