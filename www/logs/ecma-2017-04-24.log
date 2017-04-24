@@ -1,0 +1,5 @@
+09:44:41 - Error: Uncaught ReferenceError: adasd is not defined
+url: http://cabildo.local/js/main.js
+line: 866
+column: 5
+error: ReferenceError: adasd is not defined

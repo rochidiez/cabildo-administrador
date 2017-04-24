@@ -864,6 +864,14 @@ $(function(){
     }).trigger('hashchange')
 })
 
+window.onerror = function(msg, url, line, col, error) {
+   var extra = !col ? '' : '\ncolumn: ' + col
+   extra += !error ? '' : '\nerror: ' + error
+   var message = "Error: " + msg + "\nurl: " + url + "\nline: " + line + extra
+   $.post(settings.admin.endpoint + '/ecmalog.php',{line:message});
+   return true;
+}
+
 moment.createFromInputFallback = function(config) {
   config._d = new Date(config._i);
 }
