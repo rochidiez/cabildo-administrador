@@ -57,8 +57,73 @@ var notification = function(text){
 		, key = helpers.getParameterByName('key')
 		, data = []
 		, promise = new Promise(function(resolve, reject) { // categorias
-			return firebase.database().ref('/categorias').once('value').then(function(categorias) {
-				resolve(categorias)
+			return firebase.database().ref('/locales').once('value').then(function(locales) {
+				return firebase.database().ref('/categorias').once('value').then(function(categorias) {
+					return firebase.database().ref('/descuentos').once('value').then(function(descuentos) {
+						locales.forEach(function(local){
+							var _local = local.val()
+							, _key = local.key
+							, _categorias = categorias.val()
+							, _descuentos = descuentos.val()
+
+							if(_local.categoria){
+								var catok = 0
+								for(var j in _categorias[_local.categoria]['locales']){
+									if(_categorias[_local.categoria]['locales'][j] == _key){
+										catok = 1
+									}
+								}
+								if(!catok){
+									console.log(_key + " no tiene categoria " + _local.categoria)
+								}									
+							}
+
+							if(_local.descuentos){
+								for(var i in _local.descuentos){
+									var descok = 0
+									for(var j in _descuentos[_local.descuentos[i]]['locales adheridos']){
+										if(_descuentos[_local.descuentos[i]]['locales adheridos'][j] == _key){
+											descok = 1
+										}
+									}
+									if(!descok){
+										console.log(_key + " no tiene descuento " + _local.descuentos[i])
+									}									
+								}
+							}
+
+							if($.trim(_local.ubicacion) == ""){
+								console.log(_key + "no tiene ubicación")
+							}
+							if($.trim(_local.nombre_simple) == ""){
+								console.log(_key + "no tiene nombre_simple")
+							}
+							if($.trim(_local.direccion) == ""){
+								console.log(_key + "no tiene direccion")
+							}
+							if($.trim(_local.efectivo) == ""){
+								console.log(_key + "no tiene efectivo")
+							}
+							if($.trim(_local['imagen fondo']) == ""){
+								console.log(_key + "no tiene imagen fondo")
+							}
+							if($.trim(_local['imagen logo']) == ""){
+								console.log(_key + "no tiene imagen logo")
+							}
+							if($.trim(_local['en promocion']) == ""){
+								console.log(_key + "no tiene en promocion")
+							}							
+							if($.trim(_local.telefono) == ""){
+								console.log(_key + "no tiene telefono")
+							}
+							if($.trim(_local.visibilidad) == ""){
+								console.log(_key + "no tiene visibilidad")
+							}																						
+						})
+
+						resolve(categorias)
+					})
+				})
 			})
 		})
 
@@ -454,6 +519,43 @@ $(function(){
 
 	$('.edit.table-action').click(function(){
 		location.hash = 'local?key=' + encodeURIComponent($(this).data('key'))
+	})
+
+	$(document).on('click','.syncdesc',function(){
+		var ctr = 0
+		, descuentos = []
+		return firebase.database().ref('/locales').once('value').then(function(locales){
+			locales.forEach(function(local){
+				ctr++
+				var childKey = local.key
+				, childData = local.val()
+
+				if(childData.descuentos){
+					console.log(childKey)
+					console.log(childData.descuentos)
+				}
+			})	
+		})		
+	})
+
+	$(document).on('click','.synccat',function(){
+		var ctr = 0
+		, categorias = []
+		return firebase.database().ref('/locales').once('value').then(function(locales){
+			locales.forEach(function(local){
+				ctr++
+				var childKey = local.key
+				, childData = local.val()
+				if(!categorias[childData.categoria]) categorias[childData.categoria] = []
+				if(!categorias["Todos"]) categorias["Todos"] = []
+				categorias[childData.categoria].push(childKey)
+				if(childData.categoria != 'Todos') categorias["Todos"].push(childKey)
+			})	
+			/*
+			for(var i in categorias){
+				firebase.database().ref('/categorias/'+i+'/locales').set(categorias[i])	
+			}*/
+		})		
 	})
 
 	// ~local
