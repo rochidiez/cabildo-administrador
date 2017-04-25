@@ -93,31 +93,34 @@ var notification = function(text){
 							}
 
 							if($.trim(_local.ubicacion) == ""){
-								console.log(_key + "no tiene ubicación")
+								console.log(_key + " no tiene ubicación")
 							}
 							if($.trim(_local.nombre_simple) == ""){
-								console.log(_key + "no tiene nombre_simple")
+								console.log(_key + " no tiene nombre_simple")
 							}
 							if($.trim(_local.direccion) == ""){
-								console.log(_key + "no tiene direccion")
+								console.log(_key + " no tiene direccion")
 							}
 							if($.trim(_local.efectivo) == ""){
-								console.log(_key + "no tiene efectivo")
+								console.log(_key + " no tiene efectivo")
 							}
 							if($.trim(_local['imagen fondo']) == ""){
-								console.log(_key + "no tiene imagen fondo")
+								console.log(_key + " no tiene imagen fondo")
 							}
 							if($.trim(_local['imagen logo']) == ""){
-								console.log(_key + "no tiene imagen logo")
+								console.log(_key + " no tiene imagen logo")
 							}
 							if($.trim(_local['en promocion']) == ""){
-								console.log(_key + "no tiene en promocion")
-							}							
+								console.log(_key + " no tiene en promocion")
+							}	
+							if(!_local['horarios para filtro']){
+								console.log(_key + " no tiene horarios para filtro")
+							}													
 							if($.trim(_local.telefono) == ""){
-								console.log(_key + "no tiene telefono")
+								console.log(_key + " no tiene telefono")
 							}
 							if($.trim(_local.visibilidad) == ""){
-								console.log(_key + "no tiene visibilidad")
+								console.log(_key + " no tiene visibilidad")
 							}																						
 						})
 
@@ -707,7 +710,7 @@ $(function(){
 
 							for(var p in parts){
 								var int = parseInt(parts[p])
-								if(int > 0){
+								if(int >= 0){
 									out[out.length] = int
 								}
 							}
