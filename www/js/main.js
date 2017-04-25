@@ -857,17 +857,24 @@ $(function(){
 			})
 		})
 	})
+	
+	
+	$(document).on('click','.w-tab-link',function(e) {
+		$('.keyword').val($(this).data('index'))
+	})
 
 	$(document).on('keyup','.keyword',function(e) {
-		var tab = $('.w-tab-menu a.w--current').data('w-tab')
+		var tab = $('.w-tab-menu a.w--current')
+		, tabdata = tab.data('w-tab')
 		, index = $(this).val().toLowerCase()
-
-		$('div[data-w-tab="'+tab+'"] .locales > div').each(function(){
+		tab.attr('data-index',index)
+		$('div[data-w-tab="'+tabdata+'"] .locales > div').each(function(){
 			var m = $(this).data('id').toLowerCase()
-			$(this).show()
 			if(m.indexOf(index) == -1) {
-				$(this).hide()
-			} 
+				$(this).fadeOut(100)
+			} else {
+				$(this).fadeIn(100)	
+			}
 		})
 	})
 
