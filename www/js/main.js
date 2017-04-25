@@ -860,7 +860,6 @@ $(function(){
 
 	$(document).on('keyup','.keyword',function(e) {
 		var index = $(this).val().toLowerCase()
-		console.log($('div[data-w-tab="todos"] .locales > div').length)
 		$('div[data-w-tab="todos"] .locales > div').each(function(){
 			var m = $(this).data('id').toLowerCase()
 			$(this).show()
