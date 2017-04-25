@@ -5,6 +5,7 @@ var notification = function(text){
 , settings = {
 	notification_delay : 5000
 	, user : undefined
+	, default_latlng : "-34.561491, -58.456147"
 	, pagos : {
 		dia_vencimiento : 20
 	}
@@ -33,7 +34,8 @@ var notification = function(text){
 	, estadisticas : function(resolve){
 		var data = []
 		, count = 0
-		, promise = new Promise(function(resolve, reject) { // categorias
+
+		return new Promise(function(resolve, reject) { // categorias
 			return firebase.database().ref('/usuarios').once('value').then(function(usuarios) {
 				usuarios.forEach(function(locales){
 					var arr = locales.val()
@@ -45,18 +47,22 @@ var notification = function(text){
 				})				
 				resolve(count)
 			})
-		})
-
-		promise.then(function(count){
+		}).then(function(count){
 			$('.content').html($.templates('#estadisticas').render({personas:count}))
-		})
-		.then(resolve)		
+		}).then(resolve)		
 	}
 	, local : function(resolve){
 		var position = 0
 		, key = helpers.getParameterByName('key')
 		, data = []
-		, promise = new Promise(function(resolve, reject) { // categorias
+
+		if(isAdmin()){
+			key = key ? key : null
+		} else {
+			key = settings.user.displayName
+		}
+
+		return new Promise(function(resolve, reject) { // categorias
 			return firebase.database().ref('/locales').once('value').then(function(locales) {
 				return firebase.database().ref('/categorias').once('value').then(function(categorias) {
 					return firebase.database().ref('/descuentos').once('value').then(function(descuentos) {
@@ -128,15 +134,7 @@ var notification = function(text){
 					})
 				})
 			})
-		})
-
-		if(isAdmin()){
-			key = key ? key : null
-		} else {
-			key = settings.user.displayName
-		}
-
-		promise.then(function(categorias){
+		}).then(function(categorias){
 			data.categorias = categorias
 			return firebase.database().ref('/descuentos').once('value').then(function(descuentos) {
 				return descuentos
@@ -193,13 +191,12 @@ var notification = function(text){
 	, locales : function(resolve){
 
 		var data = []
-		, promise = new Promise(function(resolve, reject) { // clientes
+
+		return new Promise(function(resolve, reject) { // clientes
 			return firebase.database().ref('/clientes').once('value').then(function(clientes) {
 				resolve(clientes)
 			})
-		})
-
-		promise.then(function(clientes){
+		}).then(function(clientes){
 			data.clientes = clientes.val()
 			return firebase.database().ref('/planes').once('value').then(function(planes) {
 				return planes
@@ -442,17 +439,15 @@ $(function(){
 	// ~remove
 	$('.modal.eliminarlocal .modalbutton.yes').click(function(){
 		var key = $('body').attr('id')
-		, promise = new Promise(function(resolve, reject) { // local and cliente
-			console.log(key)
-			return firebase.database().ref('/locales').child(key).remove().then(function(){
-				return firebase.database().ref('/clientes').child(key).remove().then(function(){
-					resolve(null)
-				})
-			})
-		})
 
 		$('#loading').fadeIn(200, function(){
-			promise.then(function(){ // descuentos
+			return new Promise(function(resolve, reject) { // local and cliente
+				return firebase.database().ref('/locales').child(key).remove().then(function(){
+					return firebase.database().ref('/clientes').child(key).remove().then(function(){
+						resolve(null)
+					})
+				})
+			}).then(function(){ // descuentos
 				return firebase.database().ref('/descuentos').once('value').then(function(descuentos){
 					descuentos.forEach(function(descuento){
 						var locales = []
@@ -576,11 +571,6 @@ $(function(){
 		, web = $.trim($('input[name=web]').val())||""
 		, telefono = $.trim($('input[name=telefono]').val())||""
 		, mail = $.trim($('input[name=mail]').val())||""
-		, promise = new Promise(function(resolve, reject) {
-			firebase.database().ref('/planes/' + plan).once('value').then(function(snap_plan){
-				resolve(snap_plan.val())
-			})
-		})
 
 		if(plan=="" && isAdmin()) return notification("Por favor elegí un plan para este cliente")
 		if(direccion=="") return notification("Por favor ingresá la dirección de tu local")
@@ -591,21 +581,23 @@ $(function(){
 		if(mail=="") return notification("Por favor ingresá un email para tu local")
 
 		$('#loading').fadeIn(200, function(){
-			return promise.then(function(data){ //geojson
+			return new Promise(function(resolve, reject) {
+				firebase.database().ref('/planes/' + plan).once('value').then(function(snap_plan){
+					resolve(snap_plan.val())
+				})
+			}).then(function(data){ //geojson
 				planData = data
-				var ubi = undefined
-				if($('input[name=ubicacion_ref]').val() == "" || direccion != $('input[name=direccion_ref]').val()){
-					$.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + direccion + ' CABA, Argentina', function(geocode){
-						if(geocode.status=="OK"){
-							ubi = geocode.results[0].geometry.location.lat + ", " + geocode.results[0].geometry.location.lng
-						} 				
-					    return ubi
+				if( $('input[name=ubicacion_ref]').val() == settings.default_latlng || $('input[name=ubicacion_ref]').val() == "" || direccion != $('input[name=direccion_ref]').val()){
+					return $.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + direccion + ' CABA, Argentina', function(geocode){
+						console.log("geo ok")
 					}).fail(function() {
-					    return null
+					    console.log("geo failed")
 					})
 				}
-			}).then(function(ubi){ // photos
-				ubicacion = ubi
+				return {status:"NOCHANGE"}
+			}).then(function(geocode){ // photos
+				ubicacion = geocode.status=="OK"?geocode.results[0].geometry.location.lat + ", " + geocode.results[0].geometry.location.lng:settings.default_latlng
+				console.log(ubicacion)
 				$('.photo').each(function(){
 					if($(this).get(0).files.length){
 						var name = $(this).attr('name')
@@ -753,7 +745,7 @@ $(function(){
 					, 'mail' : mail
 					, 'nombre_simple': nombre_simple
 					, 'telefono' : telefono
-					, 'ubicacion' : ubicacion||"-34.561491, -58.456147"
+					, 'ubicacion' : ubicacion||settings.default_latlng
 					, 'web' : web
 					, 'visibilidad' : planData.visibilidad||3
 				}
@@ -851,9 +843,10 @@ $(function(){
 				setTimeout(function(){
 					notification("Local actualizado: " +key)
 					location.hash = 'locales'
+					window.scrollTo(0,0)
 					$('*[data-key="*"]').removeClass('updated')
 					$('*[data-key="'+key+'"]').addClass('updated')					
-				},100)
+				},800)
 			})
 		})
 	})
