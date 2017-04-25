@@ -859,8 +859,10 @@ $(function(){
 	})
 
 	$(document).on('keyup','.keyword',function(e) {
-		var index = $(this).val().toLowerCase()
-		$('div[data-w-tab="todos"] .locales > div').each(function(){
+		var tab = $('.w-tab-menu a.w--current').data('w-tab')
+		, index = $(this).val().toLowerCase()
+
+		$('div[data-w-tab="'+tab+'"] .locales > div').each(function(){
 			var m = $(this).data('id').toLowerCase()
 			$(this).show()
 			if(m.indexOf(index) == -1) {
