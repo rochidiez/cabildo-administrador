@@ -858,6 +858,18 @@ $(function(){
 		})
 	})
 
+	$(document).on('keyup','.keyword',function(e) {
+		var index = $(this).val().toLowerCase()
+		console.log($('div[data-w-tab="todos"] .locales > div').length)
+		$('div[data-w-tab="todos"] .locales > div').each(function(){
+			var m = $(this).data('id').toLowerCase()
+			$(this).show()
+			if(m.indexOf(index) == -1) {
+				$(this).hide()
+			} 
+		})
+	})
+
 	$(document).on('click','.pago-btn.open',function(e) {
 		$(this).toggle()
 		$('.proximo-pago-input').slideToggle()
