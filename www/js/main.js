@@ -597,7 +597,6 @@ $(function(){
 				return {status:"NOCHANGE"}
 			}).then(function(geocode){ // photos
 				ubicacion = geocode.status=="OK"?geocode.results[0].geometry.location.lat + ", " + geocode.results[0].geometry.location.lng:settings.default_latlng
-				console.log(ubicacion)
 				$('.photo').each(function(){
 					if($(this).get(0).files.length){
 						var name = $(this).attr('name')
@@ -736,12 +735,12 @@ $(function(){
 					, 'direccion' :direccion
 					, 'efectivo' : efectivo
 					, 'en promocion' : planData.promocion||0
-					, 'facebook' : $('input[name=facebook]').val()||""
+					, 'facebook' : "https://facebook.com/"+$('input[name=facebook]').val()||""
 					, 'horarios' : horarios
 					, 'horarios para filtro' : horarios_filtro
 					, 'imagen logo' : $('.imagen_logo').attr('src')||""
 					, 'imagen fondo' : $('.imagen_fondo').attr('src')||""
-					, 'instagram' : $('input[name=instagram]').val()||""
+					, 'instagram' : "https://instagram.com/"+$('input[name=instagram]').val()||""
 					, 'mail' : mail
 					, 'nombre_simple': nombre_simple
 					, 'telefono' : telefono
@@ -846,11 +845,10 @@ $(function(){
 					window.scrollTo(0,0)
 					$('*[data-key="*"]').removeClass('updated')
 					$('*[data-key="'+key+'"]').addClass('updated')					
-				},800)
+				},1000)
 			})
 		})
-	})
-	
+	})	
 	
 	$(document).on('click','.w-tab-link',function(e) {
 		$('.keyword').val($(this).data('index'))
