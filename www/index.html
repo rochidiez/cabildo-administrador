@@ -273,8 +273,8 @@
               <option value="{{:key}}"{{if ~root.data && ~root.data.categoria==key}} selected{{/if}}>{{:key}}</option>
               {{/for}}
             </select>
-            <label for="web">Sitio Web</label>
-            <input class="input w-input" maxlength="256" name="web" placeholder="avenicacabildo.com.ar" required="required" type="text" value="{{:~prop('web',data)}}">
+            <label for="web">Sitio Web (Copialo y pegalo desde el navegador)</label>
+            <input class="input w-input" maxlength="256" name="web" placeholder="http://www.avenicacabildo.com.ar" required="required" type="text" value="{{:~prop('web',data)}}">
           </div>
         </div>
         <div class="conteiner-info">
@@ -358,10 +358,16 @@
               <label for="email-clientes">Email</label>
               <input class="input w-input" maxlength="256" name="mail" placeholder="hola@avenidacabildo.com.ar" type="email" value="{{:~prop('mail',data)}}">
               <label for="facebook">Facebook</label>
-              <input class="input w-input" maxlength="256" name="facebook" placeholder="www.facebook.com/AvenidaCabildoApp" type="text" value="{{:~prop('facebook',data)}}">
-              <label for="instagram">Instagram</label>
-              <input class="input w-input" maxlength="256" name="instagram" placeholder="instagram.com/avenidacabildo" type="text" value="{{:~prop('instagram',data)}}">
-          </div>
+              <div class="inline">
+              <div>www.facebook.com/</div>
+              <input class="input w-input" maxlength="256" name="facebook" placeholder="AvenidaCabildoApp" type="text" value="{{:~prop('facebook',data)}}">
+             </div>
+             <label for="instagram">Instagram</label>
+              <div class="inline">
+              <div>www.instagram.com/</div>
+              <input class="input w-input" maxlength="256" name="instagram" placeholder="avenidacabildo" type="text" value="{{:~prop('instagram',data)}}">
+              </div>
+    </div>
         </div>
         <div class="conteiner-info">
           <div class="title-section">Descuentos</div>
