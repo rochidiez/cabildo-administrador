@@ -87,14 +87,16 @@ var notification = function(text){
 							if(_local.descuentos){
 								for(var i in _local.descuentos){
 									var descok = 0
-									for(var j in _descuentos[_local.descuentos[i]]['locales adheridos']){
-										if(_descuentos[_local.descuentos[i]]['locales adheridos'][j] == _key){
-											descok = 1
+									if(_descuentos[_local.descuentos[i]]){
+										for(var j in _descuentos[_local.descuentos[i]]['locales adheridos']){
+											if(_descuentos[_local.descuentos[i]]['locales adheridos'][j] == _key){
+												descok = 1
+											}
+										}
+										if(!descok){
+											console.log(_key + " no tiene descuento " + _local.descuentos[i])
 										}
 									}
-									if(!descok){
-										console.log(_key + " no tiene descuento " + _local.descuentos[i])
-									}									
 								}
 							}
 
