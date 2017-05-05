@@ -167,7 +167,7 @@ var notification = function(text){
 	                data.tarjetas.forEach(function(tarjeta){
 	                	entidades.push(tarjeta.key)
 	                })
-
+	                /*
 	                data.descuentos.forEach(function(descuento){
 	                	var row = descuento.val()
 	                	if(row['locales adheridos']){
@@ -178,8 +178,9 @@ var notification = function(text){
 		                	}
 		                }
 	                })
-
-	                $('.descuento--container').html($.templates('#descuento').render({values:descuentos,entidades:entidades})).promise().done(function(){
+	                console.log(descuentos)
+	                */
+	                $('.descuento--container').html($.templates('#descuento').render({values:local.descuentos,entidades:entidades})).promise().done(function(){
 	                    if($('.horarios--container').children().length > 6){
 	                        $('.add-time').addClass('w-hidden')
 	                    }
