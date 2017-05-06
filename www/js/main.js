@@ -461,7 +461,7 @@ $(function(){
 							for(var i in data['locales adheridos']){
 								ctr++
 								var value = data['locales adheridos'][i]
-								if(key != value){
+								if(value && key != value){
 									locales.push(value)
 								}
 
@@ -499,7 +499,7 @@ $(function(){
 					promociones.forEach(function(promo){
 						ctr++
 						var promo = promo.val()
-						if(key != promo){ // add 
+						if(promo && key != promo){ // add 
 							promos.push(promo)
 						} 
 
