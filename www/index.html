@@ -353,21 +353,21 @@
         <div class="conteiner-info">
           <div class="title-section">¿Cómo te contactan tus clientes?</div>
           <div class="w-form">
-              <label for="telefono">Teléfono</label>
-              <input class="input w-input" maxlength="256" name="telefono" placeholder="4544-4674" type="text" value="{{:~prop('telefono',data)}}">
-              <label for="email-clientes">Email</label>
-              <input class="input w-input" maxlength="256" name="mail" placeholder="hola@avenidacabildo.com.ar" type="email" value="{{:~prop('mail',data)}}">
-              <label for="facebook">Facebook</label>
-              <div class="inline">
+            <label for="telefono">Teléfono</label>
+            <input class="input w-input" maxlength="256" name="telefono" placeholder="4544-4674" type="text" value="{{:~prop('telefono',data)}}">
+            <label for="email-clientes">Email</label>
+            <input class="input w-input" maxlength="256" name="mail" placeholder="hola@avenidacabildo.com.ar" type="email" value="{{:~prop('mail',data)}}">
+            <label for="facebook">Facebook</label>
+            <div class="inline">
               <div>www.facebook.com/</div>
               <input class="input w-input" maxlength="256" name="facebook" placeholder="AvenidaCabildoApp" type="text" value="{{:~prop('facebook',data)}}">
-             </div>
-             <label for="instagram">Instagram</label>
-              <div class="inline">
+            </div>
+            <label for="instagram">Instagram</label>
+            <div class="inline">
               <div>www.instagram.com/</div>
               <input class="input w-input" maxlength="256" name="instagram" placeholder="avenidacabildo" type="text" value="{{:~prop('instagram',data)}}">
-              </div>
-    </div>
+            </div>
+          </div>
         </div>
         <div class="conteiner-info">
           <div class="title-section">Descuentos</div>
@@ -379,7 +379,7 @@
             <div class="descuento--container">
             </div>
 
-            <div class="descuento-cont descuentos">
+            <!--div class="descuento-cont descuentos">
               <select class="_1 select w-select porcentaje">
                 <option value="">Seleccionar</option>
                 <option value="5%">5%</option>
@@ -405,7 +405,7 @@
               <input class="_1 input w-input entidad" maxlength="256" type="text">
               <a class="add-descuento w-inline-block" href="#"><img src="images/add-circle.svg">
               </a>
-            </div>
+            </div-->
           </div>
         </div>
       </div><a class="save submit-button w-button" href="#">{{if key}}Actualizar {{:~prop('nombre_simple',data)}}{{else}}Cargar nuevo local{{/if}}</a>

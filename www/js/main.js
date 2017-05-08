@@ -162,7 +162,7 @@ var notification = function(text){
 	            var horarios_filtro = local ? local['horarios para filtro'] : null
 	            $('.horarios--container').html($.templates('#horario').render(helpers.tpl.toArray(horarios_filtro))).promise().done(function(){
 	                var entidades = []
-	                , descuentos = [""]
+	                , descuentos = local&&local.descuentos?local.descuentos:[""]
 
 	                data.tarjetas.forEach(function(tarjeta){
 	                	entidades.push(tarjeta.key)
@@ -180,7 +180,7 @@ var notification = function(text){
 	                })
 	                console.log(descuentos)
 	                */
-	                $('.descuento--container').html($.templates('#descuento').render({values:local.descuentos,entidades:entidades})).promise().done(function(){
+	                $('.descuento--container').html($.templates('#descuento').render({values:descuentos,entidades:entidades})).promise().done(function(){
 	                    if($('.horarios--container').children().length > 6){
 	                        $('.add-time').addClass('w-hidden')
 	                    }
