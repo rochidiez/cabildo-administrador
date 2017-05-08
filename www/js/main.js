@@ -10,8 +10,8 @@ var notification = function(text){
 		dia_vencimiento : 20
 	}
 	, admin : { 
-		uid : '4KZEtrqeMgc4Hm6P7NWwbCeTLke2' // cabildo
-		//uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2' // infinix
+		//uid : '4KZEtrqeMgc4Hm6P7NWwbCeTLke2' // cabildo
+		uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2' // infinix
 
 		, endpoint : 'https://avenida-cabildo.herokuapp.com' // heroku
 		//, endpoint : 'https://locales.avenidacabildo.com.ar' // cabildo
@@ -372,10 +372,11 @@ var notification = function(text){
 			}
 			return items
 		}
-		, prop : function(a,b,c){
-			var d = b
-			if(typeof b=='string') d = c
-			if(d && d[a]) return d[a]
+		, prop : function(a,b,c,d,e){
+			var f = b
+			if(typeof b=='string') f = c
+				console.log(f[a])
+			if(f && f[a]) return f[a].replace(d,e)
 			return typeof b=='string' ? b : ""
 		}
 	}    
@@ -648,6 +649,8 @@ $(function(){
 				, horarios = "Lunes a Viernes " + $('input[name=de-lunes-a-viernes]').val() + " \nSábados " + $('input[name=sabado]').val()  + " \nFeriados " + $('input[name=feriados]').val()
 				, horarios_filtro = {}
 				, horarios_ref = {}	
+				, admin = firebase.auth().currentUser
+				, credential
 
 				clientData.plan = plan
 				clientData.nombre_suscriptor = $('input[name=nombre_suscriptor]').val()||""
@@ -659,9 +662,13 @@ $(function(){
 
 				// suscriptor
 				if(clientData.mail_suscriptor != $('input[name=mail_suscriptor_ref]').val()){
-					firebase.auth().createUserWithEmailAndPassword(mailData.mail_suscriptor, mailData.pass).then(function(user) {
+					firebase.auth().createUserWithEmailAndPassword(mailData.mail_suscriptor, mailData.pass)
+					.then(function(user) {
 						//var currentuser = firebase.auth().currentUser
     					user.sendEmailVerification()
+    					return user
+    				})
+    				.then(function(user){
 					    user.updateProfile({
 					        displayName: key,
 					        photoURL: ''
@@ -671,16 +678,18 @@ $(function(){
 					    	})
 					    }, function(error) {
 					    	notification("Error: " +error)
-					    })      
-					}, function(error) {
-					    var errorCode = error.code
-					    var errorMessage = error.message
-					    if (errorCode == 'auth/weak-password') {
-					        notification("Error: La clave es muy débil")
-					    } else {
-					        notification("Error: " +error)
-					    }
-					})
+					    })
+    				})
+    				.then(function(){
+    					admin.reauthenticate(credential).then(function() {
+						  // User re-authenticated.
+						}, function(error) {
+						  // An error happened.
+						});
+    				})
+    				.catch(function(error) {
+    					console.log(error.message);
+  					})
 				}
 
 				// filtro horarios 
@@ -720,15 +729,20 @@ $(function(){
 					for(var k in horarios_ref){
 						var values = horarios_ref[k]
 						, abre_cierra = $.trim($('input[name=' + k + ']').val())||""
-
+						, out = []
 						if(abre_cierra!=""){
-							var parts = abre_cierra.split(" ")
-							, out = []
 
-							for(var p in parts){
-								var int = parseInt(parts[p])
-								if(int >= 0){
-									out[out.length] = int
+							if(abre_cierra.indexOf("open 24") > -1){
+								out.push(0)
+								out.push(24)
+							} else {
+								var parts = abre_cierra.split(" ")
+
+								for(var p in parts){
+									var int = parseInt(parts[p])
+									if(int >= 0){
+										out[out.length] = int
+									}
 								}
 							}
 
@@ -754,6 +768,9 @@ $(function(){
 					}
 				})
 
+				var facebook = $('input[name=facebook]').val()
+				var instagram = $('input[name=instagram]').val()
+
 				var postData = {
 					categoria : $('select[name=categoria]').val()||""
 					, 'descuentos' : descuentos
@@ -761,12 +778,12 @@ $(function(){
 					, 'direccion' :direccion
 					, 'efectivo' : efectivo
 					, 'en promocion' : planData.promocion||0
-					, 'facebook' : "https://facebook.com/"+$('input[name=facebook]').val()||""
+					, 'facebook' : "https://facebook.com/"+facebook.split("https://facebook.com/").join("")||""
 					, 'horarios' : horarios
 					, 'horarios para filtro' : horarios_filtro
 					, 'imagen logo' : $('.imagen_logo').attr('src')||""
 					, 'imagen fondo' : $('.imagen_fondo').attr('src')||""
-					, 'instagram' : "https://instagram.com/"+$('input[name=instagram]').val()||""
+					, 'instagram' : "https://instagram.com/"+instagram.split("https://instagram.com/").join("")||""
 					, 'mail' : mail
 					, 'nombre_simple': nombre_simple
 					, 'telefono' : telefono

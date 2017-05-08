@@ -26,7 +26,7 @@
   <link href="images/5877e0a09ac381814417974d_webclip.png" rel="apple-touch-icon">
   <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
   <script>
-
+    /*
     // Cabildo
     var config = {
       apiKey: "AIzaSyDxNOXJR9IQkPRO5fHmapWKcqozvl5ETkU",
@@ -36,8 +36,8 @@
       storageBucket: "avenida-cabildo.appspot.com",
       messagingSenderId: "854269150359"
     };  
+    */
 
-    /*
     // Infinix
     var config = {
       apiKey: "AIzaSyACm6k1hFLVQc9zJgP6omf1HjzSfkUqtYI",
@@ -46,7 +46,7 @@
       storageBucket: "infinix-console.appspot.com",
       messagingSenderId: "378423189863"
     };
-    */
+
 
     firebase.initializeApp(config);
   </script>
@@ -189,6 +189,7 @@
         <option value="21"{{if #data&&abre=='21'}} selected{{/if}}>21</option>
         <option value="22"{{if #data&&abre=='22'}} selected{{/if}}>22</option>
         <option value="23"{{if #data&&abre=='23'}} selected{{/if}}>23</option>
+        <option value="23"{{if #data&&abre=='24'}} selected{{/if}}>24</option>
       </select>
       <select class="select select-field w-select cierra">
         <option value="">Horario</option>
@@ -216,6 +217,7 @@
         <option value="21"{{if #data&&cierra=='21'}} selected{{/if}}>21</option>
         <option value="22"{{if #data&&cierra=='22'}} selected{{/if}}>22</option>
         <option value="23"{{if #data&&cierra=='23'}} selected{{/if}}>23</option>
+        <option value="24"{{if #data&&cierra=='24'}} selected{{/if}}>24</option>
       </select>
     </div>
   </script>
@@ -360,12 +362,12 @@
             <label for="facebook">Facebook</label>
             <div class="inline">
               <div>www.facebook.com/</div>
-              <input class="input w-input" maxlength="256" name="facebook" placeholder="AvenidaCabildoApp" type="text" value="{{:~prop('facebook',data)}}">
+              <input class="input w-input" maxlength="256" name="facebook" placeholder="AvenidaCabildoApp" type="text" value="{{:~prop('facebook','',data,'https://facebook.com/','')}}">
             </div>
             <label for="instagram">Instagram</label>
             <div class="inline">
               <div>www.instagram.com/</div>
-              <input class="input w-input" maxlength="256" name="instagram" placeholder="avenidacabildo" type="text" value="{{:~prop('instagram',data)}}">
+              <input class="input w-input" maxlength="256" name="instagram" placeholder="avenidacabildo" type="text" value="{{:~prop('instagram','',data,'https://instagram.com/','')}}">
             </div>
           </div>
         </div>

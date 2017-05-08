@@ -331,6 +331,7 @@ label {
   background-position: 0px 50%;
   background-size: 16px;
   background-repeat: no-repeat;
+  cursor: pointer;
 }
 
 .table-action.ver {
