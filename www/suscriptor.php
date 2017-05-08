@@ -104,6 +104,7 @@ $mail->Subject = "{$nombre_suscriptor}, tu nueva cuenta ha sido creadacon éxito
 $mail->Body    = $mail_usuario;
 $mail->AltBody = $mail_usuario;
 $mail->SMTPDebug = 0;
+$mail->CharSet = 'UTF-8';
 
 if(!$mail->send()) {
     echo 'Message could not be sent.';

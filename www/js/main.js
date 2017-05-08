@@ -10,8 +10,8 @@ var notification = function(text){
 		dia_vencimiento : 20
 	}
 	, admin : { 
-		uid : '4KZEtrqeMgc4Hm6P7NWwbCeTLke2' // cabildo
-		//uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2' // infinix
+		//uid : '4KZEtrqeMgc4Hm6P7NWwbCeTLke2' // cabildo
+		uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2' // infinix
 
 		, endpoint : 'https://avenida-cabildo.herokuapp.com' // heroku
 		//, endpoint : 'https://locales.avenidacabildo.com.ar' // cabildo
@@ -375,7 +375,6 @@ var notification = function(text){
 		, prop : function(a,b,c,d,e){
 			var f = b
 			if(typeof b=='string') f = c
-				console.log(f[a])
 			if(f && f[a]) return f[a].replace(d,e)
 			return typeof b=='string' ? b : ""
 		}
@@ -649,8 +648,6 @@ $(function(){
 				, horarios = "Lunes a Viernes " + $('input[name=de-lunes-a-viernes]').val() + " \nSábados " + $('input[name=sabado]').val()  + " \nFeriados " + $('input[name=feriados]').val()
 				, horarios_filtro = {}
 				, horarios_ref = {}	
-				, admin = firebase.auth().currentUser
-				, credential
 
 				clientData.plan = plan
 				clientData.nombre_suscriptor = $('input[name=nombre_suscriptor]').val()||""
@@ -662,10 +659,11 @@ $(function(){
 
 				// suscriptor
 				if(clientData.mail_suscriptor != $('input[name=mail_suscriptor_ref]').val()){
-					firebase.auth().createUserWithEmailAndPassword(mailData.mail_suscriptor, mailData.pass)
+					secondaryApp.auth().createUserWithEmailAndPassword(mailData.mail_suscriptor, mailData.pass)
 					.then(function(user) {
 						//var currentuser = firebase.auth().currentUser
     					user.sendEmailVerification()
+    					secondaryApp.auth().signOut();
     					return user
     				})
     				.then(function(user){
@@ -679,13 +677,6 @@ $(function(){
 					    }, function(error) {
 					    	notification("Error: " +error)
 					    })
-    				})
-    				.then(function(){
-    					admin.reauthenticate(credential).then(function() {
-						  // User re-authenticated.
-						}, function(error) {
-						  // An error happened.
-						});
     				})
     				.catch(function(error) {
     					console.log(error.message);

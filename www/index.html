@@ -27,6 +27,7 @@
   <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
   <script>
 
+    /*
     // Cabildo
     var config = {
       apiKey: "AIzaSyDxNOXJR9IQkPRO5fHmapWKcqozvl5ETkU",
@@ -36,8 +37,8 @@
       storageBucket: "avenida-cabildo.appspot.com",
       messagingSenderId: "854269150359"
     };  
+    */
 
-    /*
     // Infinix
     var config = {
       apiKey: "AIzaSyACm6k1hFLVQc9zJgP6omf1HjzSfkUqtYI",
@@ -46,9 +47,9 @@
       storageBucket: "infinix-console.appspot.com",
       messagingSenderId: "378423189863"
     };
-    */
 
     firebase.initializeApp(config);
+    var secondaryApp = firebase.initializeApp(config, "Secondary");
   </script>
 </head>
 <body>
