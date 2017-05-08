@@ -522,6 +522,27 @@ $(function(){
 		location.hash = 'local?key=' + encodeURIComponent($(this).data('key'))
 	})
 
+	$(document).on('click','.forgot-password-btn',function(e) {
+
+		var auth = firebase.auth()
+		, emailAddress = $('#email').val()||""
+		, that = this
+
+		$(this).animate({opacity:0.7}).text("Por favor espere ... ")
+		auth.sendPasswordResetEmail(emailAddress).then(function() {
+			$('.stat-container').removeClass('w-hidden').text("Un email ha sido enviado a " + emailAddress).fadeIn('fast')
+			$(that).animate({opacity:1}).text("Recuperar contraseña")
+		  // Email sent.
+		}, function(error) {
+			$('.stat-container').removeClass('w-hidden').text("Hubo el siguiente error al enviar email: " + error.message).fadeIn('fast')
+			$(that).animate({opacity:1}).text("Recuperar contraseña")
+		  // An error happened.
+		});
+
+		e.preventDefault()
+		return false
+	})
+
 	$(document).on('click','.syncdesc',function(){
 		var ctr = 0
 		, descuentos = []
@@ -639,6 +660,8 @@ $(function(){
 				// suscriptor
 				if(clientData.mail_suscriptor != $('input[name=mail_suscriptor_ref]').val()){
 					firebase.auth().createUserWithEmailAndPassword(mailData.mail_suscriptor, mailData.pass).then(function(user) {
+						//var currentuser = firebase.auth().currentUser
+    					user.sendEmailVerification()
 					    user.updateProfile({
 					        displayName: key,
 					        photoURL: ''
