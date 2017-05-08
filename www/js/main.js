@@ -10,8 +10,8 @@ var notification = function(text){
 		dia_vencimiento : 20
 	}
 	, admin : { 
-		//uid : '4KZEtrqeMgc4Hm6P7NWwbCeTLke2' // cabildo
-		uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2' // infinix
+		uid : '4KZEtrqeMgc4Hm6P7NWwbCeTLke2' // cabildo
+		//uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2' // infinix
 
 		, endpoint : 'https://avenida-cabildo.herokuapp.com' // heroku
 		//, endpoint : 'https://locales.avenidacabildo.com.ar' // cabildo
