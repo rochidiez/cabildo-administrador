@@ -25,31 +25,16 @@
   <link href="images/5877e0982a54c5ec3ce1eee6_favicon.png" rel="shortcut icon" type="image/x-icon">
   <link href="images/5877e0a09ac381814417974d_webclip.png" rel="apple-touch-icon">
   <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js" type="text/javascript"></script>
+  <script src="js/webflow.js" type="text/javascript"></script>
+  <script src="js/moment.js" type="text/javascript"></script>
+  <script src="js/jsrender.min.js"></script>
+  <script src="js/main.js"></script>  
   <script>
-
-
-    // Cabildo
-    var config = {
-      apiKey: "AIzaSyDxNOXJR9IQkPRO5fHmapWKcqozvl5ETkU",
-      authDomain: "avenida-cabildo.firebaseapp.com",
-      databaseURL: "https://avenida-cabildo.firebaseio.com",
-      projectId: "avenida-cabildo",
-      storageBucket: "avenida-cabildo.appspot.com",
-      messagingSenderId: "854269150359"
-    };  
-
-    /*
-    // Infinix
-    var config = {
-      apiKey: "AIzaSyACm6k1hFLVQc9zJgP6omf1HjzSfkUqtYI",
-      authDomain: "infinix-console.firebaseapp.com",
-      databaseURL: "https://infinix-console.firebaseio.com",
-      storageBucket: "infinix-console.appspot.com",
-      messagingSenderId: "378423189863"
-    };
-    */
-    firebase.initializeApp(config);
-    var secondaryApp = firebase.initializeApp(config, "Secondary");
+    console.log(settings.env[env].firebase)
+    firebase.initializeApp(settings.env[env].firebase);
+    var secondaryApp = firebase.initializeApp(settings.env[env].firebase, "Secondary");
   </script>
 </head>
 <body>
@@ -73,7 +58,6 @@
             <label for="password">Contraseña</label>
             <input class="input w-input" data-name="Contraseña" id="password" maxlength="256" name="Contrase-a" placeholder="Tu contraseña" type="password"><a class="login--link" href="recuperarpass.html">¿No te acordás tu contraseña?</a>
           </form>
-
           <div class="error-message w-form-fail">
             <div>Ui, tu email y contraseña no coinciden.</div>
           </div>
@@ -419,7 +403,7 @@
   <script id="locales" type="text/x-jsrender">
     <div class="container">
       <div class="w-form">
-        <input class="input w-input keyword" maxlength="256" name="nombre_simple" placeholder="Buscar local..." type="text">
+        <input class="input w-input keyword" maxlength="256" placeholder="Buscar local..." type="text">
       </div>
       <div class="tabs w-tabs" data-duration-in="300" data-duration-out="100">
         <div class="w-tab-menu">
@@ -671,31 +655,26 @@
 
   <!-- begin modals -->
 
-  <div class="modal viewlocal" id="viewlocal">
-    <div class="modal-contenedor"><img class="close" data-ix="close-viewlocal" src="images/icono-close.svg">
+  <div class="viewlocal modal" id="viewlocal">
+    <div class="modal-contenedor"><img class="close close-modal" data-ix="close-viewlocal" src="images/icono-close.svg">
       <div class="modal-contenido"></div>
     </div>
   </div>
 
   <div class="eliminarlocal modal" id="viewlocal">
-    <div class="modal-contenedor"><img class="close" data-ix="close-delete" src="images/icono-close.svg">
-      <p class="modal--pcenter">¿Estás seguro que deseas eliminar este local?</p><a class="modalbutton w-button" data-ix="close-delete" href="#">No</a><a class="modalbutton w-button yes" href="#">Si</a>
+    <div class="modal-contenedor"><img class="close close-modal" data-ix="close-delete" src="images/icono-close.svg">
+      <p class="modal--pcenter">¿Estás seguro que deseas eliminar este local?</p><a class="modalbutton w-button close-modal" data-ix="close-delete" href="#">No</a><a class="modalbutton w-button yes" href="#">Si</a>
     </div>
   </div>
 
   <div class="mensaje modal" id="mensaje">
-    <div class="modal-contenedor"><img class="close" data-ix="close-mensaje" src="images/icono-close.svg">
-      <p class="modal--pcenter"></p><a class="modalbutton w-button" data-ix="close-mensaje" href="#">OK</a>
+    <div class="modal-contenedor"><img class="close close-modal" data-ix="close-mensaje" src="images/icono-close.svg">
+      <p class="modal--pcenter"></p><a class="modalbutton w-button close-modal" data-ix="close-mensaje" href="#">OK</a>
     </div>
   </div>
 
   <!-- end modals -->
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js" type="text/javascript"></script>
-  <script src="js/webflow.js" type="text/javascript"></script>
-  <script src="js/moment.js" type="text/javascript"></script>
-  <script src="js/jsrender.min.js"></script>
-  <script src="js/main.js"></script>
 
   <!-- [if lte IE 9]><script src="https://cdnjs.cloudflare.com/ajax/libs/placeholders/3.0.2/placeholders.min.js"></script><![endif] -->
 </body>

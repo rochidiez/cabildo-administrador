@@ -1,7 +1,21 @@
+
+jQuery.fn.insertAt = function(index, element) {
+  var lastIndex = this.children().size()
+  if (index < 0) {
+    index = Math.max(0, lastIndex + 1 + index)
+  }
+  this.append(element);
+  if (index < lastIndex) {
+    this.children().eq(index).before(this.children().last())
+  }
+  return this
+}
+
 var notification = function(text){
 	$('.mensaje.modal .modal--pcenter').text(text)
 	$('.mensaje.modal').css({opacity:1}).fadeIn(100)
 }
+, env = 'dev'
 , settings = {
 	notification_delay : 5000
 	, user : undefined
@@ -9,23 +23,47 @@ var notification = function(text){
 	, pagos : {
 		dia_vencimiento : 20
 	}
-	, admin : { 
-		uid : '4KZEtrqeMgc4Hm6P7NWwbCeTLke2' // cabildo
-		//uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2' // infinix
-
-		, endpoint : 'https://avenida-cabildo.herokuapp.com' // heroku
-		//, endpoint : 'https://locales.avenidacabildo.com.ar' // cabildo
+	, routes : {
+		loaded : {},
+		once : {"locales":true},
+	}
+	, env : {
+		// Cabildo
+		prod : {
+			firebase : {
+				apiKey: "AIzaSyDxNOXJR9IQkPRO5fHmapWKcqozvl5ETkU",
+				authDomain: "avenida-cabildo.firebaseapp.com",
+				databaseURL: "https://avenida-cabildo.firebaseio.com",
+				projectId: "avenida-cabildo",
+				storageBucket: "avenida-cabildo.appspot.com",
+				messagingSenderId: "854269150359"
+			}
+			, uid : '4KZEtrqeMgc4Hm6P7NWwbCeTLke2'
+			, endpoint : 'https://avenida-cabildo.herokuapp.com'
+		}
+	    // Infinix
+	    , dev : {
+	    	firebase : {
+				apiKey: "AIzaSyACm6k1hFLVQc9zJgP6omf1HjzSfkUqtYI",
+				authDomain: "infinix-console.firebaseapp.com",
+				databaseURL: "https://infinix-console.firebaseio.com",
+				storageBucket: "infinix-console.appspot.com",
+				messagingSenderId: "378423189863"	    	
+	    	}
+	    	, uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2'
+	    	, endpoint : 'http://cabildo.local'
+	    }
 	}
 }
 , isAdmin = function(){
-	return settings.user.uid==settings.admin.uid
+	return settings.user.uid==settings.env[env].uid
 }
 , isGuest = function(){
 	return !settings.user
 }
 , routes = {
 	index : function(resolve){
-		$('.content').html($.templates('#index').render()).promise().done(function(){
+		$('.index-container').html($.templates('#index').render()).promise().done(function(){
 	  		$('body').addClass('login-body')
 	  		$('input[name="email"]').focus()
 			resolve()
@@ -34,7 +72,6 @@ var notification = function(text){
 	, estadisticas : function(resolve){
 		var data = []
 		, count = 0
-
 		return new Promise(function(resolve, reject) { // categorias
 			return firebase.database().ref('/usuarios').once('value').then(function(usuarios) {
 				usuarios.forEach(function(locales){
@@ -48,7 +85,7 @@ var notification = function(text){
 				resolve(count)
 			})
 		}).then(function(count){
-			$('.content').html($.templates('#estadisticas').render({personas:count}))
+			$('.estadisticas-container').html($.templates('#estadisticas').render({personas:count}))
 		}).then(resolve)		
 	}
 	, local : function(resolve){
@@ -63,78 +100,8 @@ var notification = function(text){
 		}
 
 		return new Promise(function(resolve, reject) { // categorias
-			return firebase.database().ref('/locales').once('value').then(function(locales) {
-				return firebase.database().ref('/categorias').once('value').then(function(categorias) {
-					return firebase.database().ref('/descuentos').once('value').then(function(descuentos) {
-						locales.forEach(function(local){
-							var _local = local.val()
-							, _key = local.key
-							, _categorias = categorias.val()
-							, _descuentos = descuentos.val()
-
-							if(_local.categoria){
-								var catok = 0
-								for(var j in _categorias[_local.categoria]['locales']){
-									if(_categorias[_local.categoria]['locales'][j] == _key){
-										catok = 1
-									}
-								}
-								if(!catok){
-									console.log(_key + " no tiene categoria " + _local.categoria)
-								}									
-							}
-
-							if(_local.descuentos){
-								for(var i in _local.descuentos){
-									var descok = 0
-									if(_descuentos[_local.descuentos[i]]){
-										for(var j in _descuentos[_local.descuentos[i]]['locales adheridos']){
-											if(_descuentos[_local.descuentos[i]]['locales adheridos'][j] == _key){
-												descok = 1
-											}
-										}
-										if(!descok){
-											console.log(_key + " no tiene descuento " + _local.descuentos[i])
-										}
-									}
-								}
-							}
-
-							if($.trim(_local.ubicacion) == ""){
-								console.log(_key + " no tiene ubicación")
-							}
-							if($.trim(_local.nombre_simple) == ""){
-								console.log(_key + " no tiene nombre_simple")
-							}
-							if($.trim(_local.direccion) == ""){
-								console.log(_key + " no tiene direccion")
-							}
-							if($.trim(_local.efectivo) == ""){
-								console.log(_key + " no tiene efectivo")
-							}
-							if($.trim(_local['imagen fondo']) == ""){
-								console.log(_key + " no tiene imagen fondo")
-							}
-							if($.trim(_local['imagen logo']) == ""){
-								console.log(_key + " no tiene imagen logo")
-							}
-							if($.trim(_local['en promocion']) == ""){
-								console.log(_key + " no tiene en promocion")
-							}	
-							if(!_local['horarios para filtro']){
-								console.log(_key + " no tiene horarios para filtro")
-							}													
-							if($.trim(_local.telefono) == ""){
-								console.log(_key + " no tiene telefono")
-							}
-							if($.trim(_local.visibilidad) == ""){
-								console.log(_key + " no tiene visibilidad")
-							}																						
-						})
-
-						resolve(categorias)
-					})
-				})
+			return firebase.database().ref('/categorias').once('value').then(function(categorias) {
+				resolve(categorias)
 			})
 		}).then(function(categorias){
 			data.categorias = categorias
@@ -158,7 +125,7 @@ var notification = function(text){
 			})
 		}).then(function(local){
 			if(local) local.key = key
-			return $('.content').html($.templates('#local').render({data:local,key:key,categorias:data.categorias.val(),cliente:data.cliente.val()},helpers.tpl)).promise().done(function(){
+			return $('.local-container').html($.templates('#local').render({data:local,key:key,categorias:data.categorias.val(),cliente:data.cliente.val()},helpers.tpl)).promise().done(function(){
 	            var horarios_filtro = local ? local['horarios para filtro'] : null
 	            $('.horarios--container').html($.templates('#horario').render(helpers.tpl.toArray(horarios_filtro))).promise().done(function(){
 	                var entidades = []
@@ -167,19 +134,7 @@ var notification = function(text){
 	                data.tarjetas.forEach(function(tarjeta){
 	                	entidades.push(tarjeta.key)
 	                })
-	                /*
-	                data.descuentos.forEach(function(descuento){
-	                	var row = descuento.val()
-	                	if(row['locales adheridos']){
-		                	for(var i in row['locales adheridos']){
-		                		if(key==row['locales adheridos'][i]){
-		                			descuentos.push(descuento.key)	
-		                		}
-		                	}
-		                }
-	                })
-	                console.log(descuentos)
-	                */
+
 	                $('.descuento--container').html($.templates('#descuento').render({values:descuentos,entidades:entidades})).promise().done(function(){
 	                    if($('.horarios--container').children().length > 6){
 	                        $('.add-time').addClass('w-hidden')
@@ -192,6 +147,9 @@ var notification = function(text){
 		})
 	}
 	, locales : function(resolve){
+
+		// only once (see settings.routes)
+		// firebase socket handlers
 
 		var data = []
 
@@ -210,6 +168,8 @@ var notification = function(text){
 				return locales
 			})
 		}).then(function(locales){
+
+			/*
             var tabs = {"todos":[]}
 
             locales.forEach(function(snapshot) {
@@ -223,13 +183,55 @@ var notification = function(text){
                 	if(!tabs[local.cliente.plan]) tabs[local.cliente.plan] = []
                     tabs[local.cliente.plan].push(local)
                 }               
-            })
+            })*/
 
-            $('.content').html($.templates('#locales').render()).promise().done(function(){
+            $('.locales-container').html($.templates('#locales').render()).promise().done(function(){
+            	/*
             	for(var i in tabs){
 	            	$('.w-tab-pane[data-w-tab="' + i + '"] .locales').html($.templates('#listadolocales').render(tabs[i], helpers.tpl))
-	            }
+	            }*/
             })
+
+            var live = firebase.database().ref('/clientes')
+			// live fb handlers
+			live.on('child_added', (data) => {
+				firebase.database().ref('/locales/'+data.key).once('value').then(function(snapshot) {
+					var local = snapshot.val()
+					local.key = $.trim(snapshot.key)
+					local.cliente = data.val()
+					$('.locales-container .w-tab-pane[data-w-tab="todos"] .locales').prepend($.templates('#listadolocales').render(local, helpers.tpl))
+			  		$('.locales-container .w-tab-pane[data-w-tab="' + local.cliente.plan + '"] .locales').prepend($.templates('#listadolocales').render(local, helpers.tpl))
+			  	})
+			})
+
+			live.on('child_changed', (data) => {
+				firebase.database().ref('/locales/'+data.key).once('value').then(function(snapshot) {
+					var local = snapshot.val()
+					local.key = data.key
+					local.cliente = data.val()
+					$('.locales-container .td').each(function(){
+						if($(this).data('id') == data.key){
+							var tab = $(this).parents('.w-tab-pane').data('w-tab')
+							var node = $('.locales-container .w-tab-pane[data-w-tab="' + tab + '"] .locales')
+							if(tab == 'todos'){
+								var index = $(this).index()
+								$(this).remove()
+								$('.locales-container .w-tab-pane[data-w-tab="todos"] .locales').insertAt(index, $.templates('#listadolocales').render(local, helpers.tpl))
+							} else {
+								var index = $(this).index()
+								$(this).remove()
+								$('.locales-container .w-tab-pane[data-w-tab="' + local.cliente.plan + '"] .locales').insertAt(index, $.templates('#listadolocales').render(local, helpers.tpl))
+							}
+						}
+					})
+				})
+			})
+
+			live.on('child_removed', (data) => {
+				$('.td[data-id="'+data.key+'"]').each(function(){
+					$(this).remove()
+				})
+			})
 
 	        resolve()
 		})
@@ -246,40 +248,49 @@ var notification = function(text){
 	, resetWebflow : function(){
 		if(typeof Webflow == undefined) return false
 		Webflow.require("tabs").ready()
-		Webflow.require('ix').init([
-		  {"slug":"close-viewlocal","name":"close-viewlocal","value":{"style":{},"triggers":[{"type":"click","selector":".viewlocal","stepsA":[{"display":"none","opacity":0,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
-		  {"slug":"close-mensaje","name":"close-mensaje","value":{"style":{},"triggers":[{"type":"click","selector":".mensaje","stepsA":[{"display":"none","opacity":0,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
-		  {"slug":"open-viewlocal","name":"open-viewlocal","value":{"style":{},"triggers":[{"type":"click","selector":".viewlocal","stepsA":[{"display":"block"},{"opacity":1,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
-		  {"slug":"open-mensaje","name":"open-mensaje","value":{"style":{},"triggers":[{"type":"click","selector":".mensaje","stepsA":[{"display":"block"},{"opacity":1,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
-		  {"slug":"close-delete","name":"close-delete","value":{"style":{},"triggers":[{"type":"click","selector":".eliminarlocal","stepsA":[{"opacity":0.02,"transition":"opacity 200 ease 0"},{"display":"none"}],"stepsB":[]}]}},
-		  {"slug":"eliminar-show","name":"eliminar-show","value":{"style":{},"triggers":[{"type":"click","selector":".eliminarlocal","stepsA":[{"display":"block"},{"opacity":1,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}}
-		])
+		//Webflow.require('ix').init([
+		  //{"slug":"close-viewlocal","name":"close-viewlocal","value":{"style":{},"triggers":[{"type":"click","selector":".viewlocal","stepsA":[{"display":"none","opacity":0,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
+		  //{"slug":"close-mensaje","name":"close-mensaje","value":{"style":{},"triggers":[{"type":"click","selector":".mensaje","stepsA":[{"display":"none","opacity":0,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
+		  //{"slug":"open-viewlocal","name":"open-viewlocal","value":{"style":{},"triggers":[{"type":"click","selector":".viewlocal","stepsA":[{"display":"block"},{"opacity":1,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
+		  // {"slug":"open-mensaje","name":"open-mensaje","value":{"style":{},"triggers":[{"type":"click","selector":".mensaje","stepsA":[{"display":"block"},{"opacity":1,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
+		  //{"slug":"close-delete","name":"close-delete","value":{"style":{},"triggers":[{"type":"click","selector":".eliminarlocal","stepsA":[{"opacity":0.02,"transition":"opacity 200 ease 0"},{"display":"none"}],"stepsB":[]}]}},
+		  //{"slug":"eliminar-show","name":"eliminar-show","value":{"style":{},"triggers":[{"type":"click","selector":".eliminarlocal","stepsA":[{"display":"block"},{"opacity":1,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}}
+		//])
 	}
 	, render : function(){
 		$('#loading').fadeIn(200, function(){
 			$('body').removeClass()
-
 			var route = location.hash.replace('#','')||'index'
 			, route = route.indexOf('?') > -1 ? route.substring(0, route.indexOf('?')) : route
-
-			if(route){
-		    	if(typeof routes[route] == 'function'){
-		    		routes[route].call(this, function(){
-		    			$('#loading').fadeOut(200,function(){
-				    		helpers.updateHeader()
-				    		helpers.resetWebflow()
-		    			})
-		    		})
-		    	} else {
-		    		$('.container').html("No existe la página")
-		    	}
+			if(route && typeof routes[route] == 'function'){
+	    		return new Promise(function(resolve, reject){
+	    			if(!$('.content .' + route + '-container').length) $('body > .content').append('<div class="' + route + '-container"></div>')
+	    			$('body > .content > div').hide()
+		    		if(settings.routes.once[route] && settings.routes.loaded[route]){
+		    			resolve(route)
+		    		} else {
+	    				settings.routes.loaded[route] = true
+						return routes[route].call(this, function(){
+							console.log("call: " + route)
+							resolve(route)	
+						})
+					}
+		    	}).then(function(route){
+		    		$('.'+route+'-container').show()
+	    			$('#loading').fadeOut(500,function(){
+			    		helpers.updateHeader()
+			    		helpers.resetWebflow()
+	    			})
+		    	})
+	    	} else {
+		    	if(!$('.content .alert-container').length) $('body > .content').append('<div class="alert-container">No existe la página</div>')
 		    }
+	    	return false
 		})
 	}
 	, randomstr : function(len){
 		var str = ""
 		, possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-
 		for( var i=0; i < len; i++ )
 			str += possible.charAt(Math.floor(Math.random() * possible.length))
 		return str;
@@ -427,8 +438,14 @@ $(function(){
 		var key = $(this).data('key')
 		$('.modal.viewlocal .modal-contenido').html('')
 		firebase.database().ref('/locales/' + key).once('value').then(function(local) {
-			$('.modal.viewlocal .modal-contenido').html($.templates('#modal_viewlocal').render(local.val(), helpers.tpl))
+			$('.modal.viewlocal .modal-contenido').html($.templates('#modal_viewlocal').render(local.val(), helpers.tpl)).promise().done(function(){
+				$('.modal.viewlocal').fadeIn()
+			})
 		})
+	})
+
+	$(document).on('click','.close-modal',function(){
+		$('.modal').fadeOut()
 	})
 
 	$(document).on('click','.edit.table-action',function(){
@@ -437,6 +454,7 @@ $(function(){
 
 	$(document).on('click','.eliminar.table-action',function(){
 		$('body').attr('id',$(this).data('key'))
+		$('.eliminarlocal.modal').fadeIn()
 	})	
 
 	// ~remove
@@ -465,7 +483,7 @@ $(function(){
 									locales.push(value)
 								}
 
-								if(ctr === promociones.length){
+								if(ctr === descuentos.length){
 									return firebase.database().ref('/descuentos/' + key + '/locales adheridos').set(locales)
 								}
 							}
@@ -486,7 +504,7 @@ $(function(){
 								locales.push(data.locales[i])
 							} 
 
-							if(ctr === promociones.length){
+							if(ctr === categorias.length){
 								return firebase.database().ref('/categorias/'+key+'/locales').set(locales)
 							}
 						}
@@ -583,7 +601,7 @@ $(function(){
 	// ~local
 	$(document).on('click','.save',function(){
 
-		var key = $('input[name="key"]').val()?$('input[name=key]').val():$('input[name=nombre_simple]').val()
+		var key = $('input[name="key"]').val()?$.trim($('input[name=key]').val()):$.trim($('input[name=nombre_simple]').val())
 		, descuentos = []
 		, ubicacion = undefined
 		, planData = {}
@@ -598,6 +616,7 @@ $(function(){
 
 		if(plan=="" && isAdmin()) return notification("Por favor elegí un plan para este cliente")
 		if(direccion=="") return notification("Por favor ingresá la dirección de tu local")
+		if(nombre_simple=="") return notification("Por favor ingresá el nombre de tu local")
 		if(horas=="") return notification("Por favor ingresá el horario de antención de tu local")
 		if(efectivo=="") return notification("Por favor ingresá un descuento exclusivo para tu local")
 		if(web=="") return notification("Por favor ingresá la web de tu local")
@@ -671,7 +690,7 @@ $(function(){
 					        displayName: key,
 					        photoURL: ''
 					    }).then(function() {
-					    	$.post(settings.admin.endpoint + '/suscriptor.php',mailData,function(){
+					    	$.post(settings.env[env].endpoint + '/suscriptor.php',mailData,function(){
 					    		notification("La cuenta de cliente ha sido creada y se envió notificación a " + mailData.email_suscriptor)
 					    	})
 					    }, function(error) {
@@ -1001,7 +1020,7 @@ $(function(){
 		}
 
 		if(location.hash!=''){
-			$('.header').html($.templates('#header').render({user:user,uid:settings.admin.uid}))
+			$('.header').html($.templates('#header').render({user:user,uid:settings.env[env].uid}))
 		}
 
 		helpers.updateHeader()
@@ -1018,7 +1037,7 @@ window.onerror = function(msg, url, line, col, error) {
    var extra = !col ? '' : '\ncolumn: ' + col
    extra += !error ? '' : '\nerror: ' + error
    var message = "Error: " + msg + "\nurl: " + url + "\nline: " + line + extra
-   $.post(settings.admin.endpoint + '/ecmalog.php',{line:message});
+   $.post(settings.env[env].endpoint + '/ecmalog.php',{line:message});
    return true;
 }
 

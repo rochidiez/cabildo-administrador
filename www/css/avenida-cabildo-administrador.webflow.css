@@ -365,6 +365,7 @@ label {
 }
 
 .modal {
+  display: none;
   position: fixed;
   left: 0px;
   top: 0px;
@@ -412,7 +413,7 @@ label {
   cursor: pointer;
 }
 
-.viewlocal.modal {
+/*.viewlocal.modal {
   display: none;
   opacity: 0;
 }
@@ -425,7 +426,7 @@ label {
 .eliminarlocal.modal {
   display: none;
   opacity: 0;
-}
+}*/
 
 .modalbutton {
   margin-right: 10px;
