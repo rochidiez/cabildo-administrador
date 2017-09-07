@@ -15,7 +15,7 @@ var notification = function(text){
 	$('.mensaje.modal .modal--pcenter').text(text)
 	$('.mensaje.modal').css({opacity:1}).fadeIn(100)
 }
-, env = 'dev'
+, env = 'prod'
 , settings = {
 	notification_delay : 5000
 	, user : undefined
