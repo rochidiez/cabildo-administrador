@@ -271,7 +271,6 @@ var notification = function(text){
 		    		} else {
 	    				settings.routes.loaded[route] = true
 						return routes[route].call(this, function(){
-							console.log("call: " + route)
 							resolve(route)	
 						})
 					}
