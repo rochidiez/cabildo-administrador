@@ -396,13 +396,17 @@ label {
 }
 
 .fondo-local {
+  display: inline-block;
+  width: 100%;  
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
 }
 
 .logo-local {
-  width: 100%;
+  max-width: 150px;
+  max-height: 150px; 
+  padding: 1em;
   /*width: 100px;
   height: 100px;*/
   background-color: #0869b4;
@@ -410,6 +414,7 @@ label {
 
 .infolocal-txt {
   margin-left: 20px;
+  text-align: left;
 }
 
 .close {
