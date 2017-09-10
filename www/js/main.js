@@ -1,3 +1,4 @@
+firebase.initializeApp(firebase_config)
 
 jQuery.fn.insertAt = function(index, element) {
   var lastIndex = this.children().size()
@@ -11,7 +12,8 @@ jQuery.fn.insertAt = function(index, element) {
   return this
 }
 
-var notification = function(text){
+var secondaryApp = firebase.initializeApp(firebase_config, "Secondary")
+, notification = function(text){
 	$('.mensaje.modal .modal--pcenter').text(text)
 	$('.mensaje.modal').css({opacity:1}).fadeIn(100)
 }
@@ -392,6 +394,7 @@ var notification = function(text){
 }
 
 $(function(){
+
 	$(document).on('click','.nav-item',function(e){
 		e.preventDefault()
 		var section = $(this).data('section')
@@ -681,7 +684,7 @@ $(function(){
 					.then(function(user) {
 						//var currentuser = firebase.auth().currentUser
     					user.sendEmailVerification()
-    					secondaryApp.auth().signOut();
+    					secondaryApp.auth().signOut()
     					return user
     				})
     				.then(function(user){
@@ -690,7 +693,7 @@ $(function(){
 					        photoURL: ''
 					    }).then(function() {
 					    	$.post(settings.env[env].endpoint + '/suscriptor.php',mailData,function(){
-					    		notification("La cuenta de cliente ha sido creada y se envió notificación a " + mailData.email_suscriptor)
+					    		notification("La cuenta de cliente ha sido creada y se envió notificación a " + mailData.mail_suscriptor)
 					    	})
 					    }, function(error) {
 					    	notification("Error: " +error)
@@ -1007,6 +1010,9 @@ $(function(){
 	        reader.readAsDataURL(this.files[0])
 	    }			
 	})
+
+//
+
 
 	firebase.auth().onAuthStateChanged(function(user) {
 		if (user) {

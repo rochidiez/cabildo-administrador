@@ -100,7 +100,7 @@ if(!$mail->send()) {
 
 $mail->addAddress($mail_suscriptor, "{$nombre_suscriptor}");
 $mail->addReplyTo('info@avenidacabildo.com.ar', 'Avenida Cabildo');
-$mail->Subject = "{$nombre_suscriptor}, tu nueva cuenta ha sido creadacon éxito";
+$mail->Subject = "{$nombre_suscriptor}, tu nueva cuenta ha sido creada con éxito";
 $mail->Body    = $mail_usuario;
 $mail->AltBody = $mail_usuario;
 $mail->SMTPDebug = 0;

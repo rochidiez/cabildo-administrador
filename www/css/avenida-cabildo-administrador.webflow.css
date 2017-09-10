@@ -395,7 +395,13 @@ label {
   display: flex;
 }
 
-.foto-local {
+.fondo-local {
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+
+.logo-local {
   width: 100%;
   /*width: 100px;
   height: 100px;*/

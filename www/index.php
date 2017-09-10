@@ -31,11 +31,6 @@
   <script src="js/moment.js?_=yyy1cfd5" type="text/javascript"></script>
   <script src="js/jsrender.min.js?_=yyy1cfd5"></script>
   <script src="js/main.js?_=yyy1cfd5"></script>  
-  <script>
-    env = 'prod'
-    firebase.initializeApp(settings.env[env].firebase);
-    var secondaryApp = firebase.initializeApp(settings.env[env].firebase, "Secondary");
-  </script>
 </head>
 <body>
 
@@ -631,7 +626,11 @@
   <!-- ~modal ~local -->
   <script id="modal_viewlocal" type="text/x-jsrender">
     <div class="informacion-local">
-      <div><img class="foto-local" src="{{if #data['imagen logo']}}{{>#data['imagen logo']}}{{else}}images/5877e0a09ac381814417974d_webclip.png{{/if}}">
+      <div class="fondo-local" style="{{if #data['imagen logo']}}background-image:url({{>#data['imagen fondo']}}){{else}}{{/if}}">
+        <img class="logo-local" src="{{if #data['imagen logo']}}{{>#data['imagen logo']}}{{else}}images/5877e0a09ac381814417974d_webclip.png{{/if}}">
+        <h1>{{:nombre_simple}}</h1>
+        <p></p>
+        <h3></h3>
       </div>
       <div class="infolocal-txt">
         <p><strong>En promoción</strong>: {{if #data['en promocion']}}Sí{{else}}No{{/if}}</p>
