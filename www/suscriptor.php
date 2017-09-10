@@ -85,21 +85,23 @@ $mail->SMTPSecure = 'tls';
 $mail->Port = 587;
 
 $mail->IsHTML(true);
+/*
 $mail->setFrom('no-reply@avenidacabildo.com.ar', 'Avenida Cabildo');
 $mail->addAddress('info@avenidacabildo.com.ar', 'Avenida Cabildo');     // Add a recipient
 $mail->Body    = $mail_admin;
 $mail->AltBody = $mail_admin;
 $mail->SMTPDebug = 0;
 
-$data['status'] = 'success';
-
 if(!$mail->send()) {
   $data['status'] = 'error';
   $data['message'] = 'Message could not be sent. Mailer Error: ' . $mail->ErrorInfo;
 } 
+*/
+
+$data['status'] = 'success';
 
 $mail->addAddress($mail_suscriptor, "{$nombre_suscriptor}");
-$mail->addReplyTo('info@avenidacabildo.com.ar', 'Avenida Cabildo');
+$mail->addReplyTo('no-reply@avenidacabildo.com.ar', 'Avenida Cabildo');
 $mail->Subject = "{$nombre_suscriptor}, tu nueva cuenta ha sido creada con éxito";
 $mail->Body    = $mail_usuario;
 $mail->AltBody = $mail_usuario;
