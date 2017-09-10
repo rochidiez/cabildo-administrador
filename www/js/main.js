@@ -47,7 +47,8 @@ var env = 'prod'
 				messagingSenderId: "378423189863"	    	
 	    	}
 	    	, uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2'
-	    	, endpoint : 'https://avenida-cabildo.devmeta.net'
+	    	, endpoint : 'http://cabildo.local'
+	    	//, endpoint : 'https://avenida-cabildo.devmeta.net'
 	    }
 	}
 }

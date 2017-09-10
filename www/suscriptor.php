@@ -5,7 +5,7 @@ require __DIR__ . "/../vendor/autoload.php";
 extract($_POST);
 
 if(empty($nombre_suscriptor)||empty($local)||empty($mail_suscriptor)||empty($pass)) die("Se necesitan más parámetros");
-$url_administrador = 'https://locales.avenidacabildo.com.ar/';
+$url_administrador = 'https://avenida-cabildo.herokuapp.com/';
 
 $mail_admin = "
 <html>
