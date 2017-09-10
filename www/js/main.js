@@ -697,8 +697,8 @@ $(document).on('click','.save',function(){
 				    })
 				})
 				.catch(function(error) {
-					console.log(error.message);
-					})
+					console.log(error.message)
+				})
 			}
 
 			// filtro horarios 
