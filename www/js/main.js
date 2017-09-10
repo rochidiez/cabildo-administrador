@@ -35,8 +35,7 @@ var env = 'prod'
 				messagingSenderId: "854269150359"
 			}
 			, uid : '4KZEtrqeMgc4Hm6P7NWwbCeTLke2'
-			//, endpoint : 'https://avenida-cabildo.herokuapp.com'
-			, endpoint : 'https://avenida-cabildo.devmeta.net'
+			, endpoint : 'https://avenida-cabildo.herokuapp.com'
 		}
 	    // Infinix
 	    , dev : {
@@ -48,7 +47,7 @@ var env = 'prod'
 				messagingSenderId: "378423189863"	    	
 	    	}
 	    	, uid : 'OnKAmfWuFCT4FN2hahBfkbqz34J2'
-	    	, endpoint : 'http://cabildo.local'
+	    	, endpoint : 'https://avenida-cabildo.devmeta.net'
 	    }
 	}
 }
@@ -689,12 +688,6 @@ $(document).on('click','.save',function(){
 				        displayName: key,
 				        photoURL: ''
 				    }).then(function() {
-				    	console.log("----")
-				    	console.log(env)
-				    	console.log(mailData)
-				    	console.log(settings.env[env].endpoint)
-				    	console.log("----")
-
 				    	$.post(settings.env[env].endpoint + '/suscriptor.php',mailData,function(resp){
 				    		console.log(resp)
 				    		notification("La cuenta de cliente ha sido creada y se envió notificación a " + mailData.mail_suscriptor)
