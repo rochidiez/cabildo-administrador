@@ -39,7 +39,8 @@ var notification = function(text){
 				messagingSenderId: "854269150359"
 			}
 			, uid : '4KZEtrqeMgc4Hm6P7NWwbCeTLke2'
-			, endpoint : 'https://avenida-cabildo.herokuapp.com'
+			//, endpoint : 'https://avenida-cabildo.herokuapp.com'
+			, endpoint : 'https://avenida-cabildo.devmeta.net'
 		}
 	    // Infinix
 	    , dev : {
