@@ -6,6 +6,8 @@ require __DIR__ . "/../vendor/autoload.php";
 
 extract($_POST);
 
+if(empty($nombre_suscriptor)||empty($local)||empty($mail_suscriptor)||empty($pass)) die("Se necesitan más parámetros");
+
 $url_administrador = 'https://locales.avenidacabildo.com.ar/';
 
 $mail_admin = "
@@ -68,7 +70,6 @@ $mail->isSMTP();
 
 /* Hay que hacer esto porque el server no funciona el ssl */
 
-/*
 $mail->SMTPOptions = array(
     'ssl' => array(
         'verify_peer' => false,
@@ -76,26 +77,17 @@ $mail->SMTPOptions = array(
         'allow_self_signed' => true
     )
 );
-*/
-$mail->Host = 'smtp.gmail.com';
+$mail->Host = 'mail.avenidacabildo.com.ar';
 $mail->SMTPAuth = true;    
-//$mail->SMTPAutoTLS = false;
-
-//$mail->Username = 'noresponder@avenidacabildo.com.ar';
-//$mail->Password = 'noresp2004';
-
-$mail->Username = 'devmetasoft@gmail.com';
-$mail->Password = 'Zoala090!';
-
-$mail->SMTPSecure = 'ssl';
-$mail->Port = 465;
-
-$mail->setFrom('no-reply@avenidacabildo.com.ar', 'Avenida Cabildo');
-$mail->addAddress('info@avenidacabildo.com.ar', 'Avenida Cabildo');     // Add a recipient
-//$mail->setFrom('no-reply@avenidacabildo.com.ar', 'Avenida Cabildo');
-//$mail->addAddress('martin@devmeta.net', 'Avenida Cabildo');     // Add a recipient
+$mail->SMTPAutoTLS = false;
+$mail->Username = 'noresponder@avenidacabildo.com.ar';
+$mail->Password = 'noresp2004';
+$mail->SMTPSecure = 'tls';
+$mail->Port = 587;
 
 $mail->IsHTML(true);
+$mail->setFrom('no-reply@avenidacabildo.com.ar', 'Avenida Cabildo');
+$mail->addAddress('info@avenidacabildo.com.ar', 'Avenida Cabildo');     // Add a recipient
 $mail->Body    = $mail_admin;
 $mail->AltBody = $mail_admin;
 $mail->SMTPDebug = 0;
