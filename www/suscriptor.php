@@ -106,9 +106,12 @@ $mail->AltBody = $mail_usuario;
 $mail->SMTPDebug = 0;
 $mail->CharSet = 'UTF-8';
 
+$data['status'] = 'success';
+
 if(!$mail->send()) {
-    echo 'Message could not be sent.';
-    echo 'Mailer Error: ' . $mail->ErrorInfo;
-} else {
-    echo 'Success';
+  $data['status'] = 'error';
+  $data['message'] = 'Message could not be sent. Mailer Error: ' . $mail->ErrorInfo;
 }
+
+header('Content-Type: application/json');
+echo json_encode($data);

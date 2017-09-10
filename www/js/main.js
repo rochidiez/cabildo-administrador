@@ -11,11 +11,7 @@ jQuery.fn.insertAt = function(index, element) {
   return this
 }
 
-var notification = function(text){
-	$('.mensaje.modal .modal--pcenter').text(text)
-	$('.mensaje.modal').css({opacity:1}).fadeIn(100)
-}
-, env = 'prod'
+var env = 'prod'
 , settings = {
 	notification_delay : 5000
 	, user : undefined
@@ -55,6 +51,10 @@ var notification = function(text){
 	    	, endpoint : 'http://cabildo.local'
 	    }
 	}
+}
+, notification = function(text){
+	$('.mensaje.modal .modal--pcenter').text(text)
+	$('.mensaje.modal').css({opacity:1}).fadeIn(100)
 }
 , isAdmin = function(){
 	return settings.user.uid==settings.env[env].uid
@@ -689,7 +689,14 @@ $(document).on('click','.save',function(){
 				        displayName: key,
 				        photoURL: ''
 				    }).then(function() {
-				    	$.post(settings.env[env].endpoint + '/suscriptor.php',mailData,function(){
+				    	console.log("----")
+				    	console.log(env)
+				    	console.log(mailData)
+				    	console.log(settings.env[env].endpoint)
+				    	console.log("----")
+
+				    	$.post(settings.env[env].endpoint + '/suscriptor.php',mailData,function(resp){
+				    		console.log(resp)
 				    		notification("La cuenta de cliente ha sido creada y se envió notificación a " + mailData.mail_suscriptor)
 				    	})
 				    }, function(error) {
