@@ -1,13 +1,14 @@
 <?php 
 
+echo "1";
 date_default_timezone_set("EST");
-
+echo "2";
 require __DIR__ . "/../vendor/autoload.php";
-
+echo "3";
 extract($_POST);
 
 if(empty($nombre_suscriptor)||empty($local)||empty($mail_suscriptor)||empty($pass)) die("Se necesitan más parámetros");
-
+echo "4";
 $url_administrador = 'https://locales.avenidacabildo.com.ar/';
 
 $mail_admin = "
@@ -92,12 +93,15 @@ $mail->Body    = $mail_admin;
 $mail->AltBody = $mail_admin;
 $mail->SMTPDebug = 0;
 
+echo "5";
 if(!$mail->send()) {
     echo 'Message could not be sent.';
     echo 'Mailer Error: ' . $mail->ErrorInfo;
 } else {
     echo 'Success';
 }
+
+echo "6";
 
 $mail->addAddress($mail_suscriptor, "{$nombre_suscriptor}");
 $mail->addReplyTo('info@avenidacabildo.com.ar', 'Avenida Cabildo');
@@ -114,5 +118,6 @@ if(!$mail->send()) {
   $data['message'] = 'Message could not be sent. Mailer Error: ' . $mail->ErrorInfo;
 }
 
+echo "7";
 header('Content-Type: application/json');
 echo json_encode($data);
