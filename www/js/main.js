@@ -629,6 +629,7 @@ $(document).on('click','.save',function(){
 			})
 		}).then(function(data){ //geojson
 			planData = data
+
 			if( $('input[name=ubicacion_ref]').val() == settings.default_latlng || $('input[name=ubicacion_ref]').val() == "" || direccion != $('input[name=direccion_ref]').val()){
 				return $.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + direccion + ' CABA, Argentina', function(geocode){
 					console.log("geo ok")

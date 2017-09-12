@@ -105,7 +105,7 @@ $mail->addReplyTo('no-reply@avenidacabildo.com.ar', 'Avenida Cabildo');
 $mail->Subject = "{$nombre_suscriptor}, tu nueva cuenta ha sido creada con éxito";
 $mail->Body    = $mail_usuario;
 $mail->AltBody = $mail_usuario;
-$mail->SMTPDebug = 2;
+$mail->SMTPDebug = 0;
 $mail->CharSet = 'UTF-8';
 
 if(!$mail->send()) {
