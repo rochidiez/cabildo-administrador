@@ -451,8 +451,7 @@ $(document).on('click','.eliminar.table-action',function(){
 	$('.eliminarlocal.modal').fadeIn()
 })	
 
-// ~remove
-$('.modal.eliminarlocal .modalbutton.yes').click(function(){
+$(document).on('click','.modal.eliminarlocal .modalbutton.yes',function(){
 	var key = $('body').attr('id')
 
 	$('#loading').fadeIn(200, function(){
