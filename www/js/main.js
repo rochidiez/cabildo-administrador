@@ -590,21 +590,23 @@ $(document).on('click','.synccat',function(){
 // ~local
 $(document).on('click','.save',function(){
 
-	var key = $('input[name="key"]').val()?$.trim($('input[name=key]').val()):$.trim($('input[name=nombre_simple]').val())
+	var keyRaw = $('input[name="key"]').val()?$.trim($('input[name=key]').val()):$.trim($('input[name=nombre_simple]').val())
+	// restrain not allowed chars for firebase keys.
+	, key = keyRaw.split('.').join("").split('#').join("").split('$').join("").split('[').join("").split(']').join("")
 	, descuentos = []
 	, planData = {}
 	, plan = $.trim($('select[name=plan]').val())||""
 	, direccion = $.trim($('input[name=direccion]').val())||""
 	, efectivo = $.trim($('input[name=efectivo]').val())||""
 	, horas = $.trim($('input[name=de-lunes-a-viernes]').val())||""
-	, nombre_simple = $.trim($('input[name=nombre_simple]').val())||""
+	, nombre_simple = key||""
 	, web = $.trim($('input[name=web]').val())||""
 	, telefono = $.trim($('input[name=telefono]').val())||""
 	, mail = $.trim($('input[name=mail]').val())||""
 
+	if(nombre_simple=="") return notification("Por favor ingresá el nombre de tu local")
 	if(plan=="" && isAdmin()) return notification("Por favor elegí un plan para este cliente")
 	if(direccion=="") return notification("Por favor ingresá la dirección de tu local")
-	if(nombre_simple=="") return notification("Por favor ingresá el nombre de tu local")
 	if(horas=="") return notification("Por favor ingresá el horario de antención de tu local")
 	if(efectivo=="") return notification("Por favor ingresá un descuento exclusivo para tu local")
 	if(web=="") return notification("Por favor ingresá la web de tu local")
