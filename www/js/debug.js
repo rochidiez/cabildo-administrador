@@ -1,5 +1,6 @@
 var tests = {
 	locales : function(){
+		
 		return firebase.database().ref('/categorias').once('value').then(function(categorias) {
 			return firebase.database().ref('/descuentos').once('value').then(function(descuentos) {
 				return firebase.database().ref('/locales').once('value').then(function(locales) {
