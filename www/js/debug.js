@@ -1,8 +1,8 @@
-var debug = {
+var tests = {
 	locales : function(){
 		return firebase.database().ref('/categorias').once('value').then(function(categorias) {
-			return firebase.database().ref('/categorias').once('value').then(function(categorias) {
-				return firebase.database().ref('/descuentos').once('value').then(function(descuentos) {
+			return firebase.database().ref('/descuentos').once('value').then(function(descuentos) {
+				return firebase.database().ref('/locales').once('value').then(function(locales) {
 					locales.forEach(function(local){
 						var _local = local.val()
 						, _key = local.key
@@ -19,6 +19,8 @@ var debug = {
 							if(!catok){
 								console.log(_key + " no tiene categoria " + _local.categoria)
 							}									
+						}else {
+							console.log(_key + " no tiene categoría")
 						}
 
 						if(_local.descuentos){
@@ -35,57 +37,43 @@ var debug = {
 									}
 								}
 							}
+						} else {
+							console.log(_key + " no tiene descuentos")
 						}
 
-						if($.trim(_local.ubicacion) == ""){
+						if(!_local.ubicacion || $.trim(_local.ubicacion) == ""){
 							console.log(_key + " no tiene ubicación")
 						}
-						if($.trim(_local.nombre_simple) == ""){
+						if(!_local.nombre_simple || $.trim(_local.nombre_simple) == ""){
 							console.log(_key + " no tiene nombre_simple")
 						}
-						if($.trim(_local.direccion) == ""){
+						if(!_local.direccion || $.trim(_local.direccion) == ""){
 							console.log(_key + " no tiene direccion")
 						}
-						if($.trim(_local.efectivo) == ""){
+						if(!_local.efectivo || $.trim(_local.efectivo) == ""){
 							console.log(_key + " no tiene efectivo")
 						}
-						if($.trim(_local['imagen fondo']) == ""){
+						if(!_local['imagen fondo'] || $.trim(_local['imagen fondo']) == ""){
 							console.log(_key + " no tiene imagen fondo")
 						}
-						if($.trim(_local['imagen logo']) == ""){
+						if(!_local['imagen logo'] || $.trim(_local['imagen logo']) == ""){
 							console.log(_key + " no tiene imagen logo")
 						}
-						if($.trim(_local['en promocion']) == ""){
+						if(!_local['en promocion'] || $.trim(_local['en promocion']) == ""){
 							console.log(_key + " no tiene en promocion")
 						}	
 						if(!_local['horarios para filtro']){
 							console.log(_key + " no tiene horarios para filtro")
 						}													
-						if($.trim(_local.telefono) == ""){
+						if(!_local.telefono || $.trim(_local.telefono) == ""){
 							console.log(_key + " no tiene telefono")
 						}
-						if($.trim(_local.visibilidad) == ""){
+						if(!_local.visibilidad || $.trim(_local.visibilidad) == ""){
 							console.log(_key + " no tiene visibilidad")
 						}																						
 					})
-
-					console.log(categorias)
 				})
 			})
-
-	        /*
-	        data.descuentos.forEach(function(descuento){
-	        	var row = descuento.val()
-	        	if(row['locales adheridos']){
-	            	for(var i in row['locales adheridos']){
-	            		if(key==row['locales adheridos'][i]){
-	            			descuentos.push(descuento.key)	
-	            		}
-	            	}
-	            }
-	        })
-	        console.log(descuentos)
-	        */
-	    }
-	})
-})
+	    })
+	}
+}

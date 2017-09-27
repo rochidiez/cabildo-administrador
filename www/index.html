@@ -25,17 +25,19 @@
   <link href="images/5877e0982a54c5ec3ce1eee6_favicon.png" rel="shortcut icon" type="image/x-icon">
   <link href="images/5877e0a09ac381814417974d_webclip.png" rel="apple-touch-icon">
   <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js?_=yyy4ewd5"></script>
-
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js?_=yyy4ewd5" type="text/javascript"></script>
   <script src="js/webflow.js?_=yyy4ewd5" type="text/javascript"></script>
   <script src="js/moment.js?_=yyy4ewd5" type="text/javascript"></script>
   <script src="js/jsrender.min.js?_=yyy4ewd5"></script>
   <script src="js/main.js?_=yyy4ewd5"></script>  
+  <script src="js/debug.js?_=yyy4ewd5"></script>
   <script>
-    env = 'prod'
+    env = 'dev'
     firebase.initializeApp(settings.env[env].firebase);
     var secondaryApp = firebase.initializeApp(settings.env[env].firebase, "Secondary");
   </script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC3TCbJ2Bj0mVDjhLfdzz7tj7ySj7i3dAs&libraries=places"
+        async defer></script>
 </head>
 <body>
 
@@ -250,7 +252,7 @@
             <label for="direcci-n">Dirección</label>
             <input name="ubicacion_ref" type="hidden" value="{{:~prop('ubicacion',data)}}">
             <input name="direccion_ref" type="hidden" value="{{:~prop('direccion',data)}}">
-            <input class="input w-input" maxlength="256" name="direccion" placeholder="Av. Cabildo 1394" required="required" type="text" value="{{:~prop('direccion',data)}}">
+            <input class="input w-input" maxlength="256" id="direccion" name="direccion" placeholder="Av. Cabildo 1394" required="required" type="text" value="{{:~prop('direccion',data)}}">
             <label for="descripci-n">Descripción sobre tu negocio</label>
             <textarea class="input w-input" maxlength="5000" name="detalle_texto" placeholder="Toda la AVENIDA en una sola aplicación.">{{:~prop('detalle texto',data)}}</textarea>
             <label for="categoria">Categoría</label>

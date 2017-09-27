@@ -12,6 +12,7 @@ jQuery.fn.insertAt = function(index, element) {
 }
 
 var env = 'prod'
+, latlng = undefined
 , settings = {
 	notification_delay : 5000
 	, user : undefined
@@ -61,6 +62,24 @@ var env = 'prod'
 }
 , isGuest = function(){
 	return !settings.user
+}
+, initAutocomplete = function (){
+  var input = document.getElementById('direccion');
+  var autocomplete = new google.maps.places.Autocomplete(input);
+
+  autocomplete.addListener('place_changed', function() {
+    var place = autocomplete.getPlace();
+    if (!place.geometry) {
+      // User entered the name of a Place that was not suggested and
+      // pressed the Enter key, or the Place Details request failed.
+      window.alert("No details available for input: '" + place.name + "'");
+      return;
+    }
+    if (place.geometry.viewport) {
+      console.log(place.geometry.location)
+      latlng = place.geometry.location.lat + ', ' + place.geometry.location.lng 
+    }
+  })
 }
 , routes = {
 	index : function(resolve){
@@ -125,12 +144,17 @@ var env = 'prod'
 				return local.val()
 			})
 		}).then(function(local){
-			if(local) local.key = key
+			if(local) {
+				local.key = key
+				latlng = local.ubicacion
+			}
 			return $('.local-container').html($.templates('#local').render({data:local,key:key,categorias:data.categorias.val(),cliente:data.cliente.val()},helpers.tpl)).promise().done(function(){
 	            var horarios_filtro = local ? local['horarios para filtro'] : null
 	            $('.horarios--container').html($.templates('#horario').render(helpers.tpl.toArray(horarios_filtro))).promise().done(function(){
 	                var entidades = []
 	                , descuentos = local&&local.descuentos?local.descuentos:[""]
+
+	                initAutocomplete()
 
 	                data.tarjetas.forEach(function(tarjeta){
 	                	entidades.push(tarjeta.key)
@@ -170,28 +194,7 @@ var env = 'prod'
 			})
 		}).then(function(locales){
 
-			/*
-            var tabs = {"todos":[]}
-
-            locales.forEach(function(snapshot) {
-                var key = snapshot.key
-                , local = snapshot.val()
-                local.key = key
-                local.cliente = data.clientes[key]
-                tabs.todos.push(local)
-
-                if(local.cliente && local.cliente.plan){
-                	if(!tabs[local.cliente.plan]) tabs[local.cliente.plan] = []
-                    tabs[local.cliente.plan].push(local)
-                }               
-            })*/
-
-            $('.locales-container').html($.templates('#locales').render()).promise().done(function(){
-            	/*
-            	for(var i in tabs){
-	            	$('.w-tab-pane[data-w-tab="' + i + '"] .locales').html($.templates('#listadolocales').render(tabs[i], helpers.tpl))
-	            }*/
-            })
+            $('.locales-container').html($.templates('#locales').render())
 
             var live = firebase.database().ref('/clientes')
 			// live fb handlers
@@ -249,14 +252,6 @@ var env = 'prod'
 	, resetWebflow : function(){
 		if(typeof Webflow == undefined) return false
 		Webflow.require("tabs").ready()
-		//Webflow.require('ix').init([
-		  //{"slug":"close-viewlocal","name":"close-viewlocal","value":{"style":{},"triggers":[{"type":"click","selector":".viewlocal","stepsA":[{"display":"none","opacity":0,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
-		  //{"slug":"close-mensaje","name":"close-mensaje","value":{"style":{},"triggers":[{"type":"click","selector":".mensaje","stepsA":[{"display":"none","opacity":0,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
-		  //{"slug":"open-viewlocal","name":"open-viewlocal","value":{"style":{},"triggers":[{"type":"click","selector":".viewlocal","stepsA":[{"display":"block"},{"opacity":1,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
-		  // {"slug":"open-mensaje","name":"open-mensaje","value":{"style":{},"triggers":[{"type":"click","selector":".mensaje","stepsA":[{"display":"block"},{"opacity":1,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}},
-		  //{"slug":"close-delete","name":"close-delete","value":{"style":{},"triggers":[{"type":"click","selector":".eliminarlocal","stepsA":[{"opacity":0.02,"transition":"opacity 200 ease 0"},{"display":"none"}],"stepsB":[]}]}},
-		  //{"slug":"eliminar-show","name":"eliminar-show","value":{"style":{},"triggers":[{"type":"click","selector":".eliminarlocal","stepsA":[{"display":"block"},{"opacity":1,"transition":"opacity 200 ease 0"}],"stepsB":[]}]}}
-		//])
 	}
 	, render : function(){
 		$('#loading').fadeIn(200, function(){
@@ -590,10 +585,6 @@ $(document).on('click','.synccat',function(){
 			categorias[childData.categoria].push(childKey)
 			if(childData.categoria != 'Todos') categorias["Todos"].push(childKey)
 		})	
-		/*
-		for(var i in categorias){
-			firebase.database().ref('/categorias/'+i+'/locales').set(categorias[i])	
-		}*/
 	})		
 })
 
@@ -602,7 +593,6 @@ $(document).on('click','.save',function(){
 
 	var key = $('input[name="key"]').val()?$.trim($('input[name=key]').val()):$.trim($('input[name=nombre_simple]').val())
 	, descuentos = []
-	, ubicacion = undefined
 	, planData = {}
 	, plan = $.trim($('select[name=plan]').val())||""
 	, direccion = $.trim($('input[name=direccion]').val())||""
@@ -627,19 +617,8 @@ $(document).on('click','.save',function(){
 			firebase.database().ref('/planes/' + plan).once('value').then(function(snap_plan){
 				resolve(snap_plan.val())
 			})
-		}).then(function(data){ //geojson
+		}).then(function(data){ // photos
 			planData = data
-
-			if( $('input[name=ubicacion_ref]').val() == settings.default_latlng || $('input[name=ubicacion_ref]').val() == "" || direccion != $('input[name=direccion_ref]').val()){
-				return $.get('https://maps.googleapis.com/maps/api/geocode/json?address=' + direccion + ' CABA, Argentina', function(geocode){
-					console.log("geo ok")
-				}).fail(function() {
-				    console.log("geo failed")
-				})
-			}
-			return {status:"NOCHANGE"}
-		}).then(function(geocode){ // photos
-			ubicacion = geocode.status=="OK"?geocode.results[0].geometry.location.lat + ", " + geocode.results[0].geometry.location.lng:settings.default_latlng
 			$('.photo').each(function(){
 				if($(this).get(0).files.length){
 					var name = $(this).attr('name')
@@ -650,7 +629,6 @@ $(document).on('click','.save',function(){
 							, 'key' : key
 						}
 					}
-
 					firebase.storage().ref().child('images/' + file.name).put(file,metadata).then(function(snapshot){
 						var i = snapshot.metadata.customMetadata.name.replace('_',' ')
 						, value = snapshot.downloadURL
@@ -798,7 +776,7 @@ $(document).on('click','.save',function(){
 				, 'mail' : mail
 				, 'nombre_simple': nombre_simple
 				, 'telefono' : telefono
-				, 'ubicacion' : ubicacion||settings.default_latlng
+				, 'ubicacion' : latlng||settings.default_latlng
 				, 'web' : web
 				, 'visibilidad' : planData.visibilidad||3
 			}
