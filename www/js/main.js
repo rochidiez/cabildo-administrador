@@ -76,8 +76,8 @@ var env = 'prod'
       return;
     }
     if (place.geometry.viewport) {
-      console.log(place.geometry.location)
-      latlng = place.geometry.location.lat + ', ' + place.geometry.location.lng 
+      var coords = place.geometry.location.toJSON()
+      latlng = coords.lat + ', ' + coords.lng 
     }
   })
 }
