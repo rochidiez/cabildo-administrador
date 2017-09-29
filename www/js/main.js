@@ -645,7 +645,6 @@ $(document).on('click','.save',function(){
 				        photoURL: ''
 				    }).then(function() {
 				    	$.post(settings.env[env].endpoint + '/suscriptor.php',mailData,function(resp){
-				    		console.log(resp)
 				    		notification("La cuenta de cliente ha sido creada y se envió notificación a " + mailData.mail_suscriptor)
 				    	})
 				    }, function(error) {

@@ -33,7 +33,6 @@
   <script src="js/debug.js?_=rtow4oo2ed5"></script>
   <script>
     env = '<?php echo ! empty($_REQUEST['env']) ? $_REQUEST['env'] : 'prod';?>'
-    console.log(settings.env[env].firebase)
     firebase.initializeApp(settings.env[env].firebase);
     var secondaryApp = firebase.initializeApp(settings.env[env].firebase, "Secondary");
   </script>
@@ -373,8 +372,6 @@
               <select class="select w-select entidad" disabled>
                 <option value="Avenida Cabildo">Avenida Cabildo</option>
               </select>
-              <a class="add-descuento w-inline-block" href="#"><img src="images/add-circle.svg">
-              </a>
             </div>
 
             <div class="descuento--container">
