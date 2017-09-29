@@ -32,7 +32,7 @@
   <script src="js/main.js?_=rtow4oo2ed5"></script>  
   <script src="js/debug.js?_=rtow4oo2ed5"></script>
   <script>
-    env = 'prod'
+    env = '<?php echo ! empty($_REQUEST['env']) ? $_REQUEST['env'] : 'prod';?>'
     firebase.initializeApp(settings.env[env].firebase);
     var secondaryApp = firebase.initializeApp(settings.env[env].firebase, "Secondary");
   </script>

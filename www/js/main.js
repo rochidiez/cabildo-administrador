@@ -554,39 +554,6 @@ $(document).on('click','.forgot-password-btn',function(e) {
 	return false
 })
 
-$(document).on('click','.syncdesc',function(){
-	var ctr = 0
-	, descuentos = []
-	return firebase.database().ref('/locales').once('value').then(function(locales){
-		locales.forEach(function(local){
-			ctr++
-			var childKey = local.key
-			, childData = local.val()
-
-			if(childData.descuentos){
-				console.log(childKey)
-				console.log(childData.descuentos)
-			}
-		})	
-	})		
-})
-
-$(document).on('click','.synccat',function(){
-	var ctr = 0
-	, categorias = []
-	return firebase.database().ref('/locales').once('value').then(function(locales){
-		locales.forEach(function(local){
-			ctr++
-			var childKey = local.key
-			, childData = local.val()
-			if(!categorias[childData.categoria]) categorias[childData.categoria] = []
-			if(!categorias["Todos"]) categorias["Todos"] = []
-			categorias[childData.categoria].push(childKey)
-			if(childData.categoria != 'Todos') categorias["Todos"].push(childKey)
-		})	
-	})		
-})
-
 // ~local
 $(document).on('click','.save',function(){
 
@@ -760,7 +727,6 @@ $(document).on('click','.save',function(){
 
 			var facebook = $('input[name=facebook]').val()
 			var instagram = $('input[name=instagram]').val()
-
 			var postData = {
 				categoria : $('select[name=categoria]').val()||""
 				, 'descuentos' : descuentos
