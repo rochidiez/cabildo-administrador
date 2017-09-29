@@ -33,6 +33,7 @@
   <script src="js/debug.js?_=rtow4oo2ed5"></script>
   <script>
     env = '<?php echo ! empty($_REQUEST['env']) ? $_REQUEST['env'] : 'prod';?>'
+    console.log(settings.env[env].firebase)
     firebase.initializeApp(settings.env[env].firebase);
     var secondaryApp = firebase.initializeApp(settings.env[env].firebase, "Secondary");
   </script>
@@ -365,36 +366,19 @@
             <input class="input w-input" maxlength="256" name="efectivo" placeholder="20%" type="text" value="{{:~prop('efectivo',data)}}">
             <label for="email-13">Descuento con tarjetas</label>
 
-            <div class="descuento--container">
-            </div>
-
-            <!--div class="descuento-cont descuentos">
-              <select class="_1 select w-select porcentaje">
-                <option value="">Seleccionar</option>
-                <option value="5%">5%</option>
+            <div class="descuento-cont">
+              <select class="_1 select w-select porcentaje" disabled>
                 <option value="10%">10%</option>
-                <option value="15%">15%</option>
-                <option value="20%">20%</option>
-                <option value="25%">25%</option>
-                <option value="30%">30%</option>
-                <option value="35%">35%</option>
-                <option value="40%">40%</option>
-                <option value="50%">50%</option>
-                <option value="55%">55%</option>
-                <option value="60%">60%</option>
-                <option value="65%">65%</option>
-                <option value="70%">70%</option>
-                <option value="75%">75%</option>
-                <option value="80%">80%</option>
-                <option value="85%">85%</option>
-                <option value="90%">90%</option>
-                <option value="95%">95%</option>
-                <option value="2x1">2x1</option>
               </select>
-              <input class="_1 input w-input entidad" maxlength="256" type="text">
+              <select class="select w-select entidad" disabled>
+                <option value="Avenida Cabildo">Avenida Cabildo</option>
+              </select>
               <a class="add-descuento w-inline-block" href="#"><img src="images/add-circle.svg">
               </a>
-            </div-->
+            </div>
+
+            <div class="descuento--container">
+            </div>
           </div>
         </div>
       </div><a class="save submit-button w-button" href="#">{{if key}}Actualizar {{:~prop('nombre_simple',data)}}{{else}}Cargar nuevo local{{/if}}</a>

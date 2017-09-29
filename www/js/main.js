@@ -11,7 +11,14 @@ jQuery.fn.insertAt = function(index, element) {
   return this
 }
 
-var env = 'prod'
+var AC = {
+	descuentos : {
+		defaults : [{
+			porcentaje : "10%", 
+			entidad : "Avenida Cabildo"
+		}]
+	}
+}
 , latlng = undefined
 , settings = {
 	notification_delay : 5000
@@ -570,6 +577,7 @@ $(document).on('click','.save',function(){
 	, web = $.trim($('input[name=web]').val())||""
 	, telefono = $.trim($('input[name=telefono]').val())||""
 	, mail = $.trim($('input[name=mail]').val())||""
+	, buildme = $('input[name="key"]').val()||false
 
 	if(nombre_simple=="") return notification("Por favor ingresá el nombre de tu local")
 	if(plan=="" && isAdmin()) return notification("Por favor elegí un plan para este cliente")
@@ -716,6 +724,13 @@ $(document).on('click','.save',function(){
 			}
 
 			// descuentos
+
+			if(buildme && AC.descuentos.defaults.length){
+				$(AC.descuentos.defaults).each(function(){
+					descuentos.push(this.porcentaje + ' con ' + this.entidad)
+				})				
+			}
+
 			$('.descuentos').each(function() {
 				var porcentaje = $(this).find('.porcentaje').val()
 				, entidad = $(this).find('.entidad').val()
