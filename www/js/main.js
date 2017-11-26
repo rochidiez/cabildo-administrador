@@ -13,10 +13,12 @@ jQuery.fn.insertAt = function(index, element) {
 
 var AC = {
 	descuentos : {
+		defaults : null
+		/*
 		defaults : [{
 			porcentaje : "10%", 
 			entidad : "Avenida Cabildo"
-		}]
+		}]*/
 	}
 }
 , latlng = undefined
