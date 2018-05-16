@@ -36,7 +36,7 @@
     firebase.initializeApp(settings.env[env].firebase);
     var secondaryApp = firebase.initializeApp(settings.env[env].firebase, "Secondary");
   </script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC3TCbJ2Bj0mVDjhLfdzz7tj7ySj7i3dAs&libraries=places"
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAnCpylsXEujI2Jb07gggRfcewyYwJSbqU&libraries=places"
         async defer></script>
 </head>
 <body>
